@@ -23,20 +23,20 @@ public interface Role{
 	*/
 
 
-	String getRoleName();
+	public String getRoleName();
 
-	String getFactionName();
+	public String getFactionName();
 
-	int getPriority();
+	public int getPriority();
 
 	//return attack stat
 	//return defense stat
 
-	boolean execute();
+	public boolean execute();
 
-	boolean hasRBImunnity();
+	public boolean hasRBImunnity();
 
-	boolean hasControlImmunity();
+	public boolean hasControlImmunity();
 
 	//event listener for attributes
 
