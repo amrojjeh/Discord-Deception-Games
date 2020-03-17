@@ -1,4 +1,4 @@
-public class Vigilante implements Role{
+public class SuicideVigilante implements Role{
 	//tempStat starts out as null, is set to Powerful when a person is healed
 	private DefenseStat tempStat;
 
@@ -7,11 +7,11 @@ public class Vigilante implements Role{
 	}
 
 	public int getPriority(){
-		return 5;
+		return 1;
 	}
 
 	public AttackStat getAttackStat(){
-		return AttackStat.BASIC;
+		return AttackStat.NONE;
 	}
 
 	public DefenseStat getDefenseStat(){
@@ -20,22 +20,15 @@ public class Vigilante implements Role{
 	}
 
 	public boolean execute(Player actor, Player target){
-		if(target.canBeKilled(actor.getAttackStat())){
-			target.die();
-			actor.setRole(new SuicideVigilante());
-		}
-		else{
-			//send message to target that they were attacked
-			//send message to Vigilante their attack failed
-		}
+		actor.dies();
 	}
 
 	public boolean hasRBImunnity(){
-		return false;
+		return true;
 	}
 
 	public boolean hasControlImmunity(){
-		return false;
+		return true;
 	}
 
 	public void setDefenseStat(DefenseStat newStat){

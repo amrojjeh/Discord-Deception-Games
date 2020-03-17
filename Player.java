@@ -59,6 +59,6 @@ public class Player
 
 	public boolean canKill(AttackStat stat)
 	{
-		return stat.getValue() >= role.getDefenseStat();
+		return stat.getValue() > role.getDefenseStat();
 	}
 }
