@@ -1,17 +1,17 @@
-public class Doctor implements Role{
+public class Vigilante implements Role{
 	//tempStat starts out as null, is set to Powerful when a person is healed
 	private DefenseStat tempStat;
 
 	public String getRoleName(){
-		return "Doctor";
+		return "Vigilante";
 	}
 
 	public int getPriority(){
-		return 3;
+		return 5;
 	}
 
 	public AttackStat getAttackStat(){
-		return AttackStat.NONE;
+		return AttackStat.BASIC;
 	}
 
 	public DefenseStat getDefenseStat(){
@@ -20,8 +20,7 @@ public class Doctor implements Role{
 	}
 
 	public boolean execute(Player actor, Player target){
-		target.getRole().setDefenseStat(DefenseStat.POWERFUL);
-		return true;
+		
 	}
 
 	public boolean hasRBImunnity(){

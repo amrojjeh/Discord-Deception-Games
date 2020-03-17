@@ -1,19 +1,6 @@
 public interface Role{
 	/*
-	//what role is it? (extension)
-	//role name
-
-	//faction
-	//faction name
-
-	//priority
-
-	//attack stat, defense stat
-
-	//overriden method execute()
-
-	//role block immunity
-	//control immunity
+	also need to think about:
 
 	//how can executioner become a jester
 
@@ -22,19 +9,29 @@ public interface Role{
 	//a "dead" role that can only talk to dead and mediums
 	*/
 
-
+	//get the role name
 	public String getRoleName();
 
+	//get the "priority" of this role
 	public int getPriority();
 
-	//return attack stat
-	//return defense stat
+	//get this role's attack stat
+	public AttackStat getAttackStat();
+	
+	//get this role's defense stat
+	public DefenseStat getDefenseStat();
 
-	public boolean execute();
+	//this role's special ability, unique to each role
+	public boolean execute(Player actor, Player target);
 
+	//if this role can be roleblocked
 	public boolean hasRBImunnity();
 
+	//if this role can be controlled
 	public boolean hasControlImmunity();
+
+	//sets this role's defense stat (temporarily)
+	public void setDefenseStat(DefenseStat newStat);
 
 	//event listener for attributes
 
