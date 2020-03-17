@@ -4,7 +4,7 @@ public class Player
 	String name;
 	Faction faction;
 
-	Action onDeath;
+	ActionOne<Player> onDeath;
 
 	Player(String n)
 	{
@@ -37,13 +37,28 @@ public class Player
 		return faction;
 	}
 
-	public void dies()
+	public String getName()
 	{
-		onDeath.run();
+		return name;
 	}
 
-	public void registerActionOnDeath(Action action)
+	public void setName(String n)
+	{
+		name = n;
+	}
+
+	public void dies()
+	{
+		onDeath.run(this);
+	}
+
+	public void registerActionOnDeath(ActionOne<Player> action)
 	{
 		onDeath = action;
+	}
+
+	public boolean canKill(AttackStat stat)
+	{
+		return stat.getValue() >= role.getDefenseStat();
 	}
 }

@@ -22,7 +22,7 @@ public class Faction
 			player.setFaction(this);
 	}
 
-	public void onMemberDeath(Action action)
+	public void onMemberDeath(ActionOne<Player> action)
 	{
 		for (Player member : members)
 			member.registerActionOnDeath(action);
