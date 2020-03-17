@@ -1,19 +1,33 @@
-public enum Faction{
-	TOWN(0), MAFIA(1), SERIAL_KILLER(2), ARSONIST(3), WEREWOLF(4), VAMPIRE(5), NEUTRAL(10);
-	//for any of these factions to win, all other factions on this list must be wiped out (except neutral)
-	int arrIndex;
+// Factions needs to be a single class, so that factions like members in a faction like the mafia can switch roles when someone dies.
 
-	Faction(int theArrIndex){
-		arrIndex = theArrIndex;
+import java.util.ArrayList;
+
+public class Faction{
+	public String factionName;
+
+	private ArrayList<Player> members;
+
+	Faction(String name)
+	{
+		factionName = name;
+		members = new ArrayList<>();
 	}
 
-	//somewhere else in the code, at the end of each night the game will check and see what the living players' factions are.
-	//if a faction member is found, their faction's corresponding index is set to true in a boolean array list.
+	Faction(String name, ArrayList<Player> m)
+	{
+		factionName = name;
+		members = m;
+	}
 
-	/*EXAMPLE:
-	A Townie, Serial killer and Executioner are the only ones left.
-	The array list would be
-	[true, false, true, false, false, false]
-	and neutrals are not counted.*/
+	public void onMemberDeath(Action action)
+	{
+		for (Player member : members)
+			member.registerActionOnDeath(action);
+	}
 
+	public void assignRoles(Func<Role, Player> func)
+	{
+		for (Player player : members)
+			player.setRole(func.run(player));
+	}
 }
