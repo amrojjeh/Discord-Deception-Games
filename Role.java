@@ -25,8 +25,6 @@ public interface Role{
 
 	public String getRoleName();
 
-	public String getFactionName();
-
 	public int getPriority();
 
 	//return attack stat

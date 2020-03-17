@@ -1,14 +1,8 @@
 public class Doctor implements Role{
-	private String playerName; //get from discord
-	private String name = "Doctor";
-	//private Faction faction = 
+	private String roleName = "Doctor";
 
 	public String getRoleName(){
-		
-	}
-
-	public String getFactionName(){
-		
+		return roleName;
 	}
 
 	public int getPriority(){
@@ -19,12 +13,12 @@ public class Doctor implements Role{
 		return AttackStat.NONE;
 	}
 
-	private AttackStat getDef(){
+	private DefenseStat getDef(){
 		return DefenseStat.NONE;
 	}
 
 	public boolean execute(){
-		
+		return false;
 	}
 
 	public boolean hasRBImunnity(){
