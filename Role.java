@@ -1,3 +1,4 @@
+// Make abstract
 public interface Role{
 	/*
 	also need to think about:
