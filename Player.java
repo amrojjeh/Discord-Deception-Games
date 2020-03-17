@@ -56,4 +56,9 @@ public class Player
 	{
 		onDeath = action;
 	}
+
+	public boolean canKill(AttackStat stat)
+	{
+		return stat.getValue() >= role.getDefenseStat();
+	}
 }
