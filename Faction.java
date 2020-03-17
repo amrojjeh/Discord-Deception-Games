@@ -22,6 +22,10 @@ public class Faction
 			player.setFaction(this);
 	}
 
+	public String getFactionName(){
+		return factionName;
+	}
+
 	public void onMemberDeath(ActionOne<Player> action)
 	{
 		for (Player member : members)

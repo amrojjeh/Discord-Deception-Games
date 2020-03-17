@@ -1,11 +1,16 @@
-//a  Vigilante becomes a SuicideVigilante if they kill a townie. The SuicideVigilante's only ability is to commit suicide that night.
-public class SuicideVigilante implements Role{
+//Doctor is a town role that can grant a person Powerful defense each night.
+public class Veteran implements Role{
 	//tempStat starts out as null, is set to Powerful when a person is healed
 	private DefenseStat tempStat;
+	private int numAlerts;
+
+	public Veteran(){
+		numAlerts = 3;
+	}
 
 	//gets this role's unique name
 	public String getRoleName(){
-		return "Vigilante";
+		return "Veteran";
 	}
 
 	//priority is used to determine in what order the different roles act.
@@ -14,7 +19,7 @@ public class SuicideVigilante implements Role{
 	}
 
 	public AttackStat getAttackStat(){
-		return AttackStat.NONE;
+		return AttackStat.BASIC;
 	}
 
 	public DefenseStat getDefenseStat(){
@@ -22,13 +27,18 @@ public class SuicideVigilante implements Role{
   		return DefenseStat.NONE;
 	}
 
+	//checks to see if this role can perform its action on given target
 	public boolean canExecute(Player actor, Player target){
+		//a veteran can only "act" upon themselves, and only if they have alerts left
+		if(actor.equals(target) && numAlerts > 0){
+			return true;
+		}
 		return false;
 	}
 
 	//this role's action.
 	public boolean execute(Player actor, Player target){
-		actor.dies();
+		//IMPLEMENT: use basic attack on all people who visited the veteran
 		return true;
 	}
 

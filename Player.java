@@ -57,8 +57,13 @@ public class Player
 		onDeath = action;
 	}
 
-	public boolean canKill(AttackStat stat)
+	public boolean canBeKillAble(AttackStat stat)
 	{
-		return stat.getValue() > role.getDefenseStat();
+		//when i git pulled this morning, this gibberish came up. does it mean anything to you?
+//<<<<<<< HEAD
+		//return stat.getValue() > role.getDefenseStat();
+//=======
+		return stat.getValue() > role.getDefenseStat().getValue();
+//>>>>>>> 3c094d05ffc716a56f688636717e12652c3db641
 	}
 }

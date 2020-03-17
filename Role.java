@@ -1,3 +1,4 @@
+// Make abstract
 public interface Role{
 	/*
 	also need to think about:
@@ -20,6 +21,9 @@ public interface Role{
 	
 	//get this role's defense stat
 	public DefenseStat getDefenseStat();
+
+	//whether or not this role can perform its ability on a certain player. sometimes, that player is yourself.
+	public boolean canExecute(Player actor, Player target);
 
 	//this role's special ability, unique to each role
 	public boolean execute(Player actor, Player target);
