@@ -1,8 +1,9 @@
-// Factions needs to be a single class, so that factions like members in a faction like the mafia can switch roles when someone dies.
+// Factions needs to be a single class, so members in a faction like the mafia can switch roles when someone dies.
 
 import java.util.ArrayList;
 
-public class Faction{
+public class Faction
+{
 	public String factionName;
 
 	private ArrayList<Player> members;
