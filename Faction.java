@@ -17,6 +17,8 @@ public class Faction{
 	{
 		factionName = name;
 		members = m;
+		for (Player player : members)
+			player.setFaction(this);
 	}
 
 	public void onMemberDeath(Action action)

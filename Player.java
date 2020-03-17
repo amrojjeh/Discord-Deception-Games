@@ -2,6 +2,7 @@ public class Player
 {
 	Role role;
 	String name;
+	Faction faction;
 
 	Action onDeath;
 
@@ -24,6 +25,16 @@ public class Player
 	public Role getRole()
 	{
 		return role;
+	}
+
+	public void setFaction(Faction f)
+	{
+		faction = f;
+	}
+
+	public Faction getFaction()
+	{
+		return faction;
 	}
 
 	public void dies()
