@@ -50,6 +50,7 @@ public class SuicideVigilante implements Role{
 	public void onEvent(Event event)
 	{
 		// KIlls himself when it's end of night
+		DefaultOnEvent.run(this, event);
 	}
 
 }

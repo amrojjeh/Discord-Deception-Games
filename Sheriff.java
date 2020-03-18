@@ -72,6 +72,6 @@ public class Sheriff implements Role{
 
 	public void onEvent(Event event)
 	{
-
+		DefaultOnEvent.run(this, event);
 	}
 }

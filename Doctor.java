@@ -68,5 +68,6 @@ public class Doctor implements Role{
 	{
 		// Write and execute a default onEvent class
 		// This is where tempstat gets reset
+		DefaultOnEvent.run(this, event);
 	}
 }
