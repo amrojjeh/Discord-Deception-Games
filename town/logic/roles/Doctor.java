@@ -1,25 +1,36 @@
+package town.logic.roles;
+
+import town.logic.roles.stats.AttackStat;
+import town.logic.roles.stats.DefenseStat;
+import town.logic.Player;
+import town.logic.Event;
+
 //Doctor is a town role that can grant a person Powerful defense each night.
-public class Veteran implements Role{
+public class Doctor implements Role{
 	//tempStat starts out as null, is set to Powerful when a person is healed
 	private DefenseStat tempStat;
-	private int numAlerts;
+	private int selfHeal;
 
-	public Veteran(){
-		numAlerts = 3;
+	public Doctor(){
+		selfHeal = 1;
+	}
+
+	public Doctor(int heals){
+		selfHeal = heals;
 	}
 
 	//gets this role's unique name
 	public String getRoleName(){
-		return "Veteran";
+		return "Doctor";
 	}
 
 	//priority is used to determine in what order the different roles act.
 	public int getPriority(){
-		return 1;
+		return 3;
 	}
 
 	public AttackStat getAttackStat(){
-		return AttackStat.BASIC;
+		return AttackStat.NONE;
 	}
 
 	public DefenseStat getDefenseStat(){
@@ -29,27 +40,31 @@ public class Veteran implements Role{
 
 	//checks to see if this role can perform its action on given target
 	public boolean canExecute(Player actor, Player target){
-		//a veteran can only "act" upon themselves, and only if they have alerts left
-		if(actor.equals(target) && numAlerts > 0){
-			return true;
-		}
-		return false;
+		//a doctor can always heal, except on themselves. they can only heal themselves once.
+		if(target.equals(actor) && selfHeal <= 0)
+				return false;
+		return true;
 	}
 
 	//this role's action.
 	public boolean execute(Player actor, Player target){
-		//IMPLEMENT: use basic attack on all people who visited the veteran
+		if(actor.equals(target))
+			selfHeal--;
+
+		target.newVisitor(actor);
+		target.getRole().setDefenseStat(DefenseStat.POWERFUL);
+		//IMPLEMENT: If target is attacked, send message to target (this one will be tough)
 		return true;
 	}
 
 	//can this role NOT be roleblocked?
 	public boolean hasRBImunnity(){
-		return true;
+		return false;
 	}
 
 	//can this role NOT be controlled by a witch?
 	public boolean hasControlImmunity(){
-		return true;
+		return false;
 	}
 
 	//used for healing / being jailed
@@ -57,8 +72,11 @@ public class Veteran implements Role{
 		tempStat = newStat;
 	}
 
+	// Gets called when the night finishes
 	public void onEvent(Event event)
 	{
+		// Write and execute a default onEvent class
+		// This is where tempstat gets reset
 		DefaultOnEvent.run(this, event);
 	}
 }

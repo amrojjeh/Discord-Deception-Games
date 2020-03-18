@@ -1,3 +1,10 @@
+package town.logic.roles;
+
+import town.logic.roles.stats.AttackStat;
+import town.logic.roles.stats.DefenseStat;
+import town.logic.Player;
+import town.logic.Event;
+
 //a  Vigilante becomes a SuicideVigilante if they kill a townie. The SuicideVigilante's only ability is to commit suicide that night.
 public class SuicideVigilante implements Role{
 	//tempStat starts out as null, is set to Powerful when a person is healed

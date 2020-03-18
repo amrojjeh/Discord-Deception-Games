@@ -1,3 +1,5 @@
+package town.logic.roles.stats;
+
 public enum AttackStat{
 	NONE("None", 0), BASIC("Basic", 1), POWERFUL("Powerful", 2), UNSTOPPABLE("Unstoppable", 3);
 
@@ -9,7 +11,7 @@ public enum AttackStat{
 		value = theValue;
 	}
 
-	int getValue(){
+	public int getValue(){
 		return value;
 	}
 

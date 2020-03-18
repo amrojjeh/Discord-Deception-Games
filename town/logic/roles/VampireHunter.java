@@ -1,29 +1,27 @@
-//Doctor is a town role that can grant a person Powerful defense each night.
-public class Doctor implements Role{
+package town.logic.roles;
+
+import town.logic.roles.stats.AttackStat;
+import town.logic.roles.stats.DefenseStat;
+import town.logic.Player;
+import town.logic.Event;
+
+//Vampire Hunter is a Town role that can visit a person each night. If they visit a Vampire, they stake them.
+public class VampireHunter implements Role{
 	//tempStat starts out as null, is set to Powerful when a person is healed
 	private DefenseStat tempStat;
-	private int selfHeal;
-
-	public Doctor(){
-		selfHeal = 1;
-	}
-
-	public Doctor(int heals){
-		selfHeal = heals;
-	}
 
 	//gets this role's unique name
 	public String getRoleName(){
-		return "Doctor";
+		return "Vampire Hunter";
 	}
 
 	//priority is used to determine in what order the different roles act.
 	public int getPriority(){
-		return 3;
+		return 5;
 	}
 
 	public AttackStat getAttackStat(){
-		return AttackStat.NONE;
+		return AttackStat.BASIC;
 	}
 
 	public DefenseStat getDefenseStat(){
@@ -33,20 +31,21 @@ public class Doctor implements Role{
 
 	//checks to see if this role can perform its action on given target
 	public boolean canExecute(Player actor, Player target){
-		//a doctor can always heal, except on themselves. they can only heal themselves once.
-		if(target.equals(actor) && selfHeal <= 0)
-				return false;
+		//a vigilante can shoot anyone but themselves, as long as they have bullets
+		if(actor.equals(target)) return false;
 		return true;
 	}
 
 	//this role's action.
 	public boolean execute(Player actor, Player target){
-		if(actor.equals(target))
-			selfHeal--;
-
-		target.newVisitor(actor);
-		target.getRole().setDefenseStat(DefenseStat.POWERFUL);
-		//IMPLEMENT: If target is attacked, send message to target (this one will be tough)
+		//check to see if target is a vampire.
+		if(target.getRole().getRoleName().equals("Vampire")){
+			//check to see if the target has worse than basic defense.
+			if(target.canBeKillAble(actor.getRole().getAttackStat())){
+				//if so, the vampire is staked
+				target.dies();
+			}
+		}
 		return true;
 	}
 
@@ -65,11 +64,8 @@ public class Doctor implements Role{
 		tempStat = newStat;
 	}
 
-	// Gets called when the night finishes
 	public void onEvent(Event event)
 	{
-		// Write and execute a default onEvent class
-		// This is where tempstat gets reset
-		DefaultOnEvent.run(this, event);
+
 	}
 }

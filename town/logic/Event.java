@@ -1,3 +1,5 @@
+package town.logic;
+
 public class Event
 {
 	public final String name;

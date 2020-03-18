@@ -1,3 +1,5 @@
+package town.logic.phases;
+
 public class Day extends Phase
 {
 	public long getTime()

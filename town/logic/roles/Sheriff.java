@@ -1,3 +1,10 @@
+package town.logic.roles;
+
+import town.logic.roles.stats.AttackStat;
+import town.logic.roles.stats.DefenseStat;
+import town.logic.Player;
+import town.logic.Event;
+
 /*Sheriff is a Town role that can investigate people to get clear-cut results on their allegiance.
 The following roles will appear as "suspicious" to a sheriff:
 	- Any Mafia role, EXCEPT Godfather.

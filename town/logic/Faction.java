@@ -1,7 +1,10 @@
-public package town;
+package town.logic;
 // Factions needs to be a single class, so members in a faction like the mafia can switch roles when someone dies.
 
 import java.util.ArrayList;
+import town.logic.delegates.ActionOne;
+import town.logic.delegates.Func;
+import town.logic.roles.Role;
 
 public class Faction
 {

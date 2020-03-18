@@ -1,4 +1,9 @@
+package town.logic;
+
 import java.util.ArrayList;
+import town.logic.roles.Role;
+import town.logic.delegates.ActionOne;
+import town.logic.roles.stats.AttackStat;
 
 public class Player
 {

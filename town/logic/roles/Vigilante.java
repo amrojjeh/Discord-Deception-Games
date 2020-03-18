@@ -1,3 +1,10 @@
+package town.logic.roles;
+
+import town.logic.roles.stats.AttackStat;
+import town.logic.roles.stats.DefenseStat;
+import town.logic.Player;
+import town.logic.Event;
+
 //Vigilante is a Town role that has 3 bullets, and use basic attack on a person any night after night 1
 public class Vigilante implements Role{
 	//tempStat starts out as null, is set to Powerful when a person is healed

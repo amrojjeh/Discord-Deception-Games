@@ -1,3 +1,10 @@
+package town.logic.roles;
+
+import town.logic.roles.stats.AttackStat;
+import town.logic.roles.stats.DefenseStat;
+import town.logic.Player;
+import town.logic.Event;
+
 /*The Investigator is a Town role that gets a clue as to what a person's role might be.
 There are 11 different results. They are as follows:
 	-Your target owns a gun. They could be a Vigilante, Veteran, or Mafioso.

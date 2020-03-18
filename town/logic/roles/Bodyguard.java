@@ -1,3 +1,10 @@
+package town.logic.roles;
+
+import town.logic.roles.stats.AttackStat;
+import town.logic.roles.stats.DefenseStat;
+import town.logic.Player;
+import town.logic.Event;
+
 //Bodyguard is a Town role that can protect a person each night. If that person is attacked, the attacker and the Bodyguard are both killed.
 public class Bodyguard implements Role{
 	//tempStat starts out as null, is set to Powerful when a person is healed

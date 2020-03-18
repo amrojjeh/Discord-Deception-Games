@@ -1,12 +1,13 @@
+package town.logic.phases;
 import java.time.Instant;
 
 public abstract class Phase
 {
 	Instant starting;
 
-	abstract long getTime();
-	abstract Phase nextPhase();
-	abstract String getName();
+	public abstract long getTime();
+	public abstract Phase nextPhase();
+	public abstract String getName();
 
 	public void start()
 	{

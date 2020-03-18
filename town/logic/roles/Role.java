@@ -1,4 +1,10 @@
-// Make abstract
+package town.logic.roles;
+
+import town.logic.roles.stats.AttackStat;
+import town.logic.roles.stats.DefenseStat;
+import town.logic.Player;
+import town.logic.Event;
+
 public interface Role{
 	/*
 	also need to think about:

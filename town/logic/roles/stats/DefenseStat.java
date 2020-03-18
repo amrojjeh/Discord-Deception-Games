@@ -1,3 +1,5 @@
+package town.logic.roles.stats;
+
 public enum DefenseStat{
 	NONE("None", 0), BASIC("Basic", 1), POWERFUL("Powerful", 2), INVINCIBLE("Unstoppable", 3);
 
