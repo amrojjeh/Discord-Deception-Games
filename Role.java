@@ -28,6 +28,11 @@ public interface Role{
 	//this role's special ability, unique to each role
 	public boolean execute(Player actor, Player target);
 
+	// visitTo would be the method that's called when something *can* be executable.
+	// It would add itself to the player's "visited" arraylist
+	// Then at the end of the night, each player will call every visitor in their visited class
+	// visited[x].role.execute(visited[x], this) would be ran in the person that was visited
+
 	//if this role can be roleblocked
 	public boolean hasRBImunnity();
 
@@ -37,6 +42,7 @@ public interface Role{
 	//sets this role's defense stat (temporarily)
 	public void setDefenseStat(DefenseStat newStat);
 
+	// Whenever an event is dispatched from Game Manager, this method will run
 	public void onEvent(Event event);
 
 	//event listener for attributes
