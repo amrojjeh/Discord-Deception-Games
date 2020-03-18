@@ -1,13 +1,15 @@
-public class Day extends Phase
+import java.time.Instant;
+
+public class GameStart extends Phase
 {
 	public long getTime()
 	{
-		return 40;
+		return 12;
 	}
 
 	public String getName()
 	{
-		return "Day";
+		return "Start";
 	}
 
 	public Phase nextPhase()
