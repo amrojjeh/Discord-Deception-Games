@@ -43,13 +43,13 @@ public class Sheriff implements Role{
 				if(!target.getRole().getRoleName().equals("Godfather")){
 					if(!target.getRole().getRoleName().equals("Werewolf")) //IMPLEMENT: and it's an even night)
 					{
-						//send a message to sheriff, telling them their target is suspcious
+						//IMPLEMENT: send a message to sheriff, telling them their target is suspcious
 					}
 				}
 			}
 			//IMPLEMENT: check to see if the target was framed
 			else{
-				//send a message to sheriff, telling them their target is not suspicious
+				//IMPLEMENT: send a message to sheriff, telling them their target is not suspicious
 			}
 		}
 		return true;

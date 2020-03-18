@@ -1,21 +1,11 @@
-//Vigilante is a Town role that has 3 bullets, and use basic attack on a person any night after night 1
-public class Vigilante implements Role{
+//Vampire Hunter is a Town role that can visit a person each night. If they visit a Vampire, they stake them.
+public class VampireHunter implements Role{
 	//tempStat starts out as null, is set to Powerful when a person is healed
 	private DefenseStat tempStat;
-	//how many bullets the vigilante has
-	private int numBullets;
-
-	public Vigilante(){
-		numBullets = 3;
-	}
-
-	public Vigilante(int b){
-		numBullets = b;
-	}
 
 	//gets this role's unique name
 	public String getRoleName(){
-		return "Vigilante";
+		return "Vampire Hunter";
 	}
 
 	//priority is used to determine in what order the different roles act.
@@ -36,26 +26,18 @@ public class Vigilante implements Role{
 	public boolean canExecute(Player actor, Player target){
 		//a vigilante can shoot anyone but themselves, as long as they have bullets
 		if(actor.equals(target)) return false;
-		if(numBullets <= 0) return false;
 		return true;
 	}
 
 	//this role's action.
 	public boolean execute(Player actor, Player target){
-		//check to see if the target has worse than basic defense.
-		if(target.canBeKillAble(actor.getRole().getAttackStat())){
-			//if so, the vigilante's target dies
-			target.dies();
-			numBullets--;
-			//if the target was a townie, the vigilante will commit suicide the next night
-			if(target.getFaction().getFactionName().equals("Town")){
-				actor.setRole(new SuicideVigilante());
+		//check to see if target is a vampire.
+		if(target.getRole().getRoleName().equals("Vampire")){
+			//check to see if the target has worse than basic defense.
+			if(target.canBeKillAble(actor.getRole().getAttackStat())){
+				//if so, the vampire is staked
+				target.dies();
 			}
-		}
-
-		else{
-			//IMPLEMENT: send message to target that they were attacked
-			//IMPLEMENT: send message to Vigilante their attack failed
 		}
 		return true;
 	}

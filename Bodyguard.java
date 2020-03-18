@@ -1,14 +1,14 @@
 //Doctor is a town role that can grant a person Powerful defense each night.
-public class Doctor implements Role{
+public class Bodyguard implements Role{
 	//tempStat starts out as null, is set to Powerful when a person is healed
 	private DefenseStat tempStat;
 	private int selfHeal;
 
-	public Doctor(){
+	public Bodyguard(){
 		selfHeal = 1;
 	}
 
-	public Doctor(int heals){
+	public Bodyguard(int heals){
 		selfHeal = heals;
 	}
 
