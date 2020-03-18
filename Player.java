@@ -1,7 +1,11 @@
+import java.util.ArrayList;
+
 public class Player
 {
 	public String name;
 	public final int id;
+
+	public ArrayList<Player> nightlyVisitors;
 
 	Role role;
 	Faction faction;
@@ -12,6 +16,7 @@ public class Player
 	{
 		this.id = id;
 		name = n;
+		nightlyVisitors = new ArrayList<Player>();
 	}
 
 	Player(int id, String n, Role r)
@@ -19,6 +24,7 @@ public class Player
 		this.id = id;
 		name = n;
 		role = r;
+		nightlyVisitors = new ArrayList<Player>();
 	}
 
 	public boolean equals(Object other)
@@ -66,5 +72,10 @@ public class Player
 	public boolean canBeKillAble(AttackStat stat)
 	{
 		return stat.getValue() > role.getDefenseStat().getValue();
+	}
+
+	public void newVisitor(Player visitor){
+		nightlyVisitors.add(visitor);
+		//IMPLEMENT: reset this list each new day
 	}
 }

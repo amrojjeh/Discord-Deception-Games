@@ -1,4 +1,4 @@
-//Doctor is a town role that can grant a person Powerful defense each night.
+//Bodyguard is a Town role that can protect a person each night. If that person is attacked, the attacker and the Bodyguard are both killed.
 public class Bodyguard implements Role{
 	//tempStat starts out as null, is set to Powerful when a person is healed
 	private DefenseStat tempStat;
@@ -14,7 +14,7 @@ public class Bodyguard implements Role{
 
 	//gets this role's unique name
 	public String getRoleName(){
-		return "Doctor";
+		return "Bodyguard";
 	}
 
 	//priority is used to determine in what order the different roles act.
@@ -23,7 +23,7 @@ public class Bodyguard implements Role{
 	}
 
 	public AttackStat getAttackStat(){
-		return AttackStat.NONE;
+		return AttackStat.POWERFUL;
 	}
 
 	public DefenseStat getDefenseStat(){
@@ -33,7 +33,7 @@ public class Bodyguard implements Role{
 
 	//checks to see if this role can perform its action on given target
 	public boolean canExecute(Player actor, Player target){
-		//a doctor can always heal, except on themselves. they can only heal themselves once.
+		//a bodyguard can always protect, except on themselves. they can only protect themselves once.
 		if(target.equals(actor) && selfHeal <= 0)
 				return false;
 		return true;
@@ -44,8 +44,9 @@ public class Bodyguard implements Role{
 		if(actor.equals(target))
 			selfHeal--;
 
-		target.getRole().setDefenseStat(DefenseStat.POWERFUL);
-		//IMPLEMENT: If target is attacked, send message to target (this one will be tough)
+		//IMPLEMENT: check to see if the target was attacked.
+		//IMPLEMENT: If target is attacked, send message to target
+		//IMPLEMENT: also send message to the attacker (you were blocked by BG) and the BG themselves
 		return true;
 	}
 
