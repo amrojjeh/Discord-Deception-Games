@@ -1,3 +1,4 @@
+public package town;
 // Factions needs to be a single class, so members in a faction like the mafia can switch roles when someone dies.
 
 import java.util.ArrayList;

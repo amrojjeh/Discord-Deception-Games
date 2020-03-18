@@ -4,10 +4,11 @@ public class Event
 	public final Player actor;
 	public final Player target;
 
-	Event(String name)
+	Event(String name, Player a)
 	{
 		this.name = name;
-		actor = target = null;
+		actor = a;
+		target = null;
 	}
 
 	Event(String name, Player actor, Player target)

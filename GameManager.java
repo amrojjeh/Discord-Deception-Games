@@ -49,6 +49,7 @@ public class GameManager
 					case "Day": break;
 					case "Trial": break;
 					case "Night":
+						actionQueue.sort();
 						executeActionQueueBasedOnEvent((action) -> action.actor.getRole().execute(action.actor, action.target));
 						break;
 					default: break;
@@ -107,5 +108,16 @@ class PlayerAction
 	{
 		if (other instanceof PlayerAction) return equals((PlayerAction)other);
 		return false;
+	}
+
+	public int compareTo(Object other)
+	{
+		if (other instanceof PlayerAction) return compareTo(other);
+		return 0;
+	}
+	
+	public int compareTo(PlayerAction other)
+	{
+		return actor.getRole().getPriority() - other.actor.getRole().getPriority();
 	}
 }
