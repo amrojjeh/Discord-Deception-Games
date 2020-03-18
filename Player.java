@@ -1,20 +1,36 @@
 public class Player
 {
+	public String name;
+	public final int id;
+
 	Role role;
-	String name;
 	Faction faction;
 
 	ActionOne<Player> onDeath;
 
-	Player(String n)
+	Player(int id, String n)
 	{
+		this.id = id;
 		name = n;
 	}
 
-	Player(String n, Role r)
+	Player(int id, String n, Role r)
 	{
+		this.id = id;
 		name = n;
 		role = r;
+	}
+
+	public boolean equals(Object other)
+	{
+		if (other instanceof Player) return equals(other);
+		return false; 
+	}
+
+	// This assumes that player IDs are unique
+	public boolean equals(Player player)
+	{
+		return id == player.id;
 	}
 
 	public void setRole(Role r)
@@ -37,16 +53,6 @@ public class Player
 		return faction;
 	}
 
-	public String getName()
-	{
-		return name;
-	}
-
-	public void setName(String n)
-	{
-		name = n;
-	}
-
 	public void dies()
 	{
 		onDeath.run(this);
@@ -59,11 +65,6 @@ public class Player
 
 	public boolean canBeKillAble(AttackStat stat)
 	{
-		//when i git pulled this morning, this gibberish came up. does it mean anything to you?
-//<<<<<<< HEAD
-		//return stat.getValue() > role.getDefenseStat();
-//=======
 		return stat.getValue() > role.getDefenseStat().getValue();
-//>>>>>>> 3c094d05ffc716a56f688636717e12652c3db641
 	}
 }
