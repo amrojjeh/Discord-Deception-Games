@@ -77,6 +77,6 @@ public class Vigilante implements Role{
 
 	public void onEvent(Event event)
 	{
-
+		DefaultOnEvent.run(this, event);
 	}
 }
