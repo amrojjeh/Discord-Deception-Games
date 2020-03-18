@@ -69,4 +69,9 @@ public class Sheriff implements Role{
 	public void setDefenseStat(DefenseStat newStat){
 		tempStat = newStat;
 	}
+
+	public void onEvent(Event event)
+	{
+
+	}
 }

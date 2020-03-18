@@ -8,6 +8,10 @@ public class Doctor implements Role{
 		selfHeal = 1;
 	}
 
+	public Doctor(int heals){
+		selfHeal = heals;
+	}
+
 	//gets this role's unique name
 	public String getRoleName(){
 		return "Doctor";
@@ -30,19 +34,16 @@ public class Doctor implements Role{
 	//checks to see if this role can perform its action on given target
 	public boolean canExecute(Player actor, Player target){
 		//a doctor can always heal, except on themselves. they can only heal themselves once.
-		if(target.equals(actor)){
-			if(selfHeal <= 0){
+		if(target.equals(actor) && selfHeal <= 0)
 				return false;
-			}
-		}
 		return true;
 	}
 
 	//this role's action.
 	public boolean execute(Player actor, Player target){
-		if(actor.equals(target)){
+		if(actor.equals(target))
 			selfHeal--;
-		}
+
 		target.getRole().setDefenseStat(DefenseStat.POWERFUL);
 		return true;
 	}
@@ -60,5 +61,12 @@ public class Doctor implements Role{
 	//used for healing / being jailed
 	public void setDefenseStat(DefenseStat newStat){
 		tempStat = newStat;
+	}
+
+	// Gets called when the night finishes
+	public void onEvent(Event event)
+	{
+		// Write and execute a default onEvent class
+		// This is where tempstat gets reset
 	}
 }

@@ -37,6 +37,8 @@ public interface Role{
 	//sets this role's defense stat (temporarily)
 	public void setDefenseStat(DefenseStat newStat);
 
+	public void onEvent(Event event);
+
 	//event listener for attributes
 
 }
