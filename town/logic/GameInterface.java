@@ -3,5 +3,5 @@ package town.logic;
 
 public interface GameInterface
 {
-	boolean pollEvent(Event e);
+	Event pollEvent();
 }
