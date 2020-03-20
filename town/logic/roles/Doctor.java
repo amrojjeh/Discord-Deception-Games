@@ -51,7 +51,6 @@ public class Doctor implements Role{
 		if(actor.equals(target))
 			selfHeal--;
 
-		target.newVisitor(actor);
 		target.getRole().setDefenseStat(DefenseStat.POWERFUL);
 		//IMPLEMENT: If target is attacked, send message to target (this one will be tough)
 		return true;
