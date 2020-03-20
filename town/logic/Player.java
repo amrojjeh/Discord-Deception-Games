@@ -79,8 +79,26 @@ public class Player
 		return stat.getValue() > role.getDefenseStat().getValue();
 	}
 
-	public void newVisitor(Player visitor){
+	public void newVisitor(Player visitor)
+	{
 		nightlyVisitors.add(visitor);
-		//IMPLEMENT: reset this list each new day
+	}
+
+	public void onEvent(Event event)
+	{
+		switch (event.name)
+		{
+			case "endNight":
+				// Run and reset visitors
+				runVisitors();
+				nightlyVisitors.clear();
+		}
+	}
+
+	// It's assumed that the nightlyVisitors are in order
+	public void runVisitors()
+	{
+		for (Player p : nightlyVisitors)
+			p.getRole().execute(p, this);
 	}
 }

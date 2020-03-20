@@ -5,7 +5,8 @@ import town.logic.roles.stats.DefenseStat;
 import town.logic.Player;
 import town.logic.Event;
 
-public interface Role{
+public interface Role
+{
 	/*
 	also need to think about:
 
@@ -33,11 +34,6 @@ public interface Role{
 
 	//this role's special ability, unique to each role
 	public boolean execute(Player actor, Player target);
-
-	// visitTo would be the method that's called when something *can* be executable.
-	// It would add itself to the player's "visited" arraylist
-	// Then at the end of the night, each player will call every visitor in their visited class
-	// visited[x].role.execute(visited[x], this) would be ran in the person that was visited
 
 	//if this role can be roleblocked
 	public boolean hasRBImunnity();
