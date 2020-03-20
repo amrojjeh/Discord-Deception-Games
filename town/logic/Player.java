@@ -79,9 +79,15 @@ public class Player
 		return stat.getValue() > role.getDefenseStat().getValue();
 	}
 
-	public void newVisitor(Player visitor)
+	public void addVisitor(Player visitor)
 	{
 		nightlyVisitors.add(visitor);
+	}
+
+	// To make it more natural
+	public void visit(Player target)
+	{
+		target.addVisitor(this);
 	}
 
 	public void onEvent(Event event)
