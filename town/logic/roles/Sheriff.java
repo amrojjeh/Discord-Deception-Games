@@ -45,7 +45,7 @@ public class Sheriff implements Role{
 
 	//this role's action.
 	public boolean execute(Player actor, Player target){
-		actor.visits(target)
+		actor.visit(target);
 		for(String f : suspicious){
 			if(f.equals(target.getFaction().getFactionName())){
 				if(!target.getRole().getRoleName().equals("Godfather")){
