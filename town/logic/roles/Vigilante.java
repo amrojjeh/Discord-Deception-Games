@@ -52,6 +52,7 @@ public class Vigilante implements Role{
 		//check to see if the target has worse than basic defense.
 		if(target.canBeKillAble(actor.getRole().getAttackStat())){
 			//if so, the vigilante's target dies
+			actor.visit(target);
 			target.dies();
 			numBullets--;
 			//if the target was a townie, the vigilante will commit suicide the next night

@@ -38,6 +38,7 @@ public class VampireHunter implements Role{
 
 	//this role's action.
 	public boolean execute(Player actor, Player target){
+		actor.visit(target);
 		//check to see if target is a vampire.
 		if(target.getRole().getRoleName().equals("Vampire")){
 			//check to see if the target has worse than basic defense.

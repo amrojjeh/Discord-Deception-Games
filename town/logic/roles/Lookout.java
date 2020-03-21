@@ -5,21 +5,14 @@ import town.logic.roles.stats.DefenseStat;
 import town.logic.Player;
 import town.logic.Event;
 
-/*Sheriff is a Town role that can investigate people to get clear-cut results on their allegiance.
-The following roles will appear as "suspicious" to a sheriff:
-	- Any Mafia role, EXCEPT Godfather.
-	- Serial Killer.
-	- Werewolf, but only on a full moon.
-	- Anyone who is framed by a Framer.
-All other roles are considered "not suspicious."*/
-public class Sheriff implements Role{
+//Doctor is a town role that can grant a person Powerful defense each night.
+public class Lookout implements Role{
 	//tempStat starts out as null, is set to Powerful when a person is healed
 	private DefenseStat tempStat;
-	private String[] suspicious = {"Mafia", "Werewolf", "Serial Killer"};
 
 	//gets this role's unique name
 	public String getRoleName(){
-		return "Sheriff";
+		return "Lookout";
 	}
 
 	//priority is used to determine in what order the different roles act.
@@ -38,27 +31,16 @@ public class Sheriff implements Role{
 
 	//checks to see if this role can perform its action on given target
 	public boolean canExecute(Player actor, Player target){
-		//a sheriff can investigate anyone besides themselves
-		if(actor.equals(target)) return false;
+		//a doctor can always heal, except on themselves. they can only heal themselves once.
+		if(target.equals(actor))  return false;
 		return true;
 	}
 
 	//this role's action.
 	public boolean execute(Player actor, Player target){
-		actor.visits(target)
-		for(String f : suspicious){
-			if(f.equals(target.getFaction().getFactionName())){
-				if(!target.getRole().getRoleName().equals("Godfather")){
-					if(!target.getRole().getRoleName().equals("Werewolf")) //IMPLEMENT: and it's an even night)
-					{
-						//IMPLEMENT: send a message to sheriff, telling them their target is suspcious
-					}
-				}
-			}
-			//IMPLEMENT: check to see if the target was framed
-			else{
-				//IMPLEMENT: send a message to sheriff, telling them their target is not suspicious
-			}
+		actor.visit(target);
+		for(Player visitor : target.nightlyVisitors){
+			//IMPLEMENT: send a message to the player, telling them everyone who visited their target.
 		}
 		return true;
 	}
@@ -78,8 +60,11 @@ public class Sheriff implements Role{
 		tempStat = newStat;
 	}
 
+	// Gets called when the night finishes
 	public void onEvent(Event event)
 	{
+		// Write and execute a default onEvent class
+		// This is where tempstat gets reset
 		DefaultOnEvent.run(this, event);
 	}
 }
