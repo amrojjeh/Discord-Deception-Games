@@ -58,10 +58,10 @@ public class GameManager
 					case "Night":
 						sortActions();
 						executeActionQueueBasedOnEvent((action) -> action.actor.visit(action.target));
+						dispatch(new Event("endNight"));
 						break;
 					default: break;
 				}
-
 				currentPhase = currentPhase.nextPhase();
 				currentPhase.start();
 			}
@@ -72,6 +72,12 @@ public class GameManager
 	{
 		// Assign players factions
 		// Assign players roles using the factions
+	}
+
+	void dispatch(Event event)
+	{
+		for (Player player : players)
+			player.onEvent(event);
 	}
 
 	void addAction(PlayerAction action)
