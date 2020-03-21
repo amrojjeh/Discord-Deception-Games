@@ -114,6 +114,7 @@ public class Player
 				nightlyVisitors.clear();
 				break;
 		}
+		role.onEvent(event);
 	}
 
 	// It's assumed that the nightlyVisitors are in order
