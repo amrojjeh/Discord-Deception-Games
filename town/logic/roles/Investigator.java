@@ -55,7 +55,7 @@ public class Investigator implements Role{
 
 	//this role's action.
 	public boolean execute(Player actor, Player target){
-		actor.visits(target);
+		actor.visit(target);
 		switch(target.getRole().getRoleName()){
 			case "Vigilante": case "Veteran": case "Mafioso":
 				//send corresponding message.
