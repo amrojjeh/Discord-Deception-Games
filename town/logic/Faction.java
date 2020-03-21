@@ -8,27 +8,26 @@ import town.logic.roles.Role;
 
 public class Faction
 {
-	// There are major and minor alignments in ToS
-	// A major role would be something like townee, while a minor role would be something like "townee killing" or "neutral killing"
-	public final String major;
-	public final String minor;
+	public String factionName;
 
 	private ArrayList<Player> members;
 
-	Faction(String ma, String mi)
+	Faction(String name)
 	{
-		major = ma;
-		minor = mi;
+		factionName = name;
 		members = new ArrayList<>();
 	}
 
-	Faction(String ma, String mi, ArrayList<Player> m)
+	Faction(String name, ArrayList<Player> m)
 	{
-		major = ma;
-		minor = mi;
+		factionName = name;
 		members = m;
 		for (Player player : members)
 			player.setFaction(this);
+	}
+
+	public String getFactionName(){
+		return factionName;
 	}
 
 	public void onMemberDeath(ActionOne<Player> action)
@@ -40,22 +39,6 @@ public class Faction
 	public void assignRoles(Func<Role, Player> func)
 	{
 		for (Player player : members)
-		{
-			player.setFaction(this);
 			player.setRole(func.run(player));
-		}
-	}
-
-	public void addMember(Player player, Func<Role, Player> func)
-	{
-		player.setFaction(this);
-		player.setRole(func.run(player));
-		members.add(player);
-	}
-
-	public void addMember(Player player)
-	{
-		player.setFaction(this);
-		members.add(player);
 	}
 }

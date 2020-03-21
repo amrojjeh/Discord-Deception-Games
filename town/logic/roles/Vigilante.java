@@ -55,7 +55,7 @@ public class Vigilante implements Role{
 			target.dies();
 			numBullets--;
 			//if the target was a townie, the vigilante will commit suicide the next night
-			if(target.getFaction().major.equals(actor.getFaction().major)){
+			if(target.getFaction().getFactionName().equals("Town")){
 				actor.setRole(new SuicideVigilante());
 			}
 		}
