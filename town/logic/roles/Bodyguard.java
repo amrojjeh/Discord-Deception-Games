@@ -50,10 +50,10 @@ public class Bodyguard implements Role{
 	public boolean execute(Player actor, Player target){
 		if(actor.equals(target))
 			selfHeal--;
-		actor.visits(target);
+		actor.visit(target);
 
 		//if a player with attackStat basic or better visits your target, they are EVIL and must be slain!
-		for(Player visitor : target.nightlyVisitors()){
+		for(Player visitor : target.nightlyVisitors){
 			if(visitor.getRole().getAttackStat().getValue() > 0){
 				actor.dies();
 				//IMPLEMENT: send message to the bodyguard, "You were killed protecting your target!"
@@ -62,7 +62,7 @@ public class Bodyguard implements Role{
 				break;
 			}
 		}
-
+		return true;
 	}
 
 	//can this role NOT be roleblocked?
