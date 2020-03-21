@@ -10,23 +10,26 @@ public class Player
 	public String name;
 	public final int id;
 
-	public ArrayList<Player> nightlyVisitors;
+	private static int final_id;
 
+	public ArrayList<Player> nightlyVisitors;
+	boolean roleBlocked = false;
+	
 	Role role;
 	Faction faction;
 
 	ActionOne<Player> onDeath;
 
-	Player(int id, String n)
+	Player(String n)
 	{
-		this.id = id;
+		id = final_id++;
 		name = n;
 		nightlyVisitors = new ArrayList<Player>();
 	}
 
-	Player(int id, String n, Role r)
+	Player(String n, Role r)
 	{
-		this.id = id;
+		this.id = final_id++;
 		name = n;
 		role = r;
 		nightlyVisitors = new ArrayList<Player>();
@@ -74,9 +77,17 @@ public class Player
 		onDeath = action;
 	}
 
+	// Can be killed
 	public boolean canBeKillAble(AttackStat stat)
 	{
 		return stat.getValue() > role.getDefenseStat().getValue();
+	}
+
+	public boolean roleBlock()
+	{
+		if (role.hasRBImunnity()) return false;
+		roleBlocked = true;
+		return true;
 	}
 
 	public void addVisitor(Player visitor)
@@ -94,10 +105,14 @@ public class Player
 	{
 		switch (event.name)
 		{
+			case "endDay":
+				roleBlocked = false;
+				break;
 			case "endNight":
 				// Run and reset visitors
 				runVisitors();
 				nightlyVisitors.clear();
+				break;
 		}
 	}
 
