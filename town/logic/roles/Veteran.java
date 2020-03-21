@@ -45,7 +45,16 @@ public class Veteran implements Role{
 
 	//this role's action.
 	public boolean execute(Player actor, Player target){
-		//IMPLEMENT: use basic attack on all people who visited the veteran
+		actor.getRole().setDefenseStat(DefenseStat.POWERFUL);
+		for(Player visitor : actor.nightlyVisitors){
+			if(visitor.canBeKillAble(AttackStat.POWERFUL)){
+				target.dies();
+				//IMPLEMENT: message that target was shot by veteran
+			}
+			else{
+				//IMPLEMENT: message that target was attacked
+			}
+		}
 		return true;
 	}
 
