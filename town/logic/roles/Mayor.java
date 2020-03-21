@@ -59,6 +59,8 @@ public class Mayor implements Role{
 	{
 		// Write and execute a default onEvent class
 		// This is where tempstat gets reset
+
+		// Mayor gets revealed here, through messages
 		DefaultOnEvent.run(this, event);
 	}
 }
