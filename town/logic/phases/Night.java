@@ -1,6 +1,6 @@
 package town.logic.phases;
 
-public class GameStart extends Phase
+public class Night extends Phase
 {
 	public long getTime()
 	{
@@ -14,6 +14,6 @@ public class GameStart extends Phase
 
 	public Phase nextPhase()
 	{
-		return new Night();
+		return new Day();
 	}
 }

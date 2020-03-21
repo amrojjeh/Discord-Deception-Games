@@ -1,6 +1,6 @@
 package town.logic.phases;
 
-public class GameStart extends Phase
+public class Trial extends Phase
 {
 	public long getTime()
 	{

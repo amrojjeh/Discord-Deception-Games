@@ -14,6 +14,6 @@ public class Day extends Phase
 
 	public Phase nextPhase()
 	{
-		return null;
+		return new Trial();
 	}
 }
