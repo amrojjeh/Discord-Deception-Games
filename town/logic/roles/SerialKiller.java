@@ -5,33 +5,33 @@ import town.logic.roles.stats.DefenseStat;
 import town.logic.Player;
 import town.logic.Event;
 
-//Lookout is a role that can see who visited a player each night.
-public class Lookout implements Role{
+//Serial Killer is a Neutral Killing role that can attack a player each night.
+public class SerialKiller implements Role{
 	//tempStat starts out as null, is set to Powerful when a person is healed
 	private DefenseStat tempStat;
 
 	//gets this role's unique name
 	public String getRoleName(){
-		return "Lookout";
+		return "Serial Killer";
 	}
 
 	//priority is used to determine in what order the different roles act.
 	public int getPriority(){
-		return 4;
+		return 5;
 	}
 
 	public AttackStat getAttackStat(){
-		return AttackStat.NONE;
+		return AttackStat.BASIC;
 	}
 
 	public DefenseStat getDefenseStat(){
 		if (tempStat != null) return tempStat;
-  		return DefenseStat.NONE;
+  		return DefenseStat.BASIC;
 	}
 
 	//checks to see if this role can perform its action on given target
 	public boolean canExecute(Player actor, Player target){
-		//a lookout can watch anyone but themselves
+		//can attack anyone but themselves
 		if(target.equals(actor))  return false;
 		return true;
 	}
@@ -39,8 +39,15 @@ public class Lookout implements Role{
 	//this role's action.
 	public boolean execute(Player actor, Player target){
 		actor.visit(target);
-		for(Player visitor : target.nightlyVisitors){
-			//IMPLEMENT: send a message to the player, telling them everyone who visited their target.
+		//check to see if the target has worse than basic defense.
+		if(target.canBeKillAble(actor.getRole().getAttackStat())){
+			//if so, they die
+			target.dies();
+		}
+
+		else{
+			//IMPLEMENT: send message to target that they were attacked
+			//IMPLEMENT: send message to Serial Killer their target was immune
 		}
 		return true;
 	}

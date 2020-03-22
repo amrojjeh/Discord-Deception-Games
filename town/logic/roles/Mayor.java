@@ -5,7 +5,8 @@ import town.logic.roles.stats.DefenseStat;
 import town.logic.Player;
 import town.logic.Event;
 
-//Doctor is a town role that can grant a person Powerful defense each night.
+//Mayors can reveal themselves during the day, granting themselves 3 votes during trial instead of 1.
+//IMPLEMENT: Reveal during the day mechanic
 public class Mayor implements Role{
 	//tempStat starts out as null, is set to Powerful when a person is healed
 	private DefenseStat tempStat;
