@@ -1,8 +1,13 @@
 package town.logic;
 
 import java.util.ArrayList;
+import java.util.Random;
+
 import town.logic.phases.*;
+import town.logic.roles.*;
+
 import town.logic.delegates.ActionOne;
+import town.logic.delegates.Func;
 
 public class GameManager
 {
@@ -75,7 +80,10 @@ public class GameManager
 	public void init()
 	{
 		// Assign players factions
+		// Everyone's a townee, for now
+		Faction town = new Faction("town", players);
 		// Assign players roles using the factions
+		town.assignRoles(new TownAssigner());
 	}
 
 	void dispatch(Event event)
@@ -101,6 +109,19 @@ public class GameManager
 	public void sortActions()
 	{
 		actionQueue.sort((one, two) -> one.compareTo(two));
+	}
+
+	public static void main(String[] args)
+	{
+		ArrayList<Player> players = new ArrayList<>();
+		for (int x = 0; x < 15; ++x)
+			players.add(new Player("Player #" + x));
+		
+		GameManager gm = new GameManager(null, players);
+		for (Player player : gm.players)
+		{
+			System.out.println(player.name + ": " + player.getRole().getRoleName());
+		}
 	}
 }
 
@@ -143,5 +164,27 @@ class PlayerAction
 	public int compareTo(PlayerAction other)
 	{
 		return actor.getRole().getPriority() - other.actor.getRole().getPriority();
+	}
+}
+
+class TownAssigner implements Func<Role, Player>
+{
+	static Random rand = new Random();
+	static int numberOfRoles = 8;
+
+	public Role run(Player player)
+	{
+		int random = rand.nextInt(numberOfRoles);
+		switch (random)
+		{
+			case 0: return new Bodyguard();
+			case 1: return new Doctor();
+			case 2: return new Investigator();
+			case 3: return new Lookout();
+			case 4: return new Mayor();
+			case 5: return new Sheriff();
+			case 6: return new Veteran();
+			default: return new Vigilante();
+		}
 	}
 }
