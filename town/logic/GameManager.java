@@ -53,8 +53,12 @@ public class GameManager
 			{
 				switch (currentPhase.getName())
 				{
-					case "Day": break;
-					case "Trial": break;
+					case "Day":
+						dispatch(new Event("endDay"));
+						break;
+					case "Trial":
+						dispatch(new Event("endTrial"));
+						break;
 					case "Night":
 						sortActions();
 						executeActionQueueBasedOnEvent((action) -> action.actor.visit(action.target));
