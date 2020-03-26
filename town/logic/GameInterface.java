@@ -4,4 +4,5 @@ package town.logic;
 public interface GameInterface
 {
 	Event pollEvent();
+	// This interface should also handle outputting
 }
