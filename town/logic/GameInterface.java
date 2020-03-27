@@ -4,5 +4,7 @@ package town.logic;
 public interface GameInterface
 {
 	Event pollEvent();
+	void sendDayMessage(String message);
+	void sendNightMessage(String message, Faction faction);
 	// This interface should also handle outputting
 }

@@ -115,7 +115,7 @@ public class GameManager
 	{
 		ArrayList<Player> players = new ArrayList<>();
 		for (int x = 0; x < 15; ++x)
-			players.add(new Player("Player #" + x));
+			players.add(new Player("Player #" + x, null));
 		
 		GameManager gm = new GameManager(null, players);
 		for (Player player : gm.players)

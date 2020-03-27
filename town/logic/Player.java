@@ -13,6 +13,8 @@ public class Player
 	private static int final_id;
 
 	public ArrayList<Player> nightlyVisitors;
+	public GameInterface gameInterface;
+	
 	boolean roleBlocked = false;
 	
 	Role role;
@@ -20,16 +22,18 @@ public class Player
 
 	ActionOne<Player> onDeath;
 
-	Player(String n)
+	Player(String n, GameInterface face)
 	{
 		id = final_id++;
+		gameInterface = face;
 		name = n;
 		nightlyVisitors = new ArrayList<Player>();
 	}
 
-	Player(String n, Role r)
+	Player(String n, Role r, GameInterface face)
 	{
 		this.id = final_id++;
+		gameInterface = face;
 		name = n;
 		role = r;
 		nightlyVisitors = new ArrayList<Player>();
