@@ -25,10 +25,12 @@ public class Test implements EventListener
 	@Override
 	public void onEvent(GenericEvent event)
 	{
-		if (event instanceof MessageReceivedEvent)
+		if (event instanceof MessageReceivedEvent && first)
 		{
+			Timer timer = new Timer("Phase Timer");
 			MessageReceivedEvent msgEvent = (MessageReceivedEvent)event;
-			msgEvent.getTextChannel().sendMessage("Yoyo").queue();
+			timer.schedule(new Day(msgEvent), 5000);
+			first = false;
 		}
 	}
 }
