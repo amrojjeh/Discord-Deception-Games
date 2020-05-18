@@ -29,7 +29,7 @@ public class Test implements EventListener
 		{
 			Timer timer = new Timer("Phase Timer");
 			MessageReceivedEvent msgEvent = (MessageReceivedEvent)event;
-			timer.schedule(new Day(msgEvent), 5000);
+			timer.schedule(new Day(msgEvent.getTextChannel()), 5000);
 			first = false;
 		}
 	}
@@ -38,7 +38,7 @@ public class Test implements EventListener
 class Day extends TimerTask
 {
 	private MessageChannel channel;
-	Day(MessageChannel channel)
+	public Day(MessageChannel channel)
 	{
 		this.channel = channel;
 	}

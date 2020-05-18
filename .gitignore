@@ -4,3 +4,4 @@
 *.sublime-build
 JDA.jar
 token.txt
+/bin/
