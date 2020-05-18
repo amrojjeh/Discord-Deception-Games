@@ -2,7 +2,6 @@
 Once, it was a only but a dream to be able to play Town of Salem in Discord, but now it's becoming a reality.
 
 We're starting all over again. Currently we're implementing all the phases:
-- Phases
 - [ ] Morning, explain deaths
 - [ ] Discussion
 - [ ] Accusation, first voting round
