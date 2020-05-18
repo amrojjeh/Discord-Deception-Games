@@ -6,6 +6,6 @@
 			<attribute name="module" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="D:/Projects/Town-of-Salem-Bot/JDA.jar"/>
+	<classpathentry kind="lib" path="JDA.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
