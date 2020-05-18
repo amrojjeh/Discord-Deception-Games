@@ -1,61 +1,15 @@
 # Town of Salem
 Once, it was a only but a dream to be able to play Town of Salem in Discord, but now it's becoming a reality.
 
-## Mechanics to be implemented
-- [ ] Gameplay loop
-- [ ] The three main phases of everyday
-- [ ] Role blocking
-- [ ] Immunities
-- [ ] Chat
-- [ ] Discord interface
+We're starting all over again. Currently we're implementing all the phases:
+- Phases
+- [ ] Morning, explain deaths
+- [ ] Discussion
+- [ ] Accusation, first voting round
+- [ ] Defense, accused person gives defense
+- [ ] Judgement, final voting round
+- [ ] Verdict, reveals votes
+- [ ] Last words
+- [ ] Night
 
-## Roles to be implemented
-### Town
-- [ ] Investigator
-- [ ] Lookout
-- [ ] Psychic
-- [ ] Sheriff
-- [ ] Spy
-- [ ] Tracker
-- [ ] Jailor
-- [ ] Vampire Hunter
-- [ ] Veteran
-- [ ] Vigilante
-- [ ] Bodygaurd
-- [X] Doctor
-- [ ] Crusader
-- [ ] Trapper
-- [ ] Escort
-- [ ] Mayor
-- [ ] Medium
-- [ ] Retributionist
-- [ ] Transporter
-
-### Mafia
-- [ ] Disguiser
-- [ ] Forger
-- [ ] Framer
-- [ ] Hypnotist
-- [ ] Janitor
-- [ ] Ambusher
-- [ ] Godfather
-- [ ] Mafioso
-- [ ] Blackmailer
-- [ ] Consigliere
-- [ ] Consort
-
-### Neutral
-- [ ] Amnesiac
-- [ ] Guardian Angel
-- [ ] Survivor
-- [ ] Pirate
-- [ ] Plaguebearer
-- [ ] Pestilence
-- [ ] Vampire
-- [ ] Executioner
-- [ ] Jester
-- [ ] Witch
-- [ ] Arsonist
-- [ ] Juggernaut
-- [ ] Serial Killer
-- [ ] Werewolf
+Note: Since people can DM each other, we're considering embracing the concept by removing any (or most) role reveals. That way dead people can continue to plea and frame others.
