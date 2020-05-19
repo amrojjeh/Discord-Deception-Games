@@ -6,7 +6,16 @@ public abstract class Phase extends TimerTask{
 	int time;
 	Phase next;
 	
-	public void startPhase() {
+	public Phase(int time, Phase next)
+	{
+		this.time = time;
+		this.next = next;
+	}
+	
+	public void startPhase() { }
+	
+	public void run()
+	{
 		Timer timer = new Timer("Phase Timer");
 		timer.schedule(next, time);
 	}
