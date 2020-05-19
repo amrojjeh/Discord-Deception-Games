@@ -13,7 +13,9 @@ public abstract class Phase extends TimerTask{
 	}
 	
 	public void startPhase() { }
+	public void endPhase() { }
 	
+	@Override
 	public void run()
 	{
 		Timer timer = new Timer("Phase Timer");

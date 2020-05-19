@@ -1,7 +1,5 @@
 package town;
 
-import java.util.Timer;
-
 public class Accusation extends Phase
 {
 	public Accusation()
