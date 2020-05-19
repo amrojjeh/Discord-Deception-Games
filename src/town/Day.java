@@ -7,13 +7,29 @@ public class Day extends Phase
 {	
 	public Day()
 	{
-		super(4000, new Accusation());
+		
+	}
+	
+	@Override
+	public void start() {
+		
+	}
+	
+	@Override
+	public void end() {
+		
 	}
 	
 	@Override
 	public void run()
 	{
 		Timer timer = new Timer("Phase Timer");
-		timer.schedule(next, time);	
 	}
+
+	@Override
+	public int duration() {
+		return 3000;
+	}
+	
+
 }

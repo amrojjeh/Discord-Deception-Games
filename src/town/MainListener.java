@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import javax.security.auth.login.LoginException;
 
 import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -43,7 +44,9 @@ public class MainListener extends ListenerAdapter
 
 	public void onMessageReceived(MessageReceivedEvent e)
 	{
-		// Put your code here to react to message
+		if(e.getMessage().getContentRaw().equals("!phaseStart")) {
+			phaseCycle(e.getTextChannel());
+		}
 	}
 	
 	public static String loadToken()
@@ -59,5 +62,13 @@ public class MainListener extends ListenerAdapter
 		String token = scanner.nextLine();
 		scanner.close();
 		return token;
+	}
+	
+	public void phaseCycle(MessageChannel c) {
+		
+		c.sendMessage("Starting phase cycle").queue();
+		PhaseManager m = new PhaseManager();
+		m.run();
+		
 	}
 }
