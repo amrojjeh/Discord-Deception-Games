@@ -2,6 +2,6 @@
 .vscode/*
 *.bat
 *.sublime-build
-JDA.jar
+*.jar
 token.txt
 /bin/
