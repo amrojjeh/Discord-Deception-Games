@@ -10,13 +10,13 @@ public class Day extends Phase
 	@Override
 	public void start() 
 	{
-		System.out.println("Starting day...");
+//		System.out.println("Starting day...");
 	}
 	
 	@Override
 	public void end() 
 	{
-		System.out.println("Ending day...");
+//		System.out.println("Ending day...");
 	}
 	
 	@Override

@@ -10,13 +10,13 @@ public class Accusation extends Phase
 	@Override
 	public void start() 
 	{
-		System.out.println("Starting accusation...");
+//		System.out.println("Starting accusation...");
 	}
 	
 	@Override
 	public void end() 
 	{
-		System.out.println("Ending accusation...");
+//		System.out.println("Ending accusation...");
 	}
 	
 	@Override
