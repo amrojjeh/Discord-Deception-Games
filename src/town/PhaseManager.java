@@ -1,7 +1,6 @@
 package town;
 
 import java.util.Timer;
-import java.util.TimerTask;
 
 public class PhaseManager
 {
@@ -10,7 +9,6 @@ public class PhaseManager
 	public PhaseManager()
 	{
 		timer = new Timer("Phase timer");
-		
 	}
 	
 	public void start() 
