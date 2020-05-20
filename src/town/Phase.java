@@ -1,24 +1,26 @@
 package town;
-import java.util.Timer;
+
 import java.util.TimerTask;
 
-public abstract class Phase extends TimerTask{
-	int time;
-	Phase next;
+public abstract class Phase extends TimerTask
+{
+	PhaseManager phaseManager;
 	
-	public Phase(int time, Phase next)
+	public Phase(PhaseManager pm) 
 	{
-		this.time = time;
-		this.next = next;
+		phaseManager = pm;
 	}
 	
-	public void startPhase() { }
-	public void endPhase() { }
+	public void start() { }
+	public void end() { }
 	
 	@Override
-	public void run()
+	public void run() 
 	{
-		Timer timer = new Timer("Phase Timer");
-		timer.schedule(next, time);
+		end();
+		phaseManager.startNextPhase(getNextPhase(phaseManager));
 	}
+	
+	public abstract Phase getNextPhase(PhaseManager pm);
+	public abstract int getDuration();
 }

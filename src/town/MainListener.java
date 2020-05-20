@@ -8,13 +8,16 @@ import java.io.FileNotFoundException;
 import javax.security.auth.login.LoginException;
 
 import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.entities.Member;
 
 import town.events.TownEvent;
 import town.events.onDeathTownEvent;
+import town.events.onMurderTownEvent;
 import town.persons.DummyPerson; // Should be removed once done testing
 import town.persons.Person;
 
@@ -30,6 +33,7 @@ public class MainListener extends ListenerAdapter
 	}
 	
 	public static void main(String[] args)
+		throws InterruptedException
 	{
 		String token;
 		JDA jda;
@@ -55,18 +59,39 @@ public class MainListener extends ListenerAdapter
 			System.out.println("Couldn't login: " + e);
 			return;
 		}
+		jda.awaitReady();
 	}
 
+	
+	@Override
+	public void onReady(ReadyEvent e)
+	{
+		System.out.println("Bot is ready to be used");
+	}
+	
+	@Override
 	public void onMessageReceived(MessageReceivedEvent e)
 	{
+		if(e.getMessage().getContentRaw().equals("!phaseStart"))
+		{
+			e.getChannel().sendMessage("Starting phase cycle").queue();
+			PhaseManager m = new PhaseManager();
+			m.start();
+		}
+		
 		if (e.getMessage().getContentRaw().startsWith("!start")) // TODO: Make event
 			for (Member m : e.getMessage().getMentionedMembers())
-				persons.add(new DummyPerson(e.getJDA(), e.getMember().getId()));
+				persons.add(new DummyPerson(e.getJDA(), m.getId()));
 		else if (e.getMessage().getContentRaw().startsWith("!kill"))
 		{
-			Person person = getPerson(e.getMember());
-			if (person != null)
-				events.add(new onDeathTownEvent(person));
+			Person deadPerson = getPerson(e.getMessage().getMentionedMembers().get(0));
+			Person murderer = getPerson(e.getMember());
+			if (deadPerson != null && murderer != null)
+			{
+				events.add(new onDeathTownEvent(e.getJDA(), deadPerson));
+				events.add(new onMurderTownEvent(e.getJDA(), murderer, deadPerson));
+			}
+			else System.out.println("Didn't get person");
 		}
 		
 		dispatchEvents();
