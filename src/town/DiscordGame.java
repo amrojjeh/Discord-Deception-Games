@@ -51,7 +51,7 @@ public class DiscordGame
 	{
 		// TODO: Only allow party leader to start game
 		// NOTE: Who is the party leader?
-		if (message.getContentRaw().contentEquals("!start"))
+		if (message.getContentRaw().contentEquals("!startGame"))
 			startGame(message.getChannel());
 
 		// TODO: Block people if they occupy a certain role
