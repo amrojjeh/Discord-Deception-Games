@@ -1,35 +1,29 @@
 package town;
 
 import java.util.Scanner;
-import java.util.ArrayList;
-import java.util.LinkedList;
+import java.util.HashMap;
 import java.io.File;
 import java.io.FileNotFoundException;
 import javax.security.auth.login.LoginException;
 
 import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.events.ReadyEvent;
+import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.entities.Member;
-
-import town.events.TownEvent;
-import town.events.onDeathTownEvent;
-import town.events.onMurderTownEvent;
-import town.persons.DummyPerson; // Should be removed once done testing
-import town.persons.Person;
 
 
 public class MainListener extends ListenerAdapter
 {
-	ArrayList<Person> persons; // TODO: Sort based on priority also (SortedSet?)
-	LinkedList<TownEvent> events; // TODO: PriorityQueue<E>
+	HashMap<String, DiscordGame> games;
+	
 	public MainListener() 
 	{
-		persons = new ArrayList<>();
-		events = new LinkedList<>();
+		games = new HashMap<>();
 	}
 	
 	public static void main(String[] args)
@@ -62,7 +56,6 @@ public class MainListener extends ListenerAdapter
 		jda.awaitReady();
 	}
 
-	
 	@Override
 	public void onReady(ReadyEvent e)
 	{
@@ -70,49 +63,54 @@ public class MainListener extends ListenerAdapter
 	}
 	
 	@Override
+	public void onGuildJoin(GuildJoinEvent e) 
+	{
+		System.out.println("Joined new guild");
+		Guild guild = e.getGuild();
+		guild.getRoles().stream().filter((role) -> games.get(role.getName()) != null).forEach((role) -> games.get(role.getName()).getNewGuild(e.getGuild()));
+	}
+	
+	@Override
 	public void onMessageReceived(MessageReceivedEvent e)
 	{
-		if(e.getMessage().getContentRaw().equals("!phaseStart"))
+		// TODO: Allow user to specify prefix
+		Message message = e.getMessage();
+		if (message.getContentRaw().contentEquals("!startLobby"))
+			startLobby(e.getJDA(), e.getGuild().getId(), e.getChannel());
+		else if (message.getContentRaw().contentEquals("!endLobby"))
+			endLobby(e.getJDA(), e.getGuild().getId(), e.getChannel());
+		else if (message.getContentRaw().startsWith("!"))
 		{
-			e.getChannel().sendMessage("Starting phase cycle").queue();
-			PhaseManager m = new PhaseManager();
-			m.start();
+			DiscordGame game = games.get(e.getGuild().getId());
+			if (game != null)
+				games.get(e.getGuild().getId()).processMessage(e.getMessage());
+			else
+				e.getChannel().sendMessage("Lobby hasn't been created yet. Do so with !startLobby").queue();
 		}
 		
-		if (e.getMessage().getContentRaw().startsWith("!start")) // TODO: Make event
-			for (Member m : e.getMessage().getMentionedMembers())
-				persons.add(new DummyPerson(e.getJDA(), m.getId()));
-		else if (e.getMessage().getContentRaw().startsWith("!kill"))
-		{
-			Person deadPerson = getPerson(e.getMessage().getMentionedMembers().get(0));
-			Person murderer = getPerson(e.getMember());
-			if (deadPerson != null && murderer != null)
-			{
-				events.add(new onDeathTownEvent(e.getJDA(), deadPerson));
-				events.add(new onMurderTownEvent(e.getJDA(), murderer, deadPerson));
-			}
-			else System.out.println("Didn't get person");
-		}
-		
-		dispatchEvents();
+		// TODO: When someone joins, check if they have an open private channel first.
 	}
 	
-	public void dispatchEvents() // TODO: Change to a for loop?
+	private void endLobby(JDA jda, String guildID, MessageChannel channelUsed)
 	{
-		if (events.size() == 0) return;
-		for (Person person : persons) 
+		if (!games.containsKey(guildID))
+			channelUsed.sendMessage("There is no lobby to end").queue();
+		else
 		{
-			person.onEvent(events.remove());
-		}
-		dispatchEvents();
+			games.remove(guildID);
+			channelUsed.sendMessage("Lobby ended").queue();
+		}		
 	}
-	
-	public Person getPerson(Member member)
+
+	public void startLobby(JDA jda, String guildID, MessageChannel channelUsed)
 	{
-		for (Person person : persons)
-			if (person.getID().equals(member.getId()))
-				return person;
-		return null;
+		if (games.containsKey(guildID))
+			channelUsed.sendMessage("Lobby already started").queue();
+		else
+		{
+			games.put(guildID, new DiscordGame(jda, guildID));
+			channelUsed.sendMessage("Lobby started").queue();
+		}
 	}
 	
 	public static String loadToken()

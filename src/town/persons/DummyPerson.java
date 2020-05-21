@@ -1,11 +1,11 @@
 package town.persons;
 
-import net.dv8tion.jda.api.JDA;
+import town.DiscordGame;
 
 public class DummyPerson extends Person
 {
-	public DummyPerson(JDA jda, String id)
+	public DummyPerson(DiscordGame game, String id)
 	{
-		super(jda, id);
+		super(game, id);
 	}
 }

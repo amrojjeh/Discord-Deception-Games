@@ -1,18 +1,19 @@
 package town.events;
 
 import net.dv8tion.jda.api.JDA;
+import town.DiscordGame;
 import town.persons.Person;
 
-public class onMurderTownEvent implements TownEvent
+public class MurderTownEvent implements TownEvent
 {
 	private Person murderer;
 	private Person victim;
-	private JDA jda;
+	private DiscordGame game;
 	
 	
-	public onMurderTownEvent(JDA jda, Person m, Person v)
+	public MurderTownEvent(DiscordGame game, Person m, Person v)
 	{
-		this.jda = jda;
+		this.game = game;
 		murderer = m;
 		victim = v;
 	}
@@ -28,15 +29,32 @@ public class onMurderTownEvent implements TownEvent
 	}
 	
 	@Override
-	public JDA getJDA() 
+	public DiscordGame getGame() 
 	{
-		return jda;
+		return game;
 	}
 	
 	@Override
-	public void standard(Person eventReceiver)
+	public JDA getJDA() 
 	{
-		if (eventReceiver == getMurderer())
-			eventReceiver.sendMessage("You killed " + jda.getUserById(getVictim().getID()).getName());
+		return game.getJDA();
 	}
+	
+	@Override
+	public void standard(Person person)
+	{
+		kill(person);
+	}
+	
+	public void kill(Person person)
+	{
+		if (murderer == getMurderer()) 
+		{
+			murderer.sendMessage("You killed " + getVictim().getRealName() + " (" + getVictim().getNickName() + ")");
+			getGame().addEvent(new DeathTownEvent(getGame(), getVictim()));
+			getGame().dispatchEvents(); // TODO: Events should be dispatched at the end of the night
+			System.out.println(getVictim().getRealName() + " killed " + getVictim().getRealName());
+		}
+	}
+	
 }

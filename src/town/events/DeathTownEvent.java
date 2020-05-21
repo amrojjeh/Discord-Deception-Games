@@ -1,16 +1,17 @@
 package town.events;
 
 import net.dv8tion.jda.api.JDA;
+import town.DiscordGame;
 import town.persons.Person;
 
-public class onDeathTownEvent implements TownEvent
+public class DeathTownEvent implements TownEvent
 {
 	private Person dead;
-	private JDA jda;
+	DiscordGame game;
 	
-	public onDeathTownEvent(JDA jda, Person dead)
+	public DeathTownEvent(DiscordGame game, Person dead)
 	{
-		this.jda = jda;
+		this.game = game;
 		this.dead = dead;
 	}
 	
@@ -20,9 +21,15 @@ public class onDeathTownEvent implements TownEvent
 	}
 	
 	@Override
+	public DiscordGame getGame() 
+	{
+		return game;
+	}
+	
+	@Override
 	public JDA getJDA() 
 	{
-		return jda;
+		return game.getJDA();
 	}
 
 	@Override

@@ -1,42 +1,51 @@
 package town.persons;
 
-import town.events.onDeathTownEvent;
-import town.events.onMurderTownEvent;
+import town.events.DeathTownEvent;
+import town.events.MurderTownEvent;
+import town.DiscordGame;
 import town.events.TownEvent;
-
-import net.dv8tion.jda.api.JDA;
 
 public abstract class Person
 {
-	String discordUserID;
-	JDA jda; // Should be put into its own interface to seperate the game and discord
+	String ID; // Used to identify each person. For Discord, it's a snowflake
+	DiscordGame game; // Should be put into its own interface to seperate the game and discord
 	
-	Person(JDA jda, String id)
+	Person(DiscordGame game, String id)
 	{
-		this.jda = jda;
-		discordUserID = id;
+		this.game = game;
+		ID = id;
 	}
 	
 	public String getID()
 	{
-		return discordUserID;
+		return ID;
+	}
+	
+	public String getRealName()
+	{
+		return game.getJDA().getUserById(ID).getName();
+	}
+	
+	public String getNickName() 
+	{
+		return game.getGuild().getMemberById(ID).getEffectiveName();
 	}
 	
 	public void sendMessage(String msg)
 	{
 		// TODO: Should check if user has private channel first
-		jda.getUserById(discordUserID).openPrivateChannel().queue((channel) -> channel.sendMessage(msg).queue());
+		game.sendDMTo(this, msg);
 	}
 	
-	public void onDeath(onDeathTownEvent event) { event.standard(this); } // Returns 1 to skip standard, 0 to continue normally
-	public void onMurder(onMurderTownEvent event) { event.standard(this); }
+	public void onDeath(DeathTownEvent event) { event.standard(this); } // Returns 1 to skip standard, 0 to continue normally
+	public void onMurder(MurderTownEvent event) { event.standard(this); }
 	
 	
 	public void onEvent(TownEvent event) 
 	{
-		if (event instanceof onDeathTownEvent) 
-			onDeath((onDeathTownEvent)event);
-		else if (event instanceof onMurderTownEvent)
-			onMurder((onMurderTownEvent)event);
+		if (event instanceof DeathTownEvent) 
+			onDeath((DeathTownEvent)event);
+		else if (event instanceof MurderTownEvent)
+			onMurder((MurderTownEvent)event);
 	}
 }
