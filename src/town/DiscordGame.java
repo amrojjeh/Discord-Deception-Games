@@ -2,6 +2,7 @@ package town;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Random;
 import java.util.Timer;
@@ -11,6 +12,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.GuildChannel;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
@@ -23,23 +25,24 @@ import town.persons.Person;
 
 public class DiscordGame
 {
-	private JDA jda;
-	private String guildID;
-	private String gameGuildID;
-	private ArrayList<Person> persons; // TODO: Sort based on priority also (SortedSet?)
-	private LinkedList<TownEvent> events; // TODO: PriorityQueue<E>
-	private PhaseManager phaseManager;
-	private boolean started;
+	JDA jda;
+	String guildID;
+	String gameGuildID;
+	ArrayList<Person> persons; // TODO: Sort based on priority also (SortedSet?)
+	LinkedList<TownEvent> events; // TODO: PriorityQueue<E>
+	PhaseManager phaseManager;
+	boolean started;
 	
 	// Important channels
-	// TODO: Possible make it possible to play with either DMs or text channels?
-	// We can make it possible depending on whether players choose to make their DMs private
-	private String dayTextChannelID;
-	private String dayVoiceChannelID;
-	private String logTextChannelID;
-	private String deadTextChannelID;
-	private String morgueTextChannelID;
-	private String prefix;
+	HashMap<String, String> textChannels;
+	HashMap<String, String> voiceChannels;
+	
+	String dayTextChannelID;
+	String dayVoiceChannelID;
+	String logTextChannelID;
+	String deadTextChannelID;
+	String morgueTextChannelID;
+	String prefix;
 	
 	public DiscordGame(JDA jda, String ID) 
 	{
@@ -50,6 +53,9 @@ public class DiscordGame
 		phaseManager = new PhaseManager();
 		persons = new ArrayList<>();
 		events = new LinkedList<>();
+		textChannels = new HashMap<>();
+		voiceChannels = new HashMap<>();
+		
 		started = false;
 	}
 	
@@ -76,7 +82,7 @@ public class DiscordGame
 			{
 				events.add(new MurderTownEvent(this, murderer, deadPerson));
 			}
-			
+			// TODO: Send message when person isn't in the lobby
 			else System.out.println("Didn't get person");
 		}
 		
@@ -95,24 +101,30 @@ public class DiscordGame
 
     public void createNewChannels(GuildAction g)
     {
-        //this channel used for general game updates
-        g.newChannel(ChannelType.TEXT, "system");
-        //players discussing during the day
-        g.newChannel(ChannelType.TEXT, "daytime_discussion");
-        g.newChannel(ChannelType.VOICE, "Daytime");
-        //mafia private chat at night
-        g.newChannel(ChannelType.TEXT, "the_hideout");
-        g.newChannel(ChannelType.VOICE, "Mafia");
-        //vampire private chat at night
-        g.newChannel(ChannelType.TEXT, "the_underground");
-        g.newChannel(ChannelType.VOICE, "Vampires");
-        //the jailor's private text channel, where he can talk to the bot
-        g.newChannel(ChannelType.TEXT, "jailor");
-        //the "jail" where the bot transfers the jailor's text anonymously, and the jailed player can respond
-        g.newChannel(ChannelType.TEXT, "jail");
+    	// this channel used for general game updates
+    	textChannels.put("system", "");
+    	// players discussing during the day
+    	textChannels.put("daytime_discussion", "");
+    	textChannels.put("the_hideout", "");
+    	textChannels.put("the_underground", "");
+    	//the jailor's private text channel, where he can talk to the bot
+        textChannels.put("jailor", "");
+      //the "jail" where the bot transfers the jailor's text anonymously, and the jailed player can respond
+        textChannels.put("jail", "");
+    	
+    	voiceChannels.put("Daytime", "");
+    	// mafia private chat at night
+    	voiceChannels.put("Mafia", "");
+    	// vampire private chat at night
+        voiceChannels.put("Vampires", "");
+    	
+        
         //for dead players
-        g.newChannel(ChannelType.TEXT, "the_afterlife");
-        g.newChannel(ChannelType.VOICE, "The Dead");
+        voiceChannels.put("The Dead", "");
+        textChannels.put("the_afterlife", "");
+    	
+        textChannels.forEach((name, id) -> g.newChannel(ChannelType.TEXT, name));
+        voiceChannels.forEach((name, id) -> g.newChannel(ChannelType.VOICE, name));
     }
 	
 	public void addEvent(TownEvent event)
@@ -151,18 +163,32 @@ public class DiscordGame
 		ga.queue();
 	}
 	
+	public void assignChannel(GuildChannel channel) 
+	{
+		if (channel.getType().equals(ChannelType.TEXT))
+			textChannels.replace(channel.getName(), channel.getId());
+		else
+			voiceChannels.replace(channel.getName(), channel.getId());
+	}
+	
 	public void getNewGuild(Guild guild)
 	{
 		guild.getChannels().get(0).createInvite().queue((invite) -> persons.forEach((person) -> person.sendMessage(invite.getUrl())));
-        Random random = new Random();
+		gameGuildID = guild.getId();
+		guild.getChannels(true).forEach((channel) -> assignChannel(channel));
+		
+		getJDA().getTextChannelById(textChannels.get("system")).sendMessage("This is a test").queue();
+		
+		// TODO: Remove timer
+		Timer timer = new Timer();
+		timer.schedule(new TimerTask() {public void run() {guild.delete().queue();}}, 60 * 1000);    
+		
+		Random random = new Random();
         int role = random.nextInt(2);
         String r;
         if(role == 0) r = "SERIAL KILLER";
         else r = "SHERIFF";
         persons.forEach((person) -> person.sendMessage("Your role is " + r));
-		// TODO: Remove timer
-		Timer timer = new Timer();
-		timer.schedule(new TimerTask() {public void run() {guild.delete().queue();}}, 60 * 1000);
 	}
 	
 	public void joinGame(String id, MessageChannel channelUsed)
@@ -217,5 +243,4 @@ public class DiscordGame
 	{
 		jda.getUserById(person.getID()).openPrivateChannel().queue((channel) -> channel.sendMessage(msg).queue());
 	}
-	
 }
