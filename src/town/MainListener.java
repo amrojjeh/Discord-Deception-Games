@@ -25,7 +25,7 @@ public class MainListener extends ListenerAdapter
 
 	HashMap<String, DiscordGame> games;
 	
-	public MainListener() 
+	public MainListener()
 	{
 		prefix = "tos.";
 		games = new HashMap<>();
@@ -98,7 +98,7 @@ public class MainListener extends ListenerAdapter
 			if (game != null)
 				games.get(e.getGuild().getId()).processMessage(e.getMessage());
 			else
-				e.getChannel().sendMessage("Lobby hasn't been created yet. Do so with tos.startLobby").queue();
+				e.getChannel().sendMessage("Party hasn't been created yet. Do so with tos.startParty").queue();
 		}
 		// TODO: When someone joins, check if they have an open private channel first.
 	}
@@ -106,22 +106,22 @@ public class MainListener extends ListenerAdapter
 	private void endLobby(JDA jda, String guildID, MessageChannel channelUsed)
 	{
 		if (!games.containsKey(guildID))
-			channelUsed.sendMessage("There is no lobby to end").queue();
+			channelUsed.sendMessage("There is no party to end").queue();
 		else
 		{
 			games.remove(guildID);
-			channelUsed.sendMessage("Lobby ended").queue();
-		}		
+			channelUsed.sendMessage("Party ended").queue();
+		}
 	}
 
 	public void startLobby(JDA jda, String guildID, MessageChannel channelUsed, Member partyLeader)
 	{
 		if (games.containsKey(guildID))
-			channelUsed.sendMessage("Lobby already started").queue();
+			channelUsed.sendMessage("Party already started").queue();
 		else
 		{
 			DiscordGame game = new DiscordGame(jda, guildID);
-			channelUsed.sendMessage("Lobby started").queue();
+			channelUsed.sendMessage("Party started").queue();
 			game.joinGame(partyLeader.getId(), channelUsed);
 			games.put(guildID, game);
 		}
