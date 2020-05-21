@@ -1,0 +1,406 @@
+[33mcommit 5c8885f380cc665de1bd8f74d575982db2027104[m[33m ([m[1;36mHEAD -> [m[1;32mmaster[m[33m, [m[1;31morigin/master[m[33m)[m
+Author: amrojjeh <amrojjeh@gmail.com>
+Date:   Mon May 18 15:39:43 2020 -0500
+
+    Ecliptified
+
+[33mcommit f514aac2146c1dd48973e9e1c27cb2accca9e77d[m
+Author: amrojjeh <amrojjeh@gmail.com>
+Date:   Mon May 18 15:26:42 2020 -0500
+
+    Restored-ish test
+
+[33mcommit 53352a1068f9844885d142263d0508cf22a2ddd0[m
+Author: amrojjeh <amrojjeh@gmail.com>
+Date:   Mon May 18 15:24:22 2020 -0500
+
+    Update readme
+
+[33mcommit 1e0e5c6d53cb03bc1f8a22bf689532941e0ec076[m
+Author: amrojjeh <amrojjeh@gmail.com>
+Date:   Mon May 18 15:09:16 2020 -0500
+
+    Moved to src
+
+[33mcommit ae7356fc78281eab7a3da77f32364114712ac531[m
+Author: amrojjeh <amrojjeh@gmail.com>
+Date:   Mon May 18 15:04:17 2020 -0500
+
+    Updated readme
+
+[33mcommit 2da5b258d0c2208da03032d89a21b7c0bc1dc147[m
+Author: amrojjeh <amrojjeh@gmail.com>
+Date:   Mon May 18 14:55:35 2020 -0500
+
+    Redemption
+
+[33mcommit 8b2510934a2c197f4b7c1e0d857d4393e822d9c2[m
+Author: amrojjeh <amrojjeh@gmail.com>
+Date:   Mon May 18 14:02:21 2020 -0500
+
+    Added tesT
+
+[33mcommit 57ab43f9e0ae8e8d9909cb12e6e7bb63b54ae75c[m
+Author: amrojjeh <amrojjeh@gmail.com>
+Date:   Thu Mar 26 21:29:43 2020 -0500
+
+    Worked on game interface
+
+[33mcommit 002d6349140d6e34f36e8fd6f45603b4a918ed52[m
+Author: amrojjeh <amrojjeh@gmail.com>
+Date:   Wed Mar 25 22:30:48 2020 -0500
+
+    GameManager init skeleton is done'
+
+[33mcommit 6542eb957ceb614f69424867c1e85ad62cf4cf57[m
+Author: amrojjeh <amrojjeh@gmail.com>
+Date:   Wed Mar 25 22:29:46 2020 -0500
+
+    Changed some design
+
+[33mcommit e4d1e6388ad97315fee0d563dec6dcec4ac29058[m
+Author: amrojjeh <amrojjeh@gmail.com>
+Date:   Wed Mar 25 21:38:16 2020 -0500
+
+    Added more events
+
+[33mcommit 0f9f21218bffecd89f576edb516085f9a75dbfdb[m
+Author: alexman37 <62260530+alexman37@users.noreply.github.com>
+Date:   Sun Mar 22 14:49:27 2020 -0400
+
+    Added more to Mayor, added Serial Killer so we can actually have a game now
+
+[33mcommit 89f209a82d697a3de7d7e9fe70f7f9c014b49f22[m
+Author: amrojjeh <amrojjeh@gmail.com>
+Date:   Sat Mar 21 16:15:16 2020 -0500
+
+    Deleted role; Fixed Sheriff
+
+[33mcommit 8f4e0d36c87d75c7597fb2f2b63b99b3756375ed[m
+Author: amrojjeh <amrojjeh@gmail.com>
+Date:   Sat Mar 21 16:13:55 2020 -0500
+
+    Added note
+
+[33mcommit 05cbb43cf110dbd6af19a1372dc17b2620903914[m
+Author: amrojjeh <amrojjeh@gmail.com>
+Date:   Sat Mar 21 16:13:03 2020 -0500
+
+    Fixed investigator
+
+[33mcommit eec5215802f2410d24f3806a9dfc03012731e839[m
+Author: amrojjeh <amrojjeh@gmail.com>
+Date:   Sat Mar 21 16:12:37 2020 -0500
+
+    Fixed bodyguard
+
+[33mcommit 006574cab1f47650ca41f54156425cf331946c4f[m
+Merge: a5b7de4 a85a80c
+Author: amrojjeh <amrojjeh@gmail.com>
+Date:   Sat Mar 21 16:10:53 2020 -0500
+
+    Merge branch 'master' of github.com:Persian-Eagle/Town-of-Salem-Bot
+
+[33mcommit a5b7de4b75b6bf02d438aa2e865de06428096f7e[m
+Author: amrojjeh <amrojjeh@gmail.com>
+Date:   Sat Mar 21 16:10:05 2020 -0500
+
+    Added phases
+
+[33mcommit a85a80ca0e7cb89aba461bf794c1bf467431af1b[m
+Merge: 81771e6 e8946ac
+Author: alexman37 <62260530+alexman37@users.noreply.github.com>
+Date:   Sat Mar 21 17:09:30 2020 -0400
+
+    Merge branch 'master' of https://github.com/Persian-Eagle/Town-of-Salem-Bot
+
+[33mcommit 81771e604bbf92ae88a1c72c4531f17b26e7d4c3[m
+Author: alexman37 <62260530+alexman37@users.noreply.github.com>
+Date:   Sat Mar 21 17:09:02 2020 -0400
+
+    Many new Town roles
+
+[33mcommit e8946ac0adbd51a1dccdcd2eb56c1767720ede23[m
+Author: amrojjeh <amrojjeh@gmail.com>
+Date:   Sat Mar 21 16:01:41 2020 -0500
+
+    Added dispatch
+
+[33mcommit ce007cbe3cafc91ab7e2a3554bdc8b076eef8cf8[m
+Author: amrojjeh <amrojjeh@gmail.com>
+Date:   Sat Mar 21 16:01:09 2020 -0500
+
+    Added to onEvent
+
+[33mcommit 2f4db515d30fd829401ab1a1a718ad602659de3e[m
+Author: amrojjeh <amrojjeh@gmail.com>
+Date:   Sat Mar 21 15:55:37 2020 -0500
+
+    Added role blocking
+
+[33mcommit 2a8e5b057a674efc4a1e5b3c4eb59ab2e009f19d[m
+Author: amrojjeh <amrojjeh@gmail.com>
+Date:   Sat Mar 21 15:15:01 2020 -0500
+
+    Reverted faction change
+
+[33mcommit 382238bf91bbce221ab97f6e9fe39e163bcb9be3[m
+Author: amrojjeh <amrojjeh@gmail.com>
+Date:   Fri Mar 20 02:04:25 2020 -0500
+
+    Updated factions
+
+[33mcommit 4c465202724573914ce0e7a9760bad7bc984a102[m
+Author: amrojjeh <amrojjeh@gmail.com>
+Date:   Thu Mar 19 20:35:26 2020 -0500
+
+    I was supposed to push this last time but forgot, oops
+
+[33mcommit fa1f28f82bae26662822285df11300aef2f4881f[m
+Author: amrojjeh <amrojjeh@gmail.com>
+Date:   Thu Mar 19 20:34:39 2020 -0500
+
+    Made event loop null friendly
+
+[33mcommit e5d5425a56ae24152c5fdf3fc42953cedd068969[m
+Author: amrojjeh <amrojjeh@gmail.com>
+Date:   Thu Mar 19 20:33:22 2020 -0500
+
+    Roles shouldn't visit when executed, since they're executed on visit
+
+[33mcommit 405d88082d4e164f37ff305f075e91aea152830f[m
+Author: amrojjeh <amrojjeh@gmail.com>
+Date:   Thu Mar 19 20:30:23 2020 -0500
+
+    Made visiting more 'natural'
+
+[33mcommit 24c15c855f3489e8f4d785066efdb50d2648ff3e[m
+Author: amrojjeh <amrojjeh@gmail.com>
+Date:   Thu Mar 19 20:22:47 2020 -0500
+
+    Finished visitor mechanic
+
+[33mcommit 7ee3e6a89fcd91629ff1a91d5031c4faa54cbe1b[m
+Author: amrojjeh <amrojjeh@gmail.com>
+Date:   Wed Mar 18 01:47:49 2020 -0500
+
+    Organized everything
+
+[33mcommit ce5d3cdc7693d36dfdb456754d66849f5f7567ec[m
+Author: amrojjeh <amrojjeh@gmail.com>
+Date:   Tue Mar 17 21:43:51 2020 -0500
+
+    Added note
+
+[33mcommit d5b7f5745403fc4545ad86a6fc8a57d25f823349[m
+Author: amrojjeh <amrojjeh@gmail.com>
+Date:   Tue Mar 17 21:43:30 2020 -0500
+
+    Did stufF
+
+[33mcommit 78885c6d95f929499119d95d987754f540b67228[m
+Author: alexman37 <62260530+alexman37@users.noreply.github.com>
+Date:   Tue Mar 17 22:14:46 2020 -0400
+
+    More minor role changes
+
+[33mcommit 8532e84919767037e3eb95b51f63746a8ac56b36[m
+Merge: 6b2fe1f 20eed8c
+Author: alexman37 <62260530+alexman37@users.noreply.github.com>
+Date:   Tue Mar 17 21:45:32 2020 -0400
+
+    Merge branch 'master' of https://github.com/Persian-Eagle/Town-of-Salem-Bot
+
+[33mcommit 6b2fe1ffd38955b13e9c8cf677d6f81dd6e6b877[m
+Author: alexman37 <62260530+alexman37@users.noreply.github.com>
+Date:   Tue Mar 17 21:45:10 2020 -0400
+
+    Minor role changes
+
+[33mcommit 20eed8cb7b8dbfc5d7617065060e1420290bc267[m
+Author: amrojjeh <amrojjeh@gmail.com>
+Date:   Tue Mar 17 20:24:48 2020 -0500
+
+    Added default OnEvent
+
+[33mcommit 792bdcb9755e1b07203777f30295ac8f48cd5329[m
+Author: amrojjeh <amrojjeh@gmail.com>
+Date:   Tue Mar 17 19:39:44 2020 -0500
+
+    Tester's now broken, gg
+
+[33mcommit 941381773f94417893488a07186fbedcbd28c0c0[m
+Author: amrojjeh <amrojjeh@gmail.com>
+Date:   Tue Mar 17 19:39:34 2020 -0500
+
+    Did player stuff
+
+[33mcommit ebc64d482a6d2efef35b08646c5e39053d4a6cf9[m
+Author: amrojjeh <amrojjeh@gmail.com>
+Date:   Tue Mar 17 19:39:18 2020 -0500
+
+    Added game loop
+
+[33mcommit befbe670ddf9f7c00c70d88240a3db2860e84fc2[m
+Author: amrojjeh <amrojjeh@gmail.com>
+Date:   Tue Mar 17 19:38:22 2020 -0500
+
+    Phases now work
+
+[33mcommit 968fea1b2f48099a139f07b33099249239380d9e[m
+Author: amrojjeh <amrojjeh@gmail.com>
+Date:   Tue Mar 17 19:36:29 2020 -0500
+
+    Added an event
+
+[33mcommit 0673f54b9673fe4ec7c0db0760d2819684ea8039[m
+Merge: a9fa157 3c094d0
+Author: alexman37 <62260530+alexman37@users.noreply.github.com>
+Date:   Tue Mar 17 14:10:48 2020 -0400
+
+    Changes described in DMs
+
+[33mcommit a9fa157e38a0897b8f0cede49b9ed1f8daf51c67[m
+Author: alexman37 <62260530+alexman37@users.noreply.github.com>
+Date:   Tue Mar 17 01:24:15 2020 -0400
+
+    Vigilante stuff
+
+[33mcommit 3c094d05ffc716a56f688636717e12652c3db641[m
+Author: amrojjeh <amrojjeh@gmail.com>
+Date:   Mon Mar 16 22:51:07 2020 -0500
+
+    Updated .gitignore
+
+[33mcommit a1e0d83b210920b5185753d7721358eb53fc2ba7[m
+Author: amrojjeh <amrojjeh@gmail.com>
+Date:   Mon Mar 16 22:43:00 2020 -0500
+
+    Fixed player
+
+[33mcommit fc52b2672c715d826a6a8e11626527668fe37d37[m
+Author: amrojjeh <amrojjeh@gmail.com>
+Date:   Mon Mar 16 21:37:14 2020 -0500
+
+    Updated readme and added a note
+
+[33mcommit 591bbbbdcce562383f5133fef168e41da1445ed6[m
+Merge: 722e999 66b9c40
+Author: alexman37 <62260530+alexman37@users.noreply.github.com>
+Date:   Mon Mar 16 22:00:30 2020 -0400
+
+    Merge branch 'master' of https://github.com/Persian-Eagle/Town-of-Salem-Bot
+
+[33mcommit 722e999584bfce690ed0abb85f53fa362690f1d4[m
+Author: alexman37 <62260530+alexman37@users.noreply.github.com>
+Date:   Mon Mar 16 22:00:06 2020 -0400
+
+    Doctor changes
+
+[33mcommit 66b9c40ee859e4ec49a4a37ed3a572834b1dc87b[m
+Author: amrojjeh <amrojjeh@gmail.com>
+Date:   Mon Mar 16 20:59:04 2020 -0500
+
+    Added canKill
+
+[33mcommit 989f03fa3cbb32927991c667675971f5938d7dc4[m
+Author: amrojjeh <amrojjeh@gmail.com>
+Date:   Mon Mar 16 20:28:19 2020 -0500
+
+    Added more capability
+
+[33mcommit 012647e9b59c7f428054451c24f9acec75166fdc[m
+Author: amrojjeh <amrojjeh@gmail.com>
+Date:   Mon Mar 16 20:25:25 2020 -0500
+
+    Added player getname
+
+[33mcommit f64d2729bbea98055d5deb9c345381ec77814520[m
+Author: amrojjeh <amrojjeh@gmail.com>
+Date:   Mon Mar 16 19:49:43 2020 -0500
+
+    Fixed comment
+
+[33mcommit 996959acf5e3669d8528d48ccab5e58bff14a796[m
+Author: amrojjeh <amrojjeh@gmail.com>
+Date:   Mon Mar 16 19:45:41 2020 -0500
+
+    Added a reference to faction from player
+
+[33mcommit ffcd85aa7cd166acc770f338370730b0b0077347[m
+Author: amrojjeh <amrojjeh@gmail.com>
+Date:   Mon Mar 16 19:44:54 2020 -0500
+
+    Just added newlines
+
+[33mcommit db72951237a09aa4a3d1d1a04af3af1af4215341[m
+Author: amrojjeh <amrojjeh@gmail.com>
+Date:   Mon Mar 16 19:29:44 2020 -0500
+
+    Just testing some stuff
+
+[33mcommit ace4d83f41051371c73c6b91eb0688e12b700d4b[m
+Author: amrojjeh <amrojjeh@gmail.com>
+Date:   Mon Mar 16 19:29:32 2020 -0500
+
+    Started game loop
+
+[33mcommit dc71c27d68137cd4c590fb0d79beddb91f78f6f6[m
+Author: amrojjeh <amrojjeh@gmail.com>
+Date:   Mon Mar 16 19:28:33 2020 -0500
+
+    Differntiated players and roles
+
+[33mcommit 87e24972ed2ea337379da8b5b601705f120e16ad[m
+Author: amrojjeh <amrojjeh@gmail.com>
+Date:   Mon Mar 16 19:27:26 2020 -0500
+
+    Changed how the faction system works
+
+[33mcommit df5c8c9154cc989d84e911fb6c4eb45419ab2fdd[m
+Author: amrojjeh <amrojjeh@gmail.com>
+Date:   Mon Mar 16 19:25:34 2020 -0500
+
+    Decided that Roles shouldn't have factions. Also fixed Doctor.java
+
+[33mcommit d49b9a3b26dac2fd7ce4fa9e43c1ad40c717ed71[m
+Author: amrojjeh <amrojjeh@gmail.com>
+Date:   Mon Mar 16 19:23:49 2020 -0500
+
+    Removed java class files
+
+[33mcommit 13ab8e6bd6d8ca9a38be10029a70ef9e90476a92[m
+Author: alexman37 <62260530+alexman37@users.noreply.github.com>
+Date:   Mon Mar 16 17:27:21 2020 -0400
+
+    faction
+
+[33mcommit 32adb33f18cd53f3398658e79be5c1fcfe469157[m
+Author: amrojjeh <amrojjeh@gmail.com>
+Date:   Mon Mar 16 15:59:50 2020 -0500
+
+    Added ignore
+
+[33mcommit 7314231a8ffb821a218e3995aef2ca86931eb3d1[m
+Author: alexman37 <62260530+alexman37@users.noreply.github.com>
+Date:   Mon Mar 16 16:45:33 2020 -0400
+
+    hello
+
+[33mcommit c6fa82582c2c7d52ae1585d3750af63dfc14e6bf[m
+Author: alexman37 <62260530+alexman37@users.noreply.github.com>
+Date:   Mon Mar 16 16:00:06 2020 -0400
+
+    epstein didnt kill himself
+
+[33mcommit 823c3c61bd0dd1ea8260704328169aaa877ce471[m
+Author: alexman37 <62260530+alexman37@users.noreply.github.com>
+Date:   Mon Mar 16 15:43:20 2020 -0400
+
+    Hello
+
+[33mcommit b99b8c4d0efb54afa0ef69a5c7dfdb6452e1af18[m
+Author: amrojjeh <amrojjeh@gmail.com>
+Date:   Mon Mar 16 14:23:29 2020 -0500
+
+    Init commit
