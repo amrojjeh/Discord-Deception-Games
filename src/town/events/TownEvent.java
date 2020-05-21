@@ -6,7 +6,7 @@ import town.persons.Person;
 
 public interface TownEvent
 {
-	public DiscordGame getGame();
-	public JDA getJDA();
-	public void standard(Person person);
+	DiscordGame getGame();
+	JDA getJDA();
+	void standard(Person person);
 }
