@@ -78,16 +78,16 @@ public class DiscordGame
 	}
 	
 	public void createNewChannels(GuildAction g) {
-		g.newChannel(ChannelType.TEXT, "Daytime_Discussion");
-		g.newChannel(ChannelType.VOICE, "Daytime_Discussion");
-		g.newChannel(ChannelType.TEXT, "Mafia_Chat");
-		g.newChannel(ChannelType.VOICE, "Mafia_Chat");
-		g.newChannel(ChannelType.TEXT, "Vampires");
-		g.newChannel(ChannelType.VOICE, "Vampires");
-		g.newChannel(ChannelType.TEXT, "Jailor");
-		g.newChannel(ChannelType.TEXT, "Jail");
-		g.newChannel(ChannelType.TEXT, "The Dead");
-		g.newChannel(ChannelType.VOICE, "The Dead");
+		g.newChannel(ChannelType.TEXT, "daytime_discussion");
+		g.newChannel(ChannelType.VOICE, "daytime_discussion");
+		g.newChannel(ChannelType.TEXT, "mafia_chat");
+		g.newChannel(ChannelType.VOICE, "mafia_chat");
+		g.newChannel(ChannelType.TEXT, "vampires");
+		g.newChannel(ChannelType.VOICE, "vampires");
+		g.newChannel(ChannelType.TEXT, "jailor");
+		g.newChannel(ChannelType.TEXT, "jail");
+		g.newChannel(ChannelType.TEXT, "the_dead");
+		g.newChannel(ChannelType.VOICE, "the_dead");
 	}
 	
 	public void addEvent(TownEvent event)
