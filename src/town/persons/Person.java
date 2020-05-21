@@ -1,7 +1,7 @@
 package town.persons;
 
 import town.events.DeathTownEvent;
-import town.events.MurderTownEvent;
+import town.events.MurderTownMessageEvent;
 import town.DiscordGame;
 import town.events.TownEvent;
 
@@ -9,16 +9,23 @@ public abstract class Person
 {
 	String ID; // Used to identify each person. For Discord, it's a snowflake
 	DiscordGame game; // Should be put into its own interface to seperate the game and discord
+	private int refNum; // This is how players can refer to other players without mentioning them
 	
-	Person(DiscordGame game, String id)
+	Person(DiscordGame game, int refNum, String id)
 	{
 		this.game = game;
 		ID = id;
+		this.refNum = refNum;
 	}
 	
 	public String getID()
 	{
 		return ID;
+	}
+	
+	public int getNum() 
+	{
+		return refNum;
 	}
 	
 	public String getRealName()
@@ -38,14 +45,19 @@ public abstract class Person
 	}
 	
 	public void onDeath(DeathTownEvent event) { event.standard(this); } // Returns 1 to skip standard, 0 to continue normally
-	public void onMurder(MurderTownEvent event) { event.standard(this); }
+	public void onMurderMessage(MurderTownMessageEvent event) {  } // By default, a person cannot kill
 	
 	
 	public void onEvent(TownEvent event) 
 	{
 		if (event instanceof DeathTownEvent) 
 			onDeath((DeathTownEvent)event);
-		else if (event instanceof MurderTownEvent)
-			onMurder((MurderTownEvent)event);
+		else if (event instanceof MurderTownMessageEvent)
+			onMurderMessage((MurderTownMessageEvent)event);
 	}
+	
+	public abstract String getRoleName();
+	public abstract int getAttackStat();
+	public abstract int getDefenseStat();
+	public abstract int getPriority();
 }
