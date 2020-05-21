@@ -4,14 +4,14 @@ import net.dv8tion.jda.api.JDA;
 import town.DiscordGame;
 import town.persons.Person;
 
-public class MurderTownEvent implements TownEvent
+public class MurderTownMessageEvent implements TownEvent
 {
 	private Person murderer;
 	private Person victim;
 	private DiscordGame game;
 	
 	
-	public MurderTownEvent(DiscordGame game, Person m, Person v)
+	public MurderTownMessageEvent(DiscordGame game, Person m, Person v)
 	{
 		this.game = game;
 		murderer = m;
@@ -43,10 +43,11 @@ public class MurderTownEvent implements TownEvent
 	@Override
 	public void standard(Person person)
 	{
-		kill(person);
+		if (person == getMurderer())
+			killVictim(person);
 	}
 	
-	public void kill(Person person)
+	public void killVictim(Person person)
 	{
 		if (person == getMurderer()) 
 		{
