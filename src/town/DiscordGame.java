@@ -77,6 +77,19 @@ public class DiscordGame
 		
 	}
 	
+	public void createNewChannels(GuildAction g) {
+		g.newChannel(ChannelType.TEXT, "Daytime_Discussion");
+		g.newChannel(ChannelType.VOICE, "Daytime_Discussion");
+		g.newChannel(ChannelType.TEXT, "Mafia_Chat");
+		g.newChannel(ChannelType.VOICE, "Mafia_Chat");
+		g.newChannel(ChannelType.TEXT, "Vampires");
+		g.newChannel(ChannelType.VOICE, "Vampires");
+		g.newChannel(ChannelType.TEXT, "Jailor");
+		g.newChannel(ChannelType.TEXT, "Jail");
+		g.newChannel(ChannelType.TEXT, "The Dead");
+		g.newChannel(ChannelType.VOICE, "The Dead");
+	}
+	
 	public void addEvent(TownEvent event)
 	{
 		events.add(event);
@@ -107,7 +120,7 @@ public class DiscordGame
 		
 		// TODO: Create channels
 		GuildAction ga = getJDA().createGuild("Town of Salem ");
-		ga.newChannel(ChannelType.TEXT, "default");
+		createNewChannels(ga);
 		ga.newRole().setName(guildID);
 		ga.queue();
 	}
