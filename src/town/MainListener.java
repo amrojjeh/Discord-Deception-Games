@@ -20,10 +20,13 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class MainListener extends ListenerAdapter
 {
+	String prefix;
+
 	HashMap<String, DiscordGame> games;
 	
 	public MainListener() 
 	{
+		prefix = "tos.";
 		games = new HashMap<>();
 	}
 	
@@ -75,7 +78,7 @@ public class MainListener extends ListenerAdapter
 	public void onMessageReceived(MessageReceivedEvent e)
 	{
 		// TODO: Make sure that when kicked, to delete the game from the hash table
-		// TODO: Allow user to specify prefix
+		// TODO: Add a help command
 		Message message = e.getMessage();
 		if (e.isFromType(ChannelType.PRIVATE))
 		{
@@ -83,20 +86,19 @@ public class MainListener extends ListenerAdapter
 			return;
 		}
 
-		if (message.getContentRaw().contentEquals("!startLobby"))
+		if (message.getContentRaw().contentEquals(prefix + "startLobby"))
 			startLobby(e.getJDA(), e.getGuild().getId(), e.getChannel());
 		// TODO: Replace endLobby with endGame if the game starts
-		else if (message.getContentRaw().contentEquals("!endLobby"))
+		else if (message.getContentRaw().contentEquals(prefix + "endLobby"))
 			endLobby(e.getJDA(), e.getGuild().getId(), e.getChannel());
-		else if (message.getContentRaw().startsWith("!"))
+		else if (message.getContentRaw().startsWith(prefix))
 		{
 			DiscordGame game = games.get(e.getGuild().getId());
 			if (game != null)
 				games.get(e.getGuild().getId()).processMessage(e.getMessage());
 			else
-				e.getChannel().sendMessage("Lobby hasn't been created yet. Do so with !startLobby").queue();
+				e.getChannel().sendMessage("Lobby hasn't been created yet. Do so with tos.startLobby").queue();
 		}
-		
 		// TODO: When someone joins, check if they have an open private channel first.
 	}
 	

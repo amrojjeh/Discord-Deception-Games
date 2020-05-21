@@ -35,11 +35,13 @@ public class DiscordGame
 	private String logTextChannelID;
 	private String deadTextChannelID;
 	private String morgueTextChannelID;
+	private String prefix;
 	
 	public DiscordGame(JDA jda, String ID) 
 	{
 		this.jda = jda;
 		guildID = ID;
+		prefix = "tos.";
 		
 		phaseManager = new PhaseManager();
 		persons = new ArrayList<>();
@@ -51,16 +53,16 @@ public class DiscordGame
 	{
 		// TODO: Only allow party leader to start game
 		// NOTE: Who is the party leader?
-		if (message.getContentRaw().contentEquals("!startGame"))
+		if (message.getContentRaw().contentEquals(prefix + "startGame"))
 			startGame(message.getChannel());
 
 		// TODO: Block people if they occupy a certain role
 		// TODO: Display party with !party
-		else if (message.getContentRaw().contentEquals("!join"))
+		else if (message.getContentRaw().contentEquals(prefix + "join"))
 			joinGame(message.getMember().getId(), message.getChannel());
 		
 		// TODO: Be able to kill using DM
-		else if (started && message.getContentRaw().startsWith("!kill"))
+		else if (started && message.getContentRaw().startsWith(prefix + "kill"))
 		{
 			// TODO: Check if there is more than one mention
 			Person deadPerson = getPerson(message.getMentionedMembers().get(0));
@@ -118,7 +120,7 @@ public class DiscordGame
 		started = true;
 		channelUsed.sendMessage("Game has started! Creating server...").queue();
 		
-		// TODO: Create channels
+		// TODO: Add an icon to the server
 		GuildAction ga = getJDA().createGuild("Town of Salem ");
 		createNewChannels(ga);
 		ga.newRole().setName(guildID);
