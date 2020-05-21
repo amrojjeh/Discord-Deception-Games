@@ -85,6 +85,7 @@ public class MainListener extends ListenerAdapter
 
 		if (message.getContentRaw().contentEquals("!startLobby"))
 			startLobby(e.getJDA(), e.getGuild().getId(), e.getChannel());
+		// TODO: Replace endLobby with endGame if the game starts
 		else if (message.getContentRaw().contentEquals("!endLobby"))
 			endLobby(e.getJDA(), e.getGuild().getId(), e.getChannel());
 		else if (message.getContentRaw().startsWith("!"))
