@@ -4,14 +4,14 @@ import net.dv8tion.jda.api.JDA;
 import town.DiscordGame;
 import town.persons.Person;
 
-public class MurderTownMessageEvent implements TownEvent
+public class MurderTownEvent implements TownEvent
 {
 	private Person murderer;
 	private Person victim;
 	private DiscordGame game;
 	
 	
-	public MurderTownMessageEvent(DiscordGame game, Person m, Person v)
+	public MurderTownEvent(DiscordGame game, Person m, Person v)
 	{
 		this.game = game;
 		murderer = m;

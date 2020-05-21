@@ -17,7 +17,7 @@ import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.requests.restaction.GuildAction;
 import town.events.TownEvent;
-import town.events.MurderTownMessageEvent;
+import town.events.MurderTownEvent;
 import town.persons.Civilian;
 import town.persons.Person;
 
@@ -74,7 +74,7 @@ public class DiscordGame
 			Person murderer = getPerson(message.getMember());
 			if (deadPerson != null && murderer != null)
 			{
-				events.add(new MurderTownMessageEvent(this, murderer, deadPerson));
+				events.add(new MurderTownEvent(this, murderer, deadPerson));
 			}
 			
 			else System.out.println("Didn't get person");

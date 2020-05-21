@@ -1,7 +1,7 @@
 package town.persons;
 
 import town.events.DeathTownEvent;
-import town.events.MurderTownMessageEvent;
+import town.events.MurderTownEvent;
 import town.DiscordGame;
 import town.events.TownEvent;
 
@@ -45,15 +45,15 @@ public abstract class Person
 	}
 	
 	public void onDeath(DeathTownEvent event) { event.standard(this); } // Returns 1 to skip standard, 0 to continue normally
-	public void onMurderMessage(MurderTownMessageEvent event) {  } // By default, a person cannot kill
+	public void onMurderMessage(MurderTownEvent event) {  } // By default, a person cannot kill
 	
 	
 	public void onEvent(TownEvent event) 
 	{
 		if (event instanceof DeathTownEvent) 
 			onDeath((DeathTownEvent)event);
-		else if (event instanceof MurderTownMessageEvent)
-			onMurderMessage((MurderTownMessageEvent)event);
+		else if (event instanceof MurderTownEvent)
+			onMurderMessage((MurderTownEvent)event);
 	}
 	
 	public abstract String getRoleName();
