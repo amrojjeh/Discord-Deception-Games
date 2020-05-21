@@ -7,6 +7,7 @@ import java.io.FileNotFoundException;
 import javax.security.auth.login.LoginException;
 
 import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
@@ -73,8 +74,15 @@ public class MainListener extends ListenerAdapter
 	@Override
 	public void onMessageReceived(MessageReceivedEvent e)
 	{
+		// TODO: Make sure that when kicked, to delete the game from the hash table
 		// TODO: Allow user to specify prefix
 		Message message = e.getMessage();
+		if (e.isFromType(ChannelType.PRIVATE))
+		{
+			// TODO: Check if user is in an ongoing game, then act accordingly
+			return;
+		}
+
 		if (message.getContentRaw().contentEquals("!startLobby"))
 			startLobby(e.getJDA(), e.getGuild().getId(), e.getChannel());
 		else if (message.getContentRaw().contentEquals("!endLobby"))
