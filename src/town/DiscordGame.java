@@ -17,8 +17,8 @@ import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.requests.restaction.GuildAction;
 import town.events.TownEvent;
-import town.events.MurderTownEvent;
-import town.persons.DummyPerson;
+import town.events.MurderTownMessageEvent;
+import town.persons.Civilian;
 import town.persons.Person;
 
 public class DiscordGame
@@ -74,22 +74,21 @@ public class DiscordGame
 			Person murderer = getPerson(message.getMember());
 			if (deadPerson != null && murderer != null)
 			{
-				events.add(new MurderTownEvent(this, murderer, deadPerson));
+				events.add(new MurderTownMessageEvent(this, murderer, deadPerson));
 			}
 			
 			else System.out.println("Didn't get person");
 		}
 		
 		dispatchEvents();
-		
 	}
 
 	public void displayParty(MessageChannel channelUsed)
 	{
 		String description = "";
-		String format = "%n %s (%s)\n";
+		String format = "%d. %s (%s)\n";
 		for (Person p : persons)
-			description += String.format(format, p.getRealName(), p.getNickName());
+			description += String.format(format, p.getNum(), p.getRealName(), p.getNickName());
 		MessageEmbed embed = new EmbedBuilder().setColor(Color.YELLOW).setTitle("Party members").setDescription(description).build();
 		channelUsed.sendMessage(embed).queue();
 	}
@@ -146,7 +145,7 @@ public class DiscordGame
 		
 		// TODO: Add an icon to the server
 		
-		GuildAction ga = getJDA().createGuild("Town of Salem ");
+		GuildAction ga = getJDA().createGuild("Town of Salem");
 		createNewChannels(ga);
 		ga.newRole().setName(guildID);
 		ga.queue();
@@ -163,7 +162,7 @@ public class DiscordGame
         persons.forEach((person) -> person.sendMessage("Your role is " + r));
 		// TODO: Remove timer
 		Timer timer = new Timer();
-		timer.schedule(new TimerTask() {public void run() {guild.delete().queue();}}, 15000);
+		timer.schedule(new TimerTask() {public void run() {guild.delete().queue();}}, 60 * 1000);
 	}
 	
 	public void joinGame(String id, MessageChannel channelUsed)
@@ -175,7 +174,8 @@ public class DiscordGame
 			return;
 		}
 		
-		persons.add(new DummyPerson(this, id));
+		// Civilian is a temporary role. Once the game starts, they should get their actual roles
+		persons.add(new Civilian(this, persons.size() + 1, id));
 		String message = String.format("<@%s> joined the lobby", id);
 		channelUsed.sendMessage(message).queue();
 	}
