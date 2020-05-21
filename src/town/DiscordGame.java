@@ -48,7 +48,9 @@ public class DiscordGame
 	}
 	
 	public void processMessage(Message message)
-	{		
+	{
+		// TODO: Only allow party leader to start game
+		// NOTE: Who is the party leader?
 		if (message.getContentRaw().contentEquals("!start"))
 			startGame(message.getChannel());
 
@@ -57,8 +59,10 @@ public class DiscordGame
 		else if (message.getContentRaw().contentEquals("!join"))
 			joinGame(message.getMember().getId(), message.getChannel());
 		
+		// TODO: Be able to kill using DM
 		else if (started && message.getContentRaw().startsWith("!kill"))
 		{
+			// TODO: Check if there is more than one mention
 			Person deadPerson = getPerson(message.getMentionedMembers().get(0));
 			Person murderer = getPerson(message.getMember());
 			if (deadPerson != null && murderer != null)
@@ -90,7 +94,7 @@ public class DiscordGame
 			channelUsed.sendMessage("Game is already running!").queue();
 			return;
 		}
-		
+
 		else if (persons.isEmpty())
 		{
 			channelUsed.sendMessage("Not enough players to start a server!").queue();
@@ -118,6 +122,13 @@ public class DiscordGame
 	
 	public void joinGame(String id, MessageChannel channelUsed)
 	{
+		if (started)
+		{
+			String message = String.format("Can't join game until session is over <@%s>", id);
+			channelUsed.sendMessage(message).queue();
+			return;
+		}
+		
 		persons.add(new DummyPerson(this, id));
 		String message = String.format("<@%s> joined the lobby", id);
 		channelUsed.sendMessage(message).queue();
