@@ -9,6 +9,7 @@ import javax.security.auth.login.LoginException;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.JDA;
@@ -86,10 +87,10 @@ public class MainListener extends ListenerAdapter
 			return;
 		}
 
-		if (message.getContentRaw().contentEquals(prefix + "startLobby"))
-			startLobby(e.getJDA(), e.getGuild().getId(), e.getChannel());
+		if (message.getContentRaw().contentEquals(prefix + "startParty"))
+			startLobby(e.getJDA(), e.getGuild().getId(), e.getChannel(), e.getMember());
 		// TODO: Replace endLobby with endGame if the game starts
-		else if (message.getContentRaw().contentEquals(prefix + "endLobby"))
+		else if (message.getContentRaw().contentEquals(prefix + "endParty"))
 			endLobby(e.getJDA(), e.getGuild().getId(), e.getChannel());
 		else if (message.getContentRaw().startsWith(prefix))
 		{
@@ -113,14 +114,16 @@ public class MainListener extends ListenerAdapter
 		}		
 	}
 
-	public void startLobby(JDA jda, String guildID, MessageChannel channelUsed)
+	public void startLobby(JDA jda, String guildID, MessageChannel channelUsed, Member partyLeader)
 	{
 		if (games.containsKey(guildID))
 			channelUsed.sendMessage("Lobby already started").queue();
 		else
 		{
-			games.put(guildID, new DiscordGame(jda, guildID));
+			DiscordGame game = new DiscordGame(jda, guildID);
 			channelUsed.sendMessage("Lobby started").queue();
+			game.joinGame(partyLeader.getId(), channelUsed);
+			games.put(guildID, game);
 		}
 	}
 	

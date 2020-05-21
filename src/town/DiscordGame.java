@@ -1,16 +1,20 @@
 package town;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.requests.restaction.GuildAction;
 import town.events.TownEvent;
 import town.events.MurderTownEvent;
@@ -53,15 +57,16 @@ public class DiscordGame
 	{
 		// TODO: Only allow party leader to start game
 		// NOTE: Who is the party leader?
+		// TODO: When game starts, allow ! as a prefix also
 		if (message.getContentRaw().contentEquals(prefix + "startGame"))
 			startGame(message.getChannel());
 
 		// TODO: Block people if they occupy a certain role
-		// TODO: Display party with !party
+		else if (message.getContentRaw().contentEquals(prefix + "party"))
+			displayParty(message.getChannel());
 		else if (message.getContentRaw().contentEquals(prefix + "join"))
 			joinGame(message.getMember().getId(), message.getChannel());
 		
-		// TODO: Be able to kill using DM
 		else if (started && message.getContentRaw().startsWith(prefix + "kill"))
 		{
 			// TODO: Check if there is more than one mention
@@ -78,19 +83,38 @@ public class DiscordGame
 		dispatchEvents();
 		
 	}
-	
-	public void createNewChannels(GuildAction g) {
-		g.newChannel(ChannelType.TEXT, "daytime_discussion");
-		g.newChannel(ChannelType.VOICE, "daytime_discussion");
-		g.newChannel(ChannelType.TEXT, "mafia_chat");
-		g.newChannel(ChannelType.VOICE, "mafia_chat");
-		g.newChannel(ChannelType.TEXT, "vampires");
-		g.newChannel(ChannelType.VOICE, "vampires");
-		g.newChannel(ChannelType.TEXT, "jailor");
-		g.newChannel(ChannelType.TEXT, "jail");
-		g.newChannel(ChannelType.TEXT, "the_dead");
-		g.newChannel(ChannelType.VOICE, "the_dead");
+
+	public void displayParty(MessageChannel channelUsed)
+	{
+		String description = "";
+		String format = "%n %s (%s)\n";
+		for (Person p : persons)
+			description += String.format(format, p.getRealName(), p.getNickName());
+		MessageEmbed embed = new EmbedBuilder().setColor(Color.YELLOW).setTitle("Party members").setDescription(description).build();
+		channelUsed.sendMessage(embed).queue();
 	}
+
+    public void createNewChannels(GuildAction g)
+    {
+        //this channel used for general game updates
+        g.newChannel(ChannelType.TEXT, "system");
+        //players discussing during the day
+        g.newChannel(ChannelType.TEXT, "daytime_discussion");
+        g.newChannel(ChannelType.VOICE, "Daytime");
+        //mafia private chat at night
+        g.newChannel(ChannelType.TEXT, "the_hideout");
+        g.newChannel(ChannelType.VOICE, "Mafia");
+        //vampire private chat at night
+        g.newChannel(ChannelType.TEXT, "the_underground");
+        g.newChannel(ChannelType.VOICE, "Vampires");
+        //the jailor's private text channel, where he can talk to the bot
+        g.newChannel(ChannelType.TEXT, "jailor");
+        //the "jail" where the bot transfers the jailor's text anonymously, and the jailed player can respond
+        g.newChannel(ChannelType.TEXT, "jail");
+        //for dead players
+        g.newChannel(ChannelType.TEXT, "the_afterlife");
+        g.newChannel(ChannelType.VOICE, "The Dead");
+    }
 	
 	public void addEvent(TownEvent event)
 	{
@@ -121,6 +145,7 @@ public class DiscordGame
 		channelUsed.sendMessage("Game has started! Creating server...").queue();
 		
 		// TODO: Add an icon to the server
+		
 		GuildAction ga = getJDA().createGuild("Town of Salem ");
 		createNewChannels(ga);
 		ga.newRole().setName(guildID);
@@ -130,6 +155,12 @@ public class DiscordGame
 	public void getNewGuild(Guild guild)
 	{
 		guild.getChannels().get(0).createInvite().queue((invite) -> persons.forEach((person) -> person.sendMessage(invite.getUrl())));
+        Random random = new Random();
+        int role = random.nextInt(2);
+        String r;
+        if(role == 0) r = "SERIAL KILLER";
+        else r = "SHERIFF";
+        persons.forEach((person) -> person.sendMessage("Your role is " + r));
 		// TODO: Remove timer
 		Timer timer = new Timer();
 		timer.schedule(new TimerTask() {public void run() {guild.delete().queue();}}, 15000);
