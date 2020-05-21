@@ -36,6 +36,11 @@ public class DeathTownEvent implements TownEvent
 	public void standard(Person person)
 	{
 		if (getDeadPerson() == person)
-			person.sendMessage("You just died.");
+			die(person);
+	}
+
+	public void die(Person person)
+	{
+		person.sendMessage("You just died.");
 	}
 }
