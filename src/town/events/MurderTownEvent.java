@@ -40,6 +40,7 @@ public class MurderTownEvent implements TownEvent
 		return game.getJDA();
 	}
 	
+	// TODO: Check if it's night
 	@Override
 	public void standard(Person person)
 	{
