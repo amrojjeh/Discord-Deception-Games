@@ -35,7 +35,7 @@ public class MurderTownEvent implements TownEvent
 	}
 	
 	@Override
-	public JDA getJDA() 
+	public JDA getJDA()
 	{
 		return game.getJDA();
 	}
@@ -48,12 +48,12 @@ public class MurderTownEvent implements TownEvent
 	
 	public void kill(Person person)
 	{
-		if (murderer == getMurderer()) 
+		if (person == getMurderer()) 
 		{
 			murderer.sendMessage("You killed " + getVictim().getRealName() + " (" + getVictim().getNickName() + ")");
 			getGame().addEvent(new DeathTownEvent(getGame(), getVictim()));
 			getGame().dispatchEvents(); // TODO: Events should be dispatched at the end of the night
-			System.out.println(getVictim().getRealName() + " killed " + getVictim().getRealName());
+			System.out.println(getMurderer().getRealName() + " killed " + getVictim().getRealName());
 		}
 	}
 	
