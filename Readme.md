@@ -24,6 +24,6 @@ We create a new server so that the admin is able to play without being able to p
 
 It might also be possible to be able to play the game without enabling DMs. This is done by creating a specific private text channel. We might also be going with this plan completely and removing all DM communications, we'll have to see which works better.
 
-We plan to have a near complete playable demo by the end of Monday. Near complete means that there will be two main roles, a win condition for both roles, and the Day and Night phases. If we have enough time, we'll also implement the lynching phase.
+We plan to have a near complete playable demo by the end of Monday (05/24/20). Near complete means that there will be two main roles, a win condition for both roles, and the Day and Night phases. If we have enough time, we'll also implement the lynching phase.
 
 Note: Since people can DM each other, we're considering embracing the concept by removing any (or most) role reveals. That way dead people can continue to plea and frame others.
