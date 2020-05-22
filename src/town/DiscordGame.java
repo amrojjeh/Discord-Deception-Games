@@ -58,7 +58,6 @@ public class DiscordGame
 	
 	public void processMessage(Message message)
 	{
-		// TODO: Only allow party leader to start game
 		// NOTE: Who is the party leader?
 		// TODO: When game starts, allow ! as a prefix also
 		if (message.getContentRaw().contentEquals(prefix + "startGame"))
@@ -82,6 +81,7 @@ public class DiscordGame
 		else if (message.getContentRaw().contentEquals(prefix + "join"))
 			joinGame(message.getMember().getId(), message.getChannel());
 		
+		// TODO: Might want to handle commands better (Seperate function? Classes? ArrayLists?)
 		else if (started && message.getContentRaw().startsWith(prefix + "kill"))
 		{
 			// TODO: Check if there is more than one mention

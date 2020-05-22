@@ -89,7 +89,7 @@ public class MainListener extends ListenerAdapter
 
 		if (message.getContentRaw().contentEquals(prefix + "startParty"))
 			startLobby(e.getJDA(), e.getGuild().getId(), e.getChannel(), e.getMember());
-		// TODO: Replace endLobby with endGame if the game starts
+		// TODO: Replace endParty with endGame if the game starts (or just have them be the same)
 		else if (message.getContentRaw().contentEquals(prefix + "endParty"))
 			endLobby(e.getJDA(), e.getGuild().getId(), e.getChannel());
 		else if (message.getContentRaw().startsWith(prefix))
