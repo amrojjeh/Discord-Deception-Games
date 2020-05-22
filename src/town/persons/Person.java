@@ -28,6 +28,11 @@ public abstract class Person
 		return refNum;
 	}
 	
+	public DiscordGame getGame()
+	{
+		return game;
+	}
+	
 	public String getRealName()
 	{
 		return game.getJDA().getUserById(ID).getName();

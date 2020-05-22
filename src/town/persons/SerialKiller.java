@@ -6,9 +6,12 @@ import town.events.MurderTownEvent;
 //the Serial Killer can kill a person each night
 public class SerialKiller extends Person
 {
+	static int amount = 0;
+	
 	public SerialKiller(DiscordGame game, int num, String id)
 	{
 		super(game, num, id);
+		amount++;
 	}
 	
 	@Override
@@ -42,4 +45,13 @@ public class SerialKiller extends Person
 		return 3;
 	}
 
+	public static int getAmount()
+	{
+		return amount;
+	}
+	
+	public static int getMaxAmount()
+	{
+		return 0;
+	}
 }

@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -20,8 +19,8 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.requests.restaction.GuildAction;
 import town.events.TownEvent;
 import town.events.MurderTownEvent;
-import town.persons.Civilian;
 import town.persons.Person;
+import town.persons.RoleAssigner;
 
 public class DiscordGame
 {
@@ -158,7 +157,7 @@ public class DiscordGame
 		ga.newRole().setName(guildID);
 		ga.queue();
 	}
-	
+
 	public void assignChannel(GuildChannel channel) 
 	{
 		if (channel.getType().equals(ChannelType.TEXT))
@@ -177,14 +176,9 @@ public class DiscordGame
 		
 		// TODO: Remove timer
 		Timer timer = new Timer();
-		timer.schedule(new TimerTask() {public void run() {guild.delete().queue();}}, 60 * 1000);    
+		timer.schedule(new TimerTask() {public void run() {guild.delete().queue();}}, 5 * 1000);    
 		
-		Random random = new Random();
-        int role = random.nextInt(2);
-        String r;
-        if(role == 0) r = "SERIAL KILLER";
-        else r = "SHERIFF";
-        persons.forEach((person) -> person.sendMessage("Your role is " + r));
+        persons.forEach((person) -> person.sendMessage("Your role is " + person.getRoleName()));
 	}
 	
 	public void joinGame(String id, MessageChannel channelUsed)
@@ -197,7 +191,7 @@ public class DiscordGame
 		}
 		
 		// Civilian is a temporary role. Once the game starts, they should get their actual roles
-		persons.add(new Civilian(this, persons.size() + 1, id));
+		persons.add(RoleAssigner.assignRole(this, persons.size() + 1, id));
 		String message = String.format("<@%s> joined the lobby", id);
 		channelUsed.sendMessage(message).queue();
 	}
