@@ -37,17 +37,14 @@ public class DiscordGame
 	HashMap<String, String> textChannels;
 	HashMap<String, String> voiceChannels;
 	
-	String dayTextChannelID;
-	String dayVoiceChannelID;
-	String logTextChannelID;
-	String deadTextChannelID;
-	String morgueTextChannelID;
+	String partyLeaderID;
 	String prefix;
 	
-	public DiscordGame(JDA jda, String ID) 
+	public DiscordGame(JDA jda, String guildId, String partyLeaderId) 
 	{
 		this.jda = jda;
-		guildID = ID;
+		guildID = guildId;
+		partyLeaderID = partyLeaderId;
 		prefix = "tos.";
 		
 		phaseManager = new PhaseManager();
@@ -65,7 +62,19 @@ public class DiscordGame
 		// NOTE: Who is the party leader?
 		// TODO: When game starts, allow ! as a prefix also
 		if (message.getContentRaw().contentEquals(prefix + "startGame"))
-			startGame(message.getChannel());
+		{
+			if (started)
+				message.getChannel().sendMessage("Game is already running!").queue();
+			else if (persons.isEmpty())
+				message.getChannel().sendMessage("Not enough players to start a server!").queue();
+			else if (!message.getMember().getId().contentEquals(partyLeaderID))
+				message.getChannel().sendMessage(String.format("Only party leader (<@%s>) can start the game!", partyLeaderID));
+			else
+			{
+				message.getChannel().sendMessage("Game has started! Creating server...").queue();
+				startGame();
+			}
+		}
 
 		// TODO: Block people if they occupy a certain role
 		else if (message.getContentRaw().contentEquals(prefix + "party"))
@@ -137,23 +146,10 @@ public class DiscordGame
 		phaseManager.start();
 	}
 	
-	public void startGame(MessageChannel channelUsed)
-	{
-		if (started) 
-		{
-			channelUsed.sendMessage("Game is already running!").queue();
-			return;
-		}
-
-		else if (persons.isEmpty())
-		{
-			channelUsed.sendMessage("Not enough players to start a server!").queue();
-			return;
-		}
-		
+	public void startGame()
+	{	
 		startPhase();
 		started = true;
-		channelUsed.sendMessage("Game has started! Creating server...").queue();
 		
 		// TODO: Add an icon to the server
 		

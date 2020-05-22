@@ -120,7 +120,7 @@ public class MainListener extends ListenerAdapter
 			channelUsed.sendMessage("Party already started").queue();
 		else
 		{
-			DiscordGame game = new DiscordGame(jda, guildID);
+			DiscordGame game = new DiscordGame(jda, guildID, partyLeader.getId());
 			channelUsed.sendMessage("Party started").queue();
 			game.joinGame(partyLeader.getId(), channelUsed);
 			games.put(guildID, game);
