@@ -10,12 +10,20 @@ public abstract class Person
 	String ID; // Used to identify each person. For Discord, it's a snowflake
 	DiscordGame game; // Should be put into its own interface to seperate the game and discord
 	private int refNum; // This is how players can refer to other players without mentioning them
+	String roleName;
+	int attackStat;
+	int defenseStat;
+	int priority;
 	
-	Person(DiscordGame game, int refNum, String id)
+	Person(DiscordGame game, int refNum, String id, String roleName, int attack, int defense, int priority)
 	{
 		this.game = game;
 		ID = id;
 		this.refNum = refNum;
+		this.roleName = roleName;
+		attackStat = attack;
+		defenseStat = defense;
+		this.priority = priority;
 	}
 	
 	public String getID()
@@ -43,6 +51,26 @@ public abstract class Person
 		return game.getGuild().getMemberById(ID).getEffectiveName();
 	}
 	
+	public String getRoleName()
+	{
+		return roleName;
+	}
+
+	public int getAttackStat()
+	{
+		return attackStat;
+	}
+
+	public int getDefenseStat()
+	{
+		return defenseStat;
+	}
+	
+	public int getPriority()
+	{
+		return priority;
+	}
+	
 	public void sendMessage(String msg)
 	{
 		// TODO: Should check if user has private channel first
@@ -60,9 +88,4 @@ public abstract class Person
 		else if (event instanceof MurderTownEvent)
 			onMurder((MurderTownEvent)event);
 	}
-	
-	public abstract String getRoleName();
-	public abstract int getAttackStat();
-	public abstract int getDefenseStat();
-	public abstract int getPriority();
 }

@@ -9,32 +9,8 @@ public class Civilian extends Person
 	
 	public Civilian(DiscordGame game, int num, String id)
 	{
-		super(game, num, id);
+		super(game, num, id, "Civilian", 0, 0, 6);
 		amount++;
-	}
-
-	@Override
-	public String getRoleName()
-	{
-		return "Civilian";
-	}
-
-	@Override
-	public int getAttackStat()
-	{
-		return 0;
-	}
-
-	@Override
-	public int getDefenseStat()
-	{
-		return 0;
-	}
-
-	@Override
-	public int getPriority()
-	{
-		return 6;
 	}
 
 	public static int getAmount()

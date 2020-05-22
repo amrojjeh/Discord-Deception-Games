@@ -10,7 +10,7 @@ public class SerialKiller extends Person
 	
 	public SerialKiller(DiscordGame game, int num, String id)
 	{
-		super(game, num, id);
+		super(game, num, id, "Serial Killer", 1, 1, 3);
 		amount++;
 	}
 	
@@ -18,31 +18,6 @@ public class SerialKiller extends Person
 	public void onMurder(MurderTownEvent e)
 	{
 		e.standard(this);
-	}
-
-	// Name of this role
-	@Override
-	public String getRoleName()
-	{
-		return "Serial Killer";
-	}
-
-	@Override
-	public int getAttackStat()
-	{
-		return 1;
-	}
-
-	@Override
-	public int getDefenseStat()
-	{
-		return 1;
-	}
-
-	@Override
-	public int getPriority()
-	{
-		return 3;
 	}
 
 	public static int getAmount()
