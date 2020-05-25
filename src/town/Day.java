@@ -1,40 +1,41 @@
-package town.phases;
+package town;
+
+import net.dv8tion.jda.api.entities.MessageChannel;
 
 //Daytime is the phase where players can discuss what is happening. There are no features other than
 //a voice and text chat that all can use.
 public class Day extends Phase
 {
-	public Day(PhaseManager pm)
+	public Day(PhaseManager pm) 
 	{
 		super(pm);
 	}
-
+	
 	//begins the phase. sends out a message, and opens up text channels and voice chat.
 	@Override
-	public void start()
+	public void start(MessageChannel mc) 
 	{
-		getGame().sendMessageToTextChannel("system", "Day started");
-		getGame().getPlayers().forEach((person) -> System.out.println(person.hasWon()));
+		mc.sendMessage("The Day phase has begun.");
 	}
-
+	
 	//ends the phase, sending out a global message of this fact.
 	@Override
-	public void end()
+	public void end(MessageChannel mc) 
 	{
-		getGame().sendMessageToTextChannel("system", "Day has ended");
+		mc.sendMessage("The Day phase has ended.");
 	}
-
+	
 	//After Daytime, the Accusation phase begins.
 	@Override
-	public Phase getNextPhase(PhaseManager pm)
+	public Phase getNextPhase(PhaseManager pm) 
 	{
 		return new Accusation(pm);
 	}
-
+	
 	//Duration: 50 seconds
 	@Override
-	public int getDurationInSeconds()
+	public int getDuration()
 	{
-		return 15;
+		return 3000;
 	}
 }

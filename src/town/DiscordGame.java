@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
@@ -173,12 +175,12 @@ public class DiscordGame
 		guild.getChannels(true).forEach((channel) -> assignChannel(channel));
 		startPhase();
 
-		persons.forEach((person) -> person.sendMessage("Your role is " + person.getRoleName()));
-	}
+		// TODO: Remove timer
+		Timer timer = new Timer();
+		timer.schedule(new TimerTask() {@Override
+			public void run() {transferOrLeave();}}, 5 * 1000);
 
-	public void endGame()
-	{
-		transferOrLeave();
+		persons.forEach((person) -> person.sendMessage("Your role is " + person.getRoleName()));
 	}
 
 	public void transferOrLeave()
@@ -267,7 +269,6 @@ public class DiscordGame
 
 	public Guild getGameGuild()
 	{
-		if (getGameID() == null) return null;
 		return getJDA().getGuildById(getGameID());
 	}
 

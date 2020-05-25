@@ -50,9 +50,7 @@ public abstract class Person
 
 	public String getNickName()
 	{
-		if (game.getGameGuild() != null)
-			return game.getGameGuild().getMemberById(ID).getEffectiveName();
-		else return game.getPartyGuild().getMemberById(ID).getEffectiveName();
+		return game.getGameGuild().getMemberById(ID).getEffectiveName();
 	}
 
 	public String getRoleName()
@@ -94,6 +92,4 @@ public abstract class Person
 	}
 
 	public abstract boolean hasWon();
-
-	public abstract void win();
 }
