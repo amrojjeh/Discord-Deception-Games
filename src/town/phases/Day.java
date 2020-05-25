@@ -1,5 +1,7 @@
 package town.phases;
 
+import town.persons.Person;
+
 //Daytime is the phase where players can discuss what is happening. There are no features other than
 //a voice and text chat that all can use.
 public class Day extends Phase
@@ -14,7 +16,16 @@ public class Day extends Phase
 	public void start()
 	{
 		getGame().sendMessageToTextChannel("system", "Day started");
-		getGame().getPlayers().forEach((person) -> System.out.println(person.hasWon()));
+		getGame().getPlayers().forEach((person) -> checkVictory(person));
+	}
+
+	public void checkVictory(Person person)
+	{
+		if (person.hasWon())
+		{
+			getGame().sendMessageToTextChannel("system", person.getNickName() + " has won");
+			person.win();
+		}
 	}
 
 	//ends the phase, sending out a global message of this fact.

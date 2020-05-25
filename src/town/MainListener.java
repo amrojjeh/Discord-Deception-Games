@@ -68,13 +68,12 @@ public class MainListener extends ListenerAdapter
 	public void onReady(ReadyEvent e)
 	{
 		System.out.println("Bot is ready to be used");
-		//		e.getJDA().getGuilds().forEach((guild) -> deleteOrLeave(guild));
+		//		e.getJDA().getGuilds().forEach((guild) -> delete(guild));
 	}
 
-	public void deleteOrLeave(Guild guild)
+	public void delete(Guild guild)
 	{
 		if (guild.getOwner().getUser().isBot()) guild.delete().queue();
-		else guild.leave().queue();
 	}
 
 	@Override
