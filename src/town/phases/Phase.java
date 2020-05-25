@@ -1,6 +1,8 @@
-package town;
+package town.phases;
 
 import java.util.TimerTask;
+
+import town.DiscordGame;
 
 public abstract class Phase extends TimerTask
 {
@@ -10,6 +12,11 @@ public abstract class Phase extends TimerTask
 	public Phase(PhaseManager pm) 
 	{
 		phaseManager = pm;
+	}
+	
+	public DiscordGame getGame() 
+	{
+		return phaseManager.getGame();
 	}
 	
 	public void start() { }
@@ -24,5 +31,5 @@ public abstract class Phase extends TimerTask
 	}
 	
 	public abstract Phase getNextPhase(PhaseManager pm);
-	public abstract int getDuration();
+	public abstract int getDurationInSeconds();
 }

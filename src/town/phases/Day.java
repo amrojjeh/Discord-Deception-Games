@@ -1,4 +1,4 @@
-package town;
+package town.phases;
 
 //Daytime is the phase where players can discuss what is happening. There are no features other than
 //a voice and text chat that all can use.
@@ -13,7 +13,7 @@ public class Day extends Phase
 	@Override
 	public void start() 
 	{
-//		System.out.println("Starting day...");
+		getGame().sendMessageToTextChannel("system", "Day started");
 	}
 	
 	//ends the phase, sending out a global message of this fact.
@@ -27,13 +27,13 @@ public class Day extends Phase
 	@Override
 	public Phase getNextPhase(PhaseManager pm) 
 	{
-		return new Accusation(pm);
+		return new Night(pm);
 	}
 	
 	//Duration: 50 seconds
 	@Override
-	public int getDuration()
+	public int getDurationInSeconds()
 	{
-		return 3000;
+		return 15;
 	}
 }

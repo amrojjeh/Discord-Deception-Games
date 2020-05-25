@@ -21,6 +21,8 @@ import town.events.TownEvent;
 import town.events.MurderTownEvent;
 import town.persons.Person;
 import town.persons.RoleAssigner;
+import town.phases.Phase;
+import town.phases.PhaseManager;
 
 public class DiscordGame
 {
@@ -46,7 +48,7 @@ public class DiscordGame
 		partyLeaderID = partyLeaderId;
 		prefix = "tos.";
 		
-		phaseManager = new PhaseManager();
+		phaseManager = new PhaseManager(this);
 		persons = new ArrayList<>();
 		events = new LinkedList<>();
 		textChannels = new HashMap<>();
@@ -77,6 +79,7 @@ public class DiscordGame
 		// TODO: Block people if they occupy a certain role
 		else if (message.getContentRaw().contentEquals(prefix + "party"))
 			displayParty(message.getChannel());
+		// TODO: Make sure the same person can't join twice
 		else if (message.getContentRaw().contentEquals(prefix + "join"))
 			joinGame(message.getMember().getId(), message.getChannel());
 		
@@ -147,7 +150,6 @@ public class DiscordGame
 	
 	public void startGame()
 	{	
-		startPhase();
 		started = true;
 		
 		// TODO: Add an icon to the server
@@ -171,12 +173,11 @@ public class DiscordGame
 		guild.getChannels().get(0).createInvite().queue((invite) -> persons.forEach((person) -> person.sendMessage(invite.getUrl())));
 		gameGuildID = guild.getId();
 		guild.getChannels(true).forEach((channel) -> assignChannel(channel));
-		
-		getJDA().getTextChannelById(textChannels.get("system")).sendMessage("This is a test").queue();
+		startPhase();
 		
 		// TODO: Remove timer
 		Timer timer = new Timer();
-		timer.schedule(new TimerTask() {public void run() {guild.delete().queue();}}, 5 * 1000);    
+		timer.schedule(new TimerTask() {public void run() {guild.delete().queue();}}, 60 * 1000);
 		
         persons.forEach((person) -> person.sendMessage("Your role is " + person.getRoleName()));
 	}
@@ -219,6 +220,16 @@ public class DiscordGame
 		return jda;
 	}
 	
+	public PhaseManager getPhaseManager()
+	{
+		return phaseManager;
+	}
+
+	public Phase getCurrentPhase()
+	{
+		return phaseManager.getCurrentPhase();
+	}
+
 	public String getID() 
 	{
 		return guildID;
@@ -232,5 +243,10 @@ public class DiscordGame
 	public void sendDMTo(Person person, String msg)
 	{
 		jda.getUserById(person.getID()).openPrivateChannel().queue((channel) -> channel.sendMessage(msg).queue());
+	}
+
+	public void sendMessageToTextChannel(String channelName, String msg)
+	{
+		getJDA().getTextChannelById(textChannels.get(channelName)).sendMessage(msg).queue();
 	}
 }

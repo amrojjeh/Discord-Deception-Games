@@ -1,4 +1,4 @@
-package town;
+package town.phases;
 
 //Accusation is the phase where players can vote to put another player on trial. If a player receives enough
 //votes, the defense phase begins for that player. There can be 3 trials in a day. Night phase happens otherwise.
@@ -32,7 +32,7 @@ public class Accusation extends Phase
 	
 	//Duration: 30 seconds
 	@Override
-	public int getDuration()
+	public int getDurationInSeconds()
 	{
 		return 3000;
 	}
