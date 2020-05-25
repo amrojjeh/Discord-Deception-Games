@@ -20,7 +20,7 @@ import net.dv8tion.jda.api.requests.restaction.GuildAction;
 import town.events.TownEvent;
 import town.events.MurderTownEvent;
 import town.persons.Person;
-import town.persons.RoleAssigner;
+import town.persons.assigner.RoleAssigner;
 import town.phases.Phase;
 import town.phases.PhaseManager;
 
@@ -177,7 +177,7 @@ public class DiscordGame
 		
 		// TODO: Remove timer
 		Timer timer = new Timer();
-		timer.schedule(new TimerTask() {public void run() {guild.delete().queue();}}, 60 * 1000);
+		timer.schedule(new TimerTask() {public void run() {guild.delete().queue();}}, 40 * 1000);
 		
         persons.forEach((person) -> person.sendMessage("Your role is " + person.getRoleName()));
 	}

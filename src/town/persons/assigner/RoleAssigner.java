@@ -1,8 +1,11 @@
-package town.persons;
+package town.persons.assigner;
 
 import java.util.Random;
 
 import town.DiscordGame;
+import town.persons.Civilian;
+import town.persons.Person;
+import town.persons.SerialKiller;
 
 public class RoleAssigner
 {
