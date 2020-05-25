@@ -3,6 +3,7 @@ package town.events;
 import net.dv8tion.jda.api.JDA;
 import town.DiscordGame;
 import town.persons.Person;
+import town.phases.Night;
 
 public class MurderTownEvent implements TownEvent
 {
@@ -40,11 +41,10 @@ public class MurderTownEvent implements TownEvent
 		return game.getJDA();
 	}
 	
-	// TODO: Check if it's night
 	@Override
 	public void standard(Person person)
 	{
-		if (person == getMurderer())
+		if (person == getMurderer() && getGame().getCurrentPhase() instanceof Night)
 			killVictim(person);
 	}
 	
