@@ -17,8 +17,8 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.requests.restaction.GuildAction;
-import town.events.TownEvent;
 import town.events.MurderTownEvent;
+import town.events.TownEvent;
 import town.persons.Person;
 import town.persons.assigner.RoleAssigner;
 import town.phases.Phase;
@@ -33,30 +33,30 @@ public class DiscordGame
 	LinkedList<TownEvent> events; // TODO: PriorityQueue<E>
 	PhaseManager phaseManager;
 	boolean started;
-	
+
 	// Important channels
 	HashMap<String, String> textChannels;
 	HashMap<String, String> voiceChannels;
-	
+
 	String partyLeaderID;
 	String prefix;
-	
-	public DiscordGame(JDA jda, String guildId, String partyLeaderId) 
+
+	public DiscordGame(JDA jda, String guildId, String partyLeaderId)
 	{
 		this.jda = jda;
 		guildID = guildId;
 		partyLeaderID = partyLeaderId;
 		prefix = "tos.";
-		
+
 		phaseManager = new PhaseManager(this);
 		persons = new ArrayList<>();
 		events = new LinkedList<>();
 		textChannels = new HashMap<>();
 		voiceChannels = new HashMap<>();
-		
+
 		started = false;
 	}
-	
+
 	public void processMessage(Message message)
 	{
 		// NOTE: Who is the party leader?
@@ -68,7 +68,7 @@ public class DiscordGame
 			else if (persons.isEmpty())
 				message.getChannel().sendMessage("Not enough players to start a server!").queue();
 			else if (!message.getMember().getId().contentEquals(partyLeaderID))
-				message.getChannel().sendMessage(String.format("Only party leader (<@%s>) can start the game!", partyLeaderID));
+				message.getChannel().sendMessage(String.format("Only party leader (<@%s>) can start the game!", getPartyLeaderID()));
 			else
 			{
 				message.getChannel().sendMessage("Game has started! Creating server...").queue();
@@ -82,9 +82,9 @@ public class DiscordGame
 		// TODO: Make sure the same person can't join twice
 		else if (message.getContentRaw().contentEquals(prefix + "join"))
 			joinGame(message.getMember().getId(), message.getChannel());
-		
+
 		// TODO: Might want to handle commands better (Seperate function? Classes? ArrayLists?)
-		else if (started && message.getContentRaw().startsWith(prefix + "kill"))
+		else if (started && message.getGuild().getIdLong() == getGameGuild().getIdLong() && message.getContentRaw().startsWith(prefix + "kill"))
 		{
 			// TODO: Check if there is more than one mention
 			Person deadPerson = getPerson(message.getMentionedMembers().get(0));
@@ -96,7 +96,7 @@ public class DiscordGame
 			// TODO: Send message when person isn't in the lobby
 			else System.out.println("Didn't get person");
 		}
-		
+
 		dispatchEvents();
 	}
 
@@ -110,78 +110,96 @@ public class DiscordGame
 		channelUsed.sendMessage(embed).queue();
 	}
 
-    public void createNewChannels(GuildAction g)
-    {
-    	// this channel used for general game updates
-    	textChannels.put("system", "");
-    	// players discussing during the day
-    	textChannels.put("daytime_discussion", "");
-    	textChannels.put("the_hideout", "");
-    	textChannels.put("the_underground", "");
-    	//the jailor's private text channel, where he can talk to the bot
-        textChannels.put("jailor", "");
-      //the "jail" where the bot transfers the jailor's text anonymously, and the jailed player can respond
-        textChannels.put("jail", "");
-    	
-    	voiceChannels.put("Daytime", "");
-    	// mafia private chat at night
-    	voiceChannels.put("Mafia", "");
-    	// vampire private chat at night
-        voiceChannels.put("Vampires", "");
-    	
-        
-        //for dead players
-        voiceChannels.put("The Dead", "");
-        textChannels.put("the_afterlife", "");
-    	
-        textChannels.forEach((name, id) -> g.newChannel(ChannelType.TEXT, name));
-        voiceChannels.forEach((name, id) -> g.newChannel(ChannelType.VOICE, name));
-    }
-	
+	public void createNewChannels(GuildAction g)
+	{
+		// this channel used for general game updates
+		textChannels.put("system", "");
+		// players discussing during the day
+		textChannels.put("daytime_discussion", "");
+		textChannels.put("the_hideout", "");
+		textChannels.put("the_underground", "");
+		//the jailor's private text channel, where he can talk to the bot
+		textChannels.put("jailor", "");
+		//the "jail" where the bot transfers the jailor's text anonymously, and the jailed player can respond
+		textChannels.put("jail", "");
+
+		voiceChannels.put("Daytime", "");
+		// mafia private chat at night
+		voiceChannels.put("Mafia", "");
+		// vampire private chat at night
+		voiceChannels.put("Vampires", "");
+
+
+		//for dead players
+		voiceChannels.put("The Dead", "");
+		textChannels.put("the_afterlife", "");
+
+		textChannels.forEach((name, id) -> g.newChannel(ChannelType.TEXT, name));
+		voiceChannels.forEach((name, id) -> g.newChannel(ChannelType.VOICE, name));
+	}
+
 	public void addEvent(TownEvent event)
 	{
 		events.add(event);
 	}
-	
-	public void startPhase() 
+
+	public void startPhase()
 	{
 		phaseManager.start();
 	}
-	
+
 	public void startGame()
-	{	
+	{
 		started = true;
-		
+
 		// TODO: Add an icon to the server
-		
+
 		GuildAction ga = getJDA().createGuild("Town of Salem");
 		createNewChannels(ga);
 		ga.newRole().setName(guildID);
 		ga.queue();
 	}
 
-	public void assignChannel(GuildChannel channel) 
+	public void assignChannel(GuildChannel channel)
 	{
 		if (channel.getType().equals(ChannelType.TEXT))
 			textChannels.replace(channel.getName(), channel.getId());
 		else
 			voiceChannels.replace(channel.getName(), channel.getId());
 	}
-	
+
 	public void getNewGuild(Guild guild)
 	{
 		guild.getChannels().get(0).createInvite().queue((invite) -> persons.forEach((person) -> person.sendMessage(invite.getUrl())));
 		gameGuildID = guild.getId();
 		guild.getChannels(true).forEach((channel) -> assignChannel(channel));
 		startPhase();
-		
+
 		// TODO: Remove timer
 		Timer timer = new Timer();
-		timer.schedule(new TimerTask() {public void run() {guild.delete().queue();}}, 40 * 1000);
-		
-        persons.forEach((person) -> person.sendMessage("Your role is " + person.getRoleName()));
+		timer.schedule(new TimerTask() {@Override
+			public void run() {transferOrLeave();}}, 5 * 1000);
+
+		persons.forEach((person) -> person.sendMessage("Your role is " + person.getRoleName()));
 	}
-	
+
+	public void transferOrLeave()
+	{
+		Member partyLeader = getGameGuild().getMemberById(getPartyLeaderID());
+		if (partyLeader != null)
+		{
+			System.out.println(getGameGuild().getOwner().getEffectiveName());
+			getGameGuild().transferOwnership(partyLeader).reason("The game has ended").queue();
+		}
+
+		else getGameGuild().delete().queue();
+	}
+
+	public String getPartyLeaderID()
+	{
+		return partyLeaderID;
+	}
+
 	public void joinGame(String id, MessageChannel channelUsed)
 	{
 		if (started)
@@ -190,13 +208,12 @@ public class DiscordGame
 			channelUsed.sendMessage(message).queue();
 			return;
 		}
-		
-		// Civilian is a temporary role. Once the game starts, they should get their actual roles
+
 		persons.add(RoleAssigner.assignRole(this, persons.size() + 1, id));
 		String message = String.format("<@%s> joined the lobby", id);
 		channelUsed.sendMessage(message).queue();
 	}
-	
+
 	public Person getPerson(Member member)
 	{
 		for (Person person : persons)
@@ -204,22 +221,27 @@ public class DiscordGame
 				return person;
 		return null;
 	}
-	
+
+	public ArrayList<Person> getPlayers()
+	{
+		return persons;
+	}
+
 	public void dispatchEvents()
 	{
 		if (events.size() == 0) return;
 		TownEvent event = events.remove();
-		for (Person person : persons) 
+		for (Person person : persons)
 			person.onEvent(event);
-		
+
 		dispatchEvents();
 	}
-	
-	public JDA getJDA() 
+
+	public JDA getJDA()
 	{
 		return jda;
 	}
-	
+
 	public PhaseManager getPhaseManager()
 	{
 		return phaseManager;
@@ -230,14 +252,24 @@ public class DiscordGame
 		return phaseManager.getCurrentPhase();
 	}
 
-	public String getID() 
+	public String getPartyID()
 	{
 		return guildID;
 	}
-	
-	public Guild getGuild()
+
+	public String getGameID()
 	{
-		return getJDA().getGuildById(getID());
+		return gameGuildID;
+	}
+
+	public Guild getPartyGuild()
+	{
+		return getJDA().getGuildById(getPartyID());
+	}
+
+	public Guild getGameGuild()
+	{
+		return getJDA().getGuildById(getGameID());
 	}
 
 	public void sendDMTo(Person person, String msg)

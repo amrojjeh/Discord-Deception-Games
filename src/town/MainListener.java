@@ -1,22 +1,23 @@
 package town;
 
-import java.util.Scanner;
-import java.util.HashMap;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.HashMap;
+import java.util.Scanner;
+
 import javax.security.auth.login.LoginException;
 
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 
 public class MainListener extends ListenerAdapter
@@ -25,16 +26,16 @@ public class MainListener extends ListenerAdapter
 
 	HashMap<String, DiscordGame> parties;
 	HashMap<String, DiscordGame> games;
-	
+
 	public MainListener()
 	{
 		prefix = "tos.";
 		parties = new HashMap<>();
 		games = new HashMap<>();
 	}
-	
+
 	public static void main(String[] args)
-		throws InterruptedException
+			throws InterruptedException
 	{
 		String token;
 		JDA jda;
@@ -42,20 +43,20 @@ public class MainListener extends ListenerAdapter
 		{
 			token = loadToken();
 		}
-		catch (FileNotFoundException e) 
+		catch (FileNotFoundException e)
 		{
 			System.out.println("token.txt did not exist.");
 			return;
 		}
-		
+
 		if (token == "")
 			System.out.println("No token is found in token.txt");
-		
-		try 
+
+		try
 		{
 			jda = new JDABuilder(token).addEventListeners(new MainListener()).build();
 		}
-		catch (LoginException e) 
+		catch (LoginException e)
 		{
 			System.out.println("Couldn't login: " + e);
 			return;
@@ -67,10 +68,17 @@ public class MainListener extends ListenerAdapter
 	public void onReady(ReadyEvent e)
 	{
 		System.out.println("Bot is ready to be used");
+		//		e.getJDA().getGuilds().forEach((guild) -> deleteOrLeave(guild));
 	}
-	
+
+	public void deleteOrLeave(Guild guild)
+	{
+		if (guild.getOwner().getUser().isBot()) guild.delete().queue();
+		else guild.leave().queue();
+	}
+
 	@Override
-	public void onGuildJoin(GuildJoinEvent e) 
+	public void onGuildJoin(GuildJoinEvent e)
 	{
 		System.out.println("Joined new guild");
 		Guild guild = e.getGuild();
@@ -81,12 +89,13 @@ public class MainListener extends ListenerAdapter
 		game.getNewGuild(guild);
 		games.put(guild.getId(), game);
 	}
-	
+
 	@Override
 	public void onMessageReceived(MessageReceivedEvent e)
 	{
 		// TODO: Make sure that when kicked, to delete the game from the hash table
 		// TODO: Add a help command
+		// TODO: Disable start party commands in game servers
 		Message message = e.getMessage();
 		if (e.isFromType(ChannelType.PRIVATE))
 			return;
@@ -100,7 +109,7 @@ public class MainListener extends ListenerAdapter
 		{
 			DiscordGame party = parties.get(e.getGuild().getId());
 			DiscordGame game = games.get(e.getGuild().getId());
-			
+
 			if (party != null)
 				party.processMessage(e.getMessage());
 			else if (game != null)
@@ -116,7 +125,7 @@ public class MainListener extends ListenerAdapter
 		}
 		// TODO: When someone joins, check if they have an open private channel first.
 	}
-	
+
 	private void endLobby(JDA jda, String guildID, MessageChannel channelUsed)
 	{
 		if (!parties.containsKey(guildID))
@@ -140,9 +149,9 @@ public class MainListener extends ListenerAdapter
 			parties.put(guildID, game);
 		}
 	}
-	
+
 	public static String loadToken()
-		throws FileNotFoundException
+			throws FileNotFoundException
 	{
 		File file = new File("token.txt");
 		Scanner scanner = new Scanner(file);
