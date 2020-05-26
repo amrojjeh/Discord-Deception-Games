@@ -1,12 +1,10 @@
 package town.phases;
 
-import town.persons.Person;
-
 //Daytime is the phase where players can discuss what is happening. There are no features other than
 //a voice and text chat that all can use.
-public class Day extends Phase
+public class Trial extends Phase
 {
-	public Day(PhaseManager pm)
+	public Trial(PhaseManager pm)
 	{
 		super(pm);
 	}
@@ -15,28 +13,22 @@ public class Day extends Phase
 	@Override
 	public void start()
 	{
-		getGame().sendMessageToTextChannel("system", "Day started");
-		getGame().getPlayers().forEach((person) -> checkVictory(person));
-	}
-
-	public void checkVictory(Person person)
-	{
-		if (person.hasWon())
-			person.win();
+		getGame().sendMessageToTextChannel("system", "[PLAYER NAME] has been put on trial!");
+		getGame().getPlayers().forEach((person) -> System.out.println(person.hasWon()));
 	}
 
 	//ends the phase, sending out a global message of this fact.
 	@Override
 	public void end()
 	{
-		getGame().sendMessageToTextChannel("system", "Day has ended");
+		//		System.out.println("Ending day...");
 	}
 
 	//After Daytime, the Accusation phase begins.
 	@Override
 	public Phase getNextPhase(PhaseManager pm)
 	{
-		return new Accusation(pm);
+		return new Night(pm);
 	}
 
 	//Duration: 50 seconds

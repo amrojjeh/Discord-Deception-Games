@@ -268,7 +268,6 @@ public class DiscordGame
 
 	public Guild getGameGuild()
 	{
-		if (getGameID() == null) return null;
 		return getJDA().getGuildById(getGameID());
 	}
 
