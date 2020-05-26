@@ -173,15 +173,16 @@ public class DiscordGame
 		guild.getChannels(true).forEach((channel) -> assignChannel(channel));
 		startPhase();
 
-		persons.forEach((person) -> person.sendMessage("Your role is " + person.getRoleName()));
+		// TODO: Tell him role in specific channel
 	}
 
 	public void endGame()
 	{
-		transferOrLeave();
+		getPhaseManager().end();
+		transferOrDelete();
 	}
 
-	public void transferOrLeave()
+	public void transferOrDelete()
 	{
 		Member partyLeader = getGameGuild().getMemberById(getPartyLeaderID());
 		if (partyLeader != null)
