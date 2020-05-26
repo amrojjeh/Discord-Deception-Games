@@ -22,10 +22,7 @@ public class Day extends Phase
 	public void checkVictory(Person person)
 	{
 		if (person.hasWon())
-		{
-			getGame().sendMessageToTextChannel("system", person.getNickName() + " has won");
 			person.win();
-		}
 	}
 
 	//ends the phase, sending out a global message of this fact.

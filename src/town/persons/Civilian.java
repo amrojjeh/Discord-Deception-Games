@@ -31,4 +31,11 @@ public class Civilian extends Person
 				getGame().getPlayers().stream().filter((person) -> person.alive).count();
 	}
 
+	@Override
+	public void win()
+	{
+		getGame().sendMessageToTextChannel("system", "**Civilians have won!**");
+		getGame().endGame();
+	}
+
 }

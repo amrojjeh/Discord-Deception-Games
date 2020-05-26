@@ -36,4 +36,11 @@ public class SerialKiller extends Person
 		return getGame().getPlayers().stream().filter((person) -> person instanceof SerialKiller && person.alive).count() ==
 				getGame().getPlayers().stream().filter((person) -> person.alive).count();
 	}
+
+	@Override
+	public void win()
+	{
+		getGame().sendMessageToTextChannel("system", "**Serial Killers have won!**");
+		getGame().endGame();
+	}
 }
