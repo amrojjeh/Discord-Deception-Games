@@ -1,7 +1,6 @@
 package town.persons;
 
 import town.DiscordGame;
-import town.events.DeathTownEvent;
 import town.events.MurderTownEvent;
 import town.events.TownEvent;
 
@@ -14,8 +13,7 @@ public abstract class Person
 	int attackStat;
 	int defenseStat;
 	int priority;
-	// TODO: Change into getter
-	public boolean alive = true;
+	boolean alive = true;
 
 	Person(DiscordGame game, int refNum, String id, String roleName, int attack, int defense, int priority)
 	{
@@ -81,15 +79,17 @@ public abstract class Person
 		game.sendDMTo(this, msg);
 	}
 
-	public void onDeath(DeathTownEvent event) { event.standard(this); } // Returns 1 to skip standard, 0 to continue normally
+	public void die()
+	{
+		alive = false;
+	}
+
 	public void onMurder(MurderTownEvent event) {  } // By default, a person cannot kill
 
 
 	public void onEvent(TownEvent event)
 	{
-		if (event instanceof DeathTownEvent)
-			onDeath((DeathTownEvent)event);
-		else if (event instanceof MurderTownEvent)
+		if (event instanceof MurderTownEvent)
 			onMurder((MurderTownEvent)event);
 	}
 

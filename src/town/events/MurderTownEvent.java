@@ -50,14 +50,9 @@ public class MurderTownEvent implements TownEvent
 
 	public void killVictim(Person person)
 	{
-		if (person == getMurderer())
-		{
-			murderer.sendMessage("You killed " + getVictim().getRealName() + " (" + getVictim().getNickName() + ")");
-			getGame().addEvent(new DeathTownEvent(getGame(), getVictim()));
-			getGame().dispatchEvents(); // TODO: Events should be dispatched at the end of the night
-			getVictim().alive = false;
-			System.out.println(getMurderer().getRealName() + " killed " + getVictim().getRealName());
-		}
+		murderer.sendMessage("You killed " + getVictim().getRealName() + " (" + getVictim().getNickName() + ")");
+		getVictim().die();
+		System.out.println(getMurderer().getRealName() + " killed " + getVictim().getRealName());
 	}
 
 }
