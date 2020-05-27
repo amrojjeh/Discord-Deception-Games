@@ -9,7 +9,7 @@ import town.persons.SerialKiller;
 
 public class RoleAssigner
 {
-	public static Person assignRole(DiscordGame g, int n, String id) 
+	public static Person assignRole(DiscordGame g, int n, Long id)
 	{
 		Random random = new Random();
 		int role = random.nextInt(2);

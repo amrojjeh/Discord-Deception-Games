@@ -6,7 +6,7 @@ import town.events.TownEvent;
 
 public abstract class Person
 {
-	String ID; // Used to identify each person. For Discord, it's a snowflake
+	Long ID; // Used to identify each person. For Discord, it's a snowflake
 	DiscordGame game; // Should be put into its own interface to seperate the game and discord
 	private int refNum; // This is how players can refer to other players without mentioning them
 	String roleName;
@@ -15,7 +15,7 @@ public abstract class Person
 	int priority;
 	boolean alive = true;
 
-	Person(DiscordGame game, int refNum, String id, String roleName, int attack, int defense, int priority)
+	Person(DiscordGame game, int refNum, Long id, String roleName, int attack, int defense, int priority)
 	{
 		this.game = game;
 		ID = id;
@@ -26,7 +26,7 @@ public abstract class Person
 		this.priority = priority;
 	}
 
-	public String getID()
+	public Long getID()
 	{
 		return ID;
 	}

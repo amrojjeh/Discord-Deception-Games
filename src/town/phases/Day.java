@@ -11,11 +11,13 @@ public class Day extends Phase
 		super(pm);
 	}
 
-	//begins the phase. sends out a message, and opens up text channels and voice chat.
+	// begins the phase. sends out a message, and opens up text channels and voice chat.
 	@Override
 	public void start()
 	{
-		getGame().sendMessageToTextChannel("system", "Day started");
+		getGame().sendMessageToTextChannel("system", "Day started").queue();
+		getGame().setChannelVisibility("daytime_discussion", true, true);
+		getGame().setChannelVisibility("Daytime", true, true);
 		getGame().getPlayers().forEach((person) -> checkVictory(person));
 	}
 
@@ -25,14 +27,15 @@ public class Day extends Phase
 			person.win();
 	}
 
-	//ends the phase, sending out a global message of this fact.
+	// ends the phase, sending out a global message of this fact.
 	@Override
 	public void end()
 	{
-		getGame().sendMessageToTextChannel("system", "Day has ended");
+		getGame().setChannelVisibility("daytime_discussion", true, false);
+		getGame().setChannelVisibility("Daytime", false, false);
 	}
 
-	//After Daytime, the Accusation phase begins.
+	// After Daytime, the Accusation phase begins.
 	@Override
 	public Phase getNextPhase(PhaseManager pm)
 	{

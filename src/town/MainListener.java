@@ -16,6 +16,8 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
+import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
+import net.dv8tion.jda.api.events.guild.update.GuildUpdateOwnerEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
@@ -24,8 +26,8 @@ public class MainListener extends ListenerAdapter
 {
 	String prefix;
 
-	HashMap<String, DiscordGame> parties;
-	HashMap<String, DiscordGame> games;
+	HashMap<Long, DiscordGame> parties;
+	HashMap<Long, DiscordGame> games;
 
 	public MainListener()
 	{
@@ -65,16 +67,21 @@ public class MainListener extends ListenerAdapter
 	}
 
 	@Override
+	public void onGuildMemberJoin(GuildMemberJoinEvent event)
+	{
+		games.get(event.getGuild().getIdLong()).guildJoin(event.getMember());
+	}
+
+	@Override
 	public void onReady(ReadyEvent e)
 	{
 		System.out.println("Bot is ready to be used");
-		//		e.getJDA().getGuilds().forEach((guild) -> deleteOrLeave(guild));
+		e.getJDA().getGuilds().forEach((guild) -> delete(guild));
 	}
 
-	public void deleteOrLeave(Guild guild)
+	public void delete(Guild guild)
 	{
 		if (guild.getOwner().getUser().isBot()) guild.delete().queue();
-		else guild.leave().queue();
 	}
 
 	@Override
@@ -83,11 +90,21 @@ public class MainListener extends ListenerAdapter
 		System.out.println("Joined new guild");
 		Guild guild = e.getGuild();
 		String roleName = guild.getRoles().get(0).getName();
-		DiscordGame game = parties.get(roleName);
+		DiscordGame game = parties.get(Long.parseLong(roleName));
 		if (game == null)
 			return;
 		game.getNewGuild(guild);
-		games.put(guild.getId(), game);
+		games.put(guild.getIdLong(), game);
+	}
+
+	@Override
+	public void onGuildUpdateOwner(GuildUpdateOwnerEvent event)
+	{
+		DiscordGame game = games.get(event.getGuild().getIdLong());
+		if (game == null) return;
+		game.leaveGame();
+		games.remove(game.getGameID());
+		parties.remove(game.getPartyID());
 	}
 
 	@Override
@@ -101,14 +118,14 @@ public class MainListener extends ListenerAdapter
 			return;
 
 		if (message.getContentRaw().contentEquals(prefix + "startParty"))
-			startLobby(e.getJDA(), e.getGuild().getId(), e.getChannel(), e.getMember());
+			startLobby(e.getJDA(), e.getGuild().getIdLong(), e.getChannel(), e.getMember());
 		// TODO: Replace endParty with endGame if the game starts (or just have them be the same)
 		else if (message.getContentRaw().contentEquals(prefix + "endParty"))
-			endLobby(e.getJDA(), e.getGuild().getId(), e.getChannel());
+			endLobby(e.getJDA(), e.getGuild().getIdLong(), e.getChannel());
 		else if (message.getContentRaw().startsWith(prefix))
 		{
-			DiscordGame party = parties.get(e.getGuild().getId());
-			DiscordGame game = games.get(e.getGuild().getId());
+			DiscordGame party = parties.get(e.getGuild().getIdLong());
+			DiscordGame game = games.get(e.getGuild().getIdLong());
 
 			if (party != null)
 				party.processMessage(e.getMessage());
@@ -119,14 +136,14 @@ public class MainListener extends ListenerAdapter
 		}
 		else if (message.getContentRaw().startsWith("!"))
 		{
-			DiscordGame game = games.get(e.getGuild().getId());
+			DiscordGame game = games.get(e.getGuild().getIdLong());
 			if (game != null)
 				game.processMessage(e.getMessage());
 		}
 		// TODO: When someone joins, check if they have an open private channel first.
 	}
 
-	private void endLobby(JDA jda, String guildID, MessageChannel channelUsed)
+	private void endLobby(JDA jda, Long guildID, MessageChannel channelUsed)
 	{
 		if (!parties.containsKey(guildID))
 			channelUsed.sendMessage("There is no party to end").queue();
@@ -137,7 +154,7 @@ public class MainListener extends ListenerAdapter
 		}
 	}
 
-	public void startLobby(JDA jda, String guildID, MessageChannel channelUsed, Member partyLeader)
+	public void startLobby(JDA jda, Long guildID, MessageChannel channelUsed, Member partyLeader)
 	{
 		if (parties.containsKey(guildID))
 			channelUsed.sendMessage("Party already started").queue();
@@ -145,7 +162,7 @@ public class MainListener extends ListenerAdapter
 		{
 			DiscordGame game = new DiscordGame(jda, guildID, partyLeader.getId());
 			channelUsed.sendMessage("Party started").queue();
-			game.joinGame(partyLeader.getId(), channelUsed);
+			game.joinGame(partyLeader.getIdLong(), channelUsed);
 			parties.put(guildID, game);
 		}
 	}

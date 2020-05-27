@@ -8,7 +8,7 @@ public class SerialKiller extends Person
 {
 	static int amount = 0;
 
-	public SerialKiller(DiscordGame game, int num, String id)
+	public SerialKiller(DiscordGame game, int num, Long id)
 	{
 		super(game, num, id, "Serial Killer", 1, 1, 3);
 		amount++;
@@ -40,7 +40,6 @@ public class SerialKiller extends Person
 	@Override
 	public void win()
 	{
-		getGame().sendMessageToTextChannel("system", "**Serial Killers have won!**");
-		getGame().endGame();
+		getGame().sendMessageToTextChannel("system", "**Serial Killers have won!**").queue((msg) -> getGame().endGame());
 	}
 }

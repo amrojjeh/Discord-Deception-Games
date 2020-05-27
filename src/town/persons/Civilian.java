@@ -7,7 +7,7 @@ public class Civilian extends Person
 {
 	static int amount = 0;
 
-	public Civilian(DiscordGame game, int num, String id)
+	public Civilian(DiscordGame game, int num, Long id)
 	{
 		super(game, num, id, "Civilian", 0, 0, 6);
 		amount++;
@@ -34,8 +34,6 @@ public class Civilian extends Person
 	@Override
 	public void win()
 	{
-		getGame().sendMessageToTextChannel("system", "**Civilians have won!**");
-		getGame().endGame();
+		getGame().sendMessageToTextChannel("system", "**Civilians have won!**").queue((msg) -> getGame().endGame());
 	}
-
 }
