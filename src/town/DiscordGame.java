@@ -89,6 +89,7 @@ public class DiscordGame
 		else if (message.getContentRaw().contentEquals(prefix + "party"))
 			displayParty(message.getChannel());
 		// TODO: Make sure the same person can't join twice
+		// TODO: Make sure his DM is open
 		else if (message.getContentRaw().contentEquals(prefix + "join"))
 			joinGame(message.getMember().getIdLong(), message.getChannel());
 
@@ -142,16 +143,25 @@ public class DiscordGame
 
 		// FIXME: WARNING: Unable to load JDK7 types (java.nio.file.Path): no Java7 type support added
 		// Is being caued by the addPermissionOverride method.
+		// FIXME: Setting position is not working
 		g.newChannel(ChannelType.TEXT, "system")
 		.setPosition(0)
 		.addPermissionOverride(playerRoleData, readPermissions(), writePermissions());
 
 		g.newChannel(ChannelType.VOICE, "Daytime")
-		.setPosition(1);
+		.setPosition(2);
 
 		// players discussing during the day
 		g.newChannel(ChannelType.TEXT, "daytime_discussion")
-		.setPosition(2);
+		.setPosition(3);
+
+		for (Person p : getPlayers())
+		{
+			g.newChannel(ChannelType.TEXT, "private")
+			.setPosition(1)
+			.addPermissionOverride(playerRoleData, 0, readPermissions() | writePermissions())
+			.setTopic(p.getRealName()); // This will be used as an identifier
+		}
 
 		//		textChannels.put("the_hideout", "");
 		//		textChannels.put("the_underground", "");
@@ -193,14 +203,37 @@ public class DiscordGame
 		ga.queue();
 	}
 
+	public Member getMemberFromGame(Person person)
+	{
+		return getMemberFromGame(person.getID());
+	}
+
+	public Member getMemberFromGame(Long memberID)
+	{
+		return getGameGuild().getMemberById(memberID);
+	}
+
 	public void assignChannel(GuildChannel channel)
 	{
+		for (Person p : getPlayers())
+		{
+			if (channel.getType() == ChannelType.TEXT)
+			{
+				TextChannel textChannel = (TextChannel)channel;
+				String topic = textChannel.getTopic();
+				if (topic != null && topic.contains(p.getRealName()))
+				{
+					p.assignPrivateChannel(textChannel.getIdLong());
+					return;
+				}
+			}
+		}
 		channels.put(channel.getName(), channel.getIdLong());
 	}
 
 	public void getNewGuild(Guild guild)
 	{
-		guild.getChannels().get(0).createInvite().queue((invite) -> persons.forEach((person) -> person.sendMessage(invite.getUrl())));
+		guild.getChannels().get(0).createInvite().queue((invite) -> persons.forEach((person) -> sendDMTo(person, invite.getUrl())));
 		gameGuildID = guild.getIdLong();
 		guild.getChannels(true).forEach((channel) -> assignChannel(channel));
 		startPhase();
@@ -267,6 +300,11 @@ public class DiscordGame
 	public GuildChannel getGuildChannel(String channelName)
 	{
 		Long channelID = channels.get(channelName);
+		return getGuildChannel(channelID);
+	}
+
+	public GuildChannel getGuildChannel(Long channelID)
+	{
 		if (channelID != null)
 			return getGameGuild().getGuildChannelById(channelID);
 		return null;
@@ -275,6 +313,11 @@ public class DiscordGame
 	public TextChannel getTextChannel(String channelName)
 	{
 		Long channelID = channels.get(channelName);
+		return getTextChannel(channelID);
+	}
+
+	public TextChannel getTextChannel(Long channelID)
+	{
 		if (channelID != null)
 			return getGameGuild().getTextChannelById(channelID);
 		return null;
@@ -283,6 +326,11 @@ public class DiscordGame
 	public VoiceChannel getVoiceChannel(String channelName)
 	{
 		Long channelID = channels.get(channelName);
+		return getVoiceChannel(channelID);
+	}
+
+	public VoiceChannel getVoiceChannel(Long channelID)
+	{
 		if (channelID != null)
 			return getGameGuild().getVoiceChannelById(channelID);
 		return null;
@@ -338,7 +386,7 @@ public class DiscordGame
 		return getGameGuild().getRoleById(playerRoleID);
 	}
 
-	public void sendDMTo(Person person, String msg)
+	private void sendDMTo(Person person, String msg)
 	{
 		jda.getUserById(person.getID()).openPrivateChannel().queue((channel) -> channel.sendMessage(msg).queue());
 	}
@@ -346,6 +394,11 @@ public class DiscordGame
 	public MessageAction sendMessageToTextChannel(String channelName, String msg)
 	{
 		return getTextChannel(channelName).sendMessage(msg);
+	}
+
+	public MessageAction sendMessageToTextChannel(Long channelID, String msg)
+	{
+		return getTextChannel(channelID).sendMessage(msg);
 	}
 
 	public void leaveGame()
@@ -361,8 +414,14 @@ public class DiscordGame
 		// TODO: Otherwise boot? Other option is to make him spectator
 		for (Person p : getPlayers())
 			if (p.getID().longValue() == member.getUser().getIdLong())
+			{
 				// TODO: Make a hashmap of roles
 				getGameGuild().addRoleToMember(member, getGameGuild().getRolesByName("Player", false).get(0)).queue();
+				TextChannel textChannel = getTextChannel(p.getChannelID());
+				textChannel.createPermissionOverride(getMemberFromGame(p)).setAllow(readPermissions() | writePermissions()).queue();
+				// TODO: Instead of sending test, send help information through p.sendMessage(p.helpMessage())
+				p.sendMessage("This is a test!");
+			}
 	}
 
 	// Write doesn't matter if we're setting a voice channel

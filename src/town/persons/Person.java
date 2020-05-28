@@ -14,6 +14,7 @@ public abstract class Person
 	int defenseStat;
 	int priority;
 	boolean alive = true;
+	private Long privateChannelID;
 
 	Person(DiscordGame game, int refNum, Long id, String roleName, int attack, int defense, int priority)
 	{
@@ -75,8 +76,18 @@ public abstract class Person
 
 	public void sendMessage(String msg)
 	{
-		// TODO: Should check if user has private channel first
-		game.sendDMTo(this, msg);
+		// TODO: What if privateChannelID is null?
+		game.sendMessageToTextChannel(privateChannelID, msg).queue();
+	}
+
+	public void assignPrivateChannel(Long channelID)
+	{
+		privateChannelID = channelID;
+	}
+
+	public Long getChannelID()
+	{
+		return privateChannelID;
 	}
 
 	public void die()
@@ -84,13 +95,18 @@ public abstract class Person
 		alive = false;
 	}
 
-	public void onMurder(MurderTownEvent event) {  } // By default, a person cannot kill
+	public void onMurder(MurderTownEvent event) { event.standard(this); }
 
 
 	public void onEvent(TownEvent event)
 	{
 		if (event instanceof MurderTownEvent)
 			onMurder((MurderTownEvent)event);
+	}
+
+	public void setChannelID(Long id)
+	{
+		privateChannelID = id;
 	}
 
 	public abstract boolean hasWon();
