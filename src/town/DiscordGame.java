@@ -16,6 +16,8 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.VoiceChannel;
 import net.dv8tion.jda.api.requests.restaction.GuildAction;
 import net.dv8tion.jda.api.requests.restaction.GuildAction.RoleData;
 import net.dv8tion.jda.api.requests.restaction.MessageAction;
@@ -210,11 +212,6 @@ public class DiscordGame
 		// TODO: Tell him role in specific channel
 	}
 
-	public HashMap<String, Long> getChannels()
-	{
-		return channels;
-	}
-
 	public void endGame()
 	{
 		getPhaseManager().end();
@@ -265,6 +262,30 @@ public class DiscordGame
 	public ArrayList<Person> getPlayers()
 	{
 		return persons;
+	}
+
+	public GuildChannel getGuildChannel(String channelName)
+	{
+		Long channelID = channels.get(channelName);
+		if (channelID != null)
+			return getGameGuild().getGuildChannelById(channelID);
+		return null;
+	}
+
+	public TextChannel getTextChannel(String channelName)
+	{
+		Long channelID = channels.get(channelName);
+		if (channelID != null)
+			return getGameGuild().getTextChannelById(channelID);
+		return null;
+	}
+
+	public VoiceChannel getVoiceChannel(String channelName)
+	{
+		Long channelID = channels.get(channelName);
+		if (channelID != null)
+			return getGameGuild().getVoiceChannelById(channelID);
+		return null;
 	}
 
 	public void dispatchEvents()
@@ -324,7 +345,7 @@ public class DiscordGame
 
 	public MessageAction sendMessageToTextChannel(String channelName, String msg)
 	{
-		return getJDA().getTextChannelById(channels.get(channelName)).sendMessage(msg);
+		return getTextChannel(channelName).sendMessage(msg);
 	}
 
 	public void leaveGame()
@@ -347,7 +368,7 @@ public class DiscordGame
 	// Write doesn't matter if we're setting a voice channel
 	public void setChannelVisibility(String channelName, boolean read, boolean write)
 	{
-		GuildChannel channel = getGameGuild().getGuildChannelById(channels.get(channelName));
+		GuildChannel channel = getGuildChannel(channelName);
 		PermissionOverrideAction action = null;
 		if (channel.getType().equals(ChannelType.VOICE))
 		{
