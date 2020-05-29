@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.TreeMap;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
@@ -113,6 +114,8 @@ public class DiscordGame
 
 		dispatchEvents();
 	}
+	
+
 
 	public void displayParty(MessageChannel channelUsed)
 	{
@@ -419,7 +422,6 @@ public class DiscordGame
 				TextChannel textChannel = getTextChannel(p.getChannelID());
 				textChannel.createPermissionOverride(getMemberFromGame(p)).setAllow(readPermissions() | writePermissions()).queue();
 				// TODO: Instead of sending test, send help information through p.sendMessage(p.helpMessage())
-				p.sendMessage("This is a test!");
 			}
 			else member.kick("He was not part of the lobby").queue();
 	}

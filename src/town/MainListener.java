@@ -1,12 +1,15 @@
 package town;
 
+import java.awt.Color;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.Scanner;
+import java.util.TreeMap;
 
 import javax.security.auth.login.LoginException;
 
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.ChannelType;
@@ -14,12 +17,14 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.guild.update.GuildUpdateOwnerEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import town.persons.Person;
 
 
 public class MainListener extends ListenerAdapter
@@ -123,6 +128,9 @@ public class MainListener extends ListenerAdapter
 		// TODO: Replace endParty with endGame if the game starts (or just have them be the same)
 		else if (message.getContentRaw().contentEquals(prefix + "endParty"))
 			endLobby(e.getJDA(), e.getGuild().getIdLong(), e.getChannel());
+		else if (message.getContentRaw().contentEquals(prefix + "help")) {
+			e.getChannel().sendMessage(helpTable()).queue();
+		}
 		else if (message.getContentRaw().startsWith(prefix))
 		{
 			DiscordGame party = parties.get(e.getGuild().getIdLong());
@@ -142,6 +150,19 @@ public class MainListener extends ListenerAdapter
 				game.processMessage(e.getMessage());
 		}
 		// TODO: When someone joins, check if they have an open private channel first.
+	}
+	
+	public MessageEmbed helpTable() {
+		String description = "```" + 
+		prefix + "help........ " + "displays this message" + "\n" +
+		prefix + "startParty.. " + "starts a new party for players to join" + "\n" +
+		prefix + "endParty.... " + "cancels the current party" + "\n" +
+		prefix + "join........ " + "join the current party" + "\n" +
+		prefix + "party....... " + "displays all members currently in the party" + "\n" +
+		prefix + "startGame... " + "begins the game with current party members" + "```";
+		
+		MessageEmbed embed = new EmbedBuilder().setColor(Color.GREEN).setTitle("List of ToS Commands").setDescription(description).build();
+		return embed;
 	}
 
 	private void endLobby(JDA jda, Long guildID, MessageChannel channelUsed)
