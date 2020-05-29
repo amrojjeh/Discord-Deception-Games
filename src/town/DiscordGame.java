@@ -265,8 +265,6 @@ public class DiscordGame
 		else getGameGuild().delete().queue();
 	}
 
-	// TODO: Write a getChannel method that takes a string and returns a channel
-
 	public void joinGame(long id, MessageChannel channelUsed)
 	{
 		if (started)
@@ -414,16 +412,35 @@ public class DiscordGame
 		// For now we'll boot.
 
 		// Check if member was in the lobby
+		boolean shouldKick = true;
 		for (Person p : getPlayers())
 			if (p.getID().longValue() == member.getUser().getIdLong())
 			{
 				// TODO: Make a hashmap of roles
 				getGameGuild().addRoleToMember(member, getGameGuild().getRolesByName("Player", false).get(0)).queue();
 				TextChannel textChannel = getTextChannel(p.getChannelID());
-				textChannel.createPermissionOverride(getMemberFromGame(p)).setAllow(readPermissions() | writePermissions()).queue();
+				textChannel.putPermissionOverride(getMemberFromGame(p)).setAllow(readPermissions() | writePermissions()).queue();
 				// TODO: Instead of sending test, send help information through p.sendMessage(p.helpMessage())
+<<<<<<< HEAD
+=======
+				p.sendMessage("This is a test!");
+				shouldKick = false;
+				break;
+>>>>>>> 34352b15cf59767551d85831fd1e105c93d323c9
 			}
-			else member.kick("He was not part of the lobby").queue();
+
+		if (shouldKick)
+			member.kick("He was not part of the lobby").queue();
+	}
+
+	public void discconectEveryoneFromVC(String vcName)
+	{
+		discconectEveryoneFromVC(getVoiceChannel(vcName));
+	}
+
+	public void discconectEveryoneFromVC(VoiceChannel channel)
+	{
+		channel.getMembers().forEach(p -> p.getGuild().kickVoiceMember(p).queue());
 	}
 
 	// Write doesn't matter if we're setting a voice channel

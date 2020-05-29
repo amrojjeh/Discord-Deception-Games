@@ -33,6 +33,7 @@ public class Day extends Phase
 	{
 		getGame().setChannelVisibility("daytime_discussion", true, false);
 		getGame().setChannelVisibility("Daytime", false, false);
+		getGame().discconectEveryoneFromVC("Daytime");
 	}
 
 	// After Daytime, the Accusation phase begins.
