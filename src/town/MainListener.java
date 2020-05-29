@@ -97,12 +97,13 @@ public class MainListener extends ListenerAdapter
 		games.put(guild.getIdLong(), game);
 	}
 
+	// Bot should leave the game once the owner has changed
 	@Override
 	public void onGuildUpdateOwner(GuildUpdateOwnerEvent event)
 	{
 		DiscordGame game = games.get(event.getGuild().getIdLong());
 		if (game == null) return;
-		game.leaveGame();
+		game.getGameGuild().leave().queue();
 		games.remove(game.getGameID());
 		parties.remove(game.getPartyID());
 	}
@@ -160,7 +161,7 @@ public class MainListener extends ListenerAdapter
 			channelUsed.sendMessage("Party already started").queue();
 		else
 		{
-			DiscordGame game = new DiscordGame(jda, guildID, partyLeader.getId());
+			DiscordGame game = new DiscordGame(jda, guildID, partyLeader.getIdLong());
 			channelUsed.sendMessage("Party started").queue();
 			game.joinGame(partyLeader.getIdLong(), channelUsed);
 			parties.put(guildID, game);

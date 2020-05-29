@@ -17,6 +17,7 @@ import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.VoiceChannel;
 import net.dv8tion.jda.api.requests.restaction.GuildAction;
 import net.dv8tion.jda.api.requests.restaction.GuildAction.RoleData;
@@ -32,8 +33,8 @@ import town.phases.PhaseManager;
 public class DiscordGame
 {
 	JDA jda;
-	Long guildID;
-	Long gameGuildID;
+	long guildID;
+	long gameGuildID;
 	ArrayList<Person> persons; // TODO: Sort based on priority also (SortedSet?)
 	LinkedList<TownEvent> events; // TODO: PriorityQueue<E>
 	PhaseManager phaseManager;
@@ -42,15 +43,15 @@ public class DiscordGame
 	// Important channels (Name : id)
 	HashMap<String, Long> channels;
 
-	Long playerRoleID;
-	Long botRoleID;
-	Long aliveRoleID;
-	Long deadRoleID;
+	long playerRoleID;
+	long botRoleID;
+	long aliveRoleID;
+	long deadRoleID;
 
-	String partyLeaderID;
+	long partyLeaderID;
 	String prefix;
 
-	public DiscordGame(JDA jda, Long guildId, String partyLeaderId)
+	public DiscordGame(JDA jda, Long guildId, long partyLeaderId)
 	{
 		this.jda = jda;
 		guildID = guildId;
@@ -76,8 +77,8 @@ public class DiscordGame
 			// TODO: 5 people min.
 			else if (persons.isEmpty())
 				message.getChannel().sendMessage("Not enough players to start a server!").queue();
-			else if (!message.getMember().getId().contentEquals(partyLeaderID))
-				message.getChannel().sendMessage(String.format("Only party leader (<@%s>) can start the game!", getPartyLeaderID()));
+			else if (message.getMember().getIdLong() != partyLeaderID)
+				message.getChannel().sendMessage(String.format("Only party leader (<@%d>) can start the game!", partyLeaderID));
 			else
 			{
 				message.getChannel().sendMessage("Game has started! Creating server...").queue();
@@ -99,6 +100,9 @@ public class DiscordGame
 			// TODO: Check if there is more than one mention
 			Person deadPerson = getPerson(message.getMentionedMembers().get(0));
 			Person murderer = getPerson(message.getMember());
+			// TODO: Instead of making the event here, each person will have a hash of commands.
+			// We can get the person through the message author, and since commands will be stored as hashes, we can retrieve command objects with O(1) call
+			// A command object will return a Town Event once run. It will be a Function<Person, TownEvent>.
 			if (deadPerson != null && murderer != null)
 			{
 				events.add(new MurderTownEvent(this, murderer, deadPerson));
@@ -186,21 +190,30 @@ public class DiscordGame
 		events.add(event);
 	}
 
-	public void startPhase()
-	{
-		phaseManager.start();
-	}
-
 	public void startGame()
 	{
 		started = true;
 
 		// TODO: Add an icon to the server
 
-		GuildAction ga = getJDA().createGuild("Town of Salem");
+		GuildAction ga = jda.createGuild("Town of Salem");
 		createNewChannels(ga);
-		ga.newRole().setName(guildID.toString());
+		ga.newRole().setName("" + guildID);
 		ga.queue();
+	}
+
+	public void getNewGuild(Guild guild)
+	{
+		guild.getChannels().get(0).createInvite().queue((invite) -> persons.forEach((person) -> sendDMTo(person, invite.getUrl())));
+		gameGuildID = guild.getIdLong();
+		guild.getChannels(true).forEach((channel) -> assignChannel(channel));
+		phaseManager.start();
+		getGameGuild().addRoleToMember(jda.getSelfUser().getIdLong(), guild.getRolesByName("Bot", false).get(0)).queue();
+
+		playerRoleID = guild.getRolesByName("Player", false).get(0).getIdLong();
+		botRoleID = guild.getRolesByName("Bot", false).get(0).getIdLong();
+
+		// TODO: Tell him role in specific channel
 	}
 
 	public Member getMemberFromGame(Person person)
@@ -231,29 +244,15 @@ public class DiscordGame
 		channels.put(channel.getName(), channel.getIdLong());
 	}
 
-	public void getNewGuild(Guild guild)
-	{
-		guild.getChannels().get(0).createInvite().queue((invite) -> persons.forEach((person) -> sendDMTo(person, invite.getUrl())));
-		gameGuildID = guild.getIdLong();
-		guild.getChannels(true).forEach((channel) -> assignChannel(channel));
-		startPhase();
-		getGameGuild().addRoleToMember(getJDA().getSelfUser().getIdLong(), guild.getRolesByName("Bot", false).get(0)).queue();
-
-		playerRoleID = guild.getRolesByName("Player", false).get(0).getIdLong();
-		botRoleID = guild.getRolesByName("Bot", false).get(0).getIdLong();
-
-		// TODO: Tell him role in specific channel
-	}
-
 	public void endGame()
 	{
-		getPhaseManager().end();
+		phaseManager.end();
 		transferOrDelete();
 	}
 
 	public void transferOrDelete()
 	{
-		Member partyLeader = getGameGuild().getMemberById(getPartyLeaderID());
+		Member partyLeader = getMemberFromGame(partyLeaderID);
 		if (partyLeader != null)
 		{
 			System.out.println(getGameGuild().getOwner().getEffectiveName());
@@ -263,14 +262,9 @@ public class DiscordGame
 		else getGameGuild().delete().queue();
 	}
 
-	public String getPartyLeaderID()
-	{
-		return partyLeaderID;
-	}
-
 	// TODO: Write a getChannel method that takes a string and returns a channel
 
-	public void joinGame(Long id, MessageChannel channelUsed)
+	public void joinGame(long id, MessageChannel channelUsed)
 	{
 		if (started)
 		{
@@ -295,6 +289,20 @@ public class DiscordGame
 	public ArrayList<Person> getPlayers()
 	{
 		return persons;
+	}
+
+	public ArrayList<Person> getAlivePlayers()
+	{
+		ArrayList<Person> alive = new ArrayList<>();
+		persons.stream().filter(p -> p.isAlive()).forEach(p -> alive.add(p));
+		return alive;
+	}
+
+	public ArrayList<Person> getDeadPlayers()
+	{
+		ArrayList<Person> dead = new ArrayList<>();
+		persons.stream().filter(p -> !p.isAlive()).forEach(p -> dead.add(p));
+		return dead;
 	}
 
 	public GuildChannel getGuildChannel(String channelName)
@@ -346,19 +354,14 @@ public class DiscordGame
 		dispatchEvents();
 	}
 
-	public JDA getJDA()
-	{
-		return jda;
-	}
-
-	public PhaseManager getPhaseManager()
-	{
-		return phaseManager;
-	}
-
 	public Phase getCurrentPhase()
 	{
 		return phaseManager.getCurrentPhase();
+	}
+
+	public User getUser(Person person)
+	{
+		return jda.getUserById(person.getID());
 	}
 
 	public Long getPartyID()
@@ -373,17 +376,17 @@ public class DiscordGame
 
 	public Guild getPartyGuild()
 	{
-		return getJDA().getGuildById(getPartyID());
+		return jda.getGuildById(getPartyID());
 	}
 
 	public Guild getGameGuild()
 	{
-		return getJDA().getGuildById(getGameID());
+		return jda.getGuildById(getGameID());
 	}
 
-	public Role getPlayerRole()
+	public Role getRole(long roleID)
 	{
-		return getGameGuild().getRoleById(playerRoleID);
+		return getGameGuild().getRoleById(roleID);
 	}
 
 	private void sendDMTo(Person person, String msg)
@@ -401,17 +404,13 @@ public class DiscordGame
 		return getTextChannel(channelID).sendMessage(msg);
 	}
 
-	public void leaveGame()
-	{
-		getGameGuild().leave().queue();
-	}
-
 	public void guildJoin(Member member)
 	{
-		System.out.println("Person joined");
 		// TODO: If the game starts, remove invite link?
-		// Check if member was in the lobby
 		// TODO: Otherwise boot? Other option is to make him spectator
+		// For now we'll boot.
+
+		// Check if member was in the lobby
 		for (Person p : getPlayers())
 			if (p.getID().longValue() == member.getUser().getIdLong())
 			{
@@ -422,6 +421,7 @@ public class DiscordGame
 				// TODO: Instead of sending test, send help information through p.sendMessage(p.helpMessage())
 				p.sendMessage("This is a test!");
 			}
+			else member.kick("He was not part of the lobby").queue();
 	}
 
 	// Write doesn't matter if we're setting a voice channel
@@ -429,21 +429,22 @@ public class DiscordGame
 	{
 		GuildChannel channel = getGuildChannel(channelName);
 		PermissionOverrideAction action = null;
+		Role playerRole = getRole(playerRoleID);
 		if (channel.getType().equals(ChannelType.VOICE))
 		{
 			if (read)
-				action = channel.putPermissionOverride(getPlayerRole()).reset().setAllow(connectPermissions());
+				action = channel.putPermissionOverride(playerRole).reset().setAllow(connectPermissions());
 			else
-				action = channel.putPermissionOverride(getPlayerRole()).reset().setDeny(connectPermissions());
+				action = channel.putPermissionOverride(playerRole).reset().setDeny(connectPermissions());
 		}
 		else if (channel.getType().equals(ChannelType.TEXT))
 		{
 			if (read && !write)
-				action = channel.putPermissionOverride(getPlayerRole()).reset().setPermissions(readPermissions(), writePermissions());
+				action = channel.putPermissionOverride(playerRole).reset().setPermissions(readPermissions(), writePermissions());
 			else if (read && write)
-				action = channel.putPermissionOverride(getPlayerRole()).reset().setPermissions(readPermissions() | writePermissions(), 0);
+				action = channel.putPermissionOverride(playerRole).reset().setPermissions(readPermissions() | writePermissions(), 0);
 			else
-				action = channel.putPermissionOverride(getPlayerRole()).reset().setDeny(readPermissions() | writePermissions());
+				action = channel.putPermissionOverride(playerRole).reset().setDeny(readPermissions() | writePermissions());
 		}
 		if (action != null)
 			action.queue();

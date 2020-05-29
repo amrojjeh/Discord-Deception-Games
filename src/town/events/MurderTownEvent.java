@@ -1,6 +1,5 @@
 package town.events;
 
-import net.dv8tion.jda.api.JDA;
 import town.DiscordGame;
 import town.persons.Person;
 import town.phases.Night;
@@ -33,12 +32,6 @@ public class MurderTownEvent implements TownEvent
 	public DiscordGame getGame()
 	{
 		return game;
-	}
-
-	@Override
-	public JDA getJDA()
-	{
-		return game.getJDA();
 	}
 
 	@Override

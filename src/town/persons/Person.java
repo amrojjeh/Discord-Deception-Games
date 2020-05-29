@@ -44,7 +44,7 @@ public abstract class Person
 
 	public String getRealName()
 	{
-		return game.getJDA().getUserById(ID).getName();
+		return game.getUser(this).getName();
 	}
 
 	public String getNickName()
@@ -72,6 +72,11 @@ public abstract class Person
 	public int getPriority()
 	{
 		return priority;
+	}
+
+	public boolean isAlive()
+	{
+		return alive;
 	}
 
 	public void sendMessage(String msg)
