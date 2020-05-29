@@ -421,12 +421,9 @@ public class DiscordGame
 				TextChannel textChannel = getTextChannel(p.getChannelID());
 				textChannel.putPermissionOverride(getMemberFromGame(p)).setAllow(readPermissions() | writePermissions()).queue();
 				// TODO: Instead of sending test, send help information through p.sendMessage(p.helpMessage())
-<<<<<<< HEAD
-=======
 				p.sendMessage("This is a test!");
 				shouldKick = false;
 				break;
->>>>>>> 34352b15cf59767551d85831fd1e105c93d323c9
 			}
 
 		if (shouldKick)
