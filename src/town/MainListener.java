@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.Scanner;
-import java.util.TreeMap;
 
 import javax.security.auth.login.LoginException;
 
@@ -24,7 +23,6 @@ import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.guild.update.GuildUpdateOwnerEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import town.persons.Person;
 
 
 public class MainListener extends ListenerAdapter
@@ -151,16 +149,16 @@ public class MainListener extends ListenerAdapter
 		}
 		// TODO: When someone joins, check if they have an open private channel first.
 	}
-	
+
 	public MessageEmbed helpTable() {
-		String description = "```" + 
-		prefix + "help........ " + "displays this message" + "\n" +
-		prefix + "startParty.. " + "starts a new party for players to join" + "\n" +
-		prefix + "endParty.... " + "cancels the current party" + "\n" +
-		prefix + "join........ " + "join the current party" + "\n" +
-		prefix + "party....... " + "displays all members currently in the party" + "\n" +
-		prefix + "startGame... " + "begins the game with current party members" + "```";
-		
+		String description = "```" +
+				prefix + "help........ " + "displays this message" + "\n" +
+				prefix + "startParty.. " + "starts a new party for players to join" + "\n" +
+				prefix + "endParty.... " + "cancels the current party" + "\n" +
+				prefix + "join........ " + "join the current party" + "\n" +
+				prefix + "party....... " + "displays all members currently in the party" + "\n" +
+				prefix + "startGame... " + "begins the game with current party members" + "```";
+
 		MessageEmbed embed = new EmbedBuilder().setColor(Color.GREEN).setTitle("List of ToS Commands").setDescription(description).build();
 		return embed;
 	}
