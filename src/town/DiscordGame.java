@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.TreeMap;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
@@ -24,7 +23,6 @@ import net.dv8tion.jda.api.requests.restaction.GuildAction;
 import net.dv8tion.jda.api.requests.restaction.GuildAction.RoleData;
 import net.dv8tion.jda.api.requests.restaction.MessageAction;
 import net.dv8tion.jda.api.requests.restaction.PermissionOverrideAction;
-import town.events.MurderTownEvent;
 import town.events.TownEvent;
 import town.persons.Person;
 import town.persons.assigner.RoleAssigner;
@@ -69,23 +67,9 @@ public class DiscordGame
 
 	public void processMessage(Message message)
 	{
-		// NOTE: Who is the party leader?
 		// TODO: When game starts, allow ! as a prefix also
 		if (message.getContentRaw().contentEquals(prefix + "startGame"))
-		{
-			if (started)
-				message.getChannel().sendMessage("Game is already running!").queue();
-			// TODO: 5 people min.
-			else if (persons.isEmpty())
-				message.getChannel().sendMessage("Not enough players to start a server!").queue();
-			else if (message.getMember().getIdLong() != partyLeaderID)
-				message.getChannel().sendMessage(String.format("Only party leader (<@%d>) can start the game!", partyLeaderID));
-			else
-			{
-				message.getChannel().sendMessage("Game has started! Creating server...").queue();
-				startGame();
-			}
-		}
+			startGameCommand(message);
 
 		// TODO: Block people if they occupy a certain role
 		else if (message.getContentRaw().contentEquals(prefix + "party"))
@@ -95,27 +79,61 @@ public class DiscordGame
 		else if (message.getContentRaw().contentEquals(prefix + "join"))
 			joinGame(message.getMember().getIdLong(), message.getChannel());
 
-		// TODO: Might want to handle commands better (Seperate function? Classes? ArrayLists?)
-		else if (started && message.getGuild().getIdLong() == getGameGuild().getIdLong() && message.getContentRaw().startsWith(prefix + "kill"))
-		{
-			// TODO: Check if there is more than one mention
-			Person deadPerson = getPerson(message.getMentionedMembers().get(0));
-			Person murderer = getPerson(message.getMember());
-			// TODO: Instead of making the event here, each person will have a hash of commands.
-			// We can get the person through the message author, and since commands will be stored as hashes, we can retrieve command objects with O(1) call
-			// A command object will return a Town Event once run. It will be a Function<Person, TownEvent>.
-			if (deadPerson != null && murderer != null)
-			{
-				events.add(new MurderTownEvent(this, murderer, deadPerson));
-			}
-			// TODO: Send message when person isn't in the lobby
-			else System.out.println("Didn't get person");
-		}
-
-		dispatchEvents();
+		else if (started && isMessageFromGameGuild(message) && message.getContentRaw().startsWith(prefix + "ability"))
+			activateAbilityCommand(message);
 	}
-	
 
+	private boolean isMessageFromGameGuild(Message message)
+	{
+		return message.getGuild().getIdLong() == getGameGuild().getIdLong();
+	}
+
+	private void startGameCommand(Message message)
+	{
+		if (started)
+			message.getChannel().sendMessage("Game is already running!").queue();
+		// TODO: 5 people min.
+		else if (persons.isEmpty())
+			message.getChannel().sendMessage("Not enough players to start a server!").queue();
+		else if (message.getMember().getIdLong() != partyLeaderID)
+			message.getChannel().sendMessage(String.format("Only party leader (<@%d>) can start the game!", partyLeaderID));
+		else
+		{
+			message.getChannel().sendMessage("Game has started! Creating server...").queue();
+			startGame();
+		}
+	}
+
+	private void activateAbilityCommand(Message message)
+	{
+		// TODO: Maybe support mentions again
+		ArrayList<Person> references = new ArrayList<>();
+		String[] words = message.getContentStripped().split(" ");
+		for (int x = 1; x < words.length; ++x)
+		{
+			// Check if parsable
+			int personNum = 0; // 0 can't exist as a ref
+			try
+			{
+				personNum = Integer.parseInt(words[x]);
+			}
+			catch (NumberFormatException e)
+			{
+				message.getChannel().sendMessage("Can only reference people by numbers. Use tos.party to get the list").queue();
+				return;
+			}
+
+			Person reference = getPerson(personNum);
+			if (reference == null)
+			{
+				message.getChannel().sendMessage(String.format("Person with number %d doesn't exist", personNum)).queue();
+				return;
+			}
+			references.add(reference);
+		}
+		Person user = getPerson(message.getMember());
+		message.getChannel().sendMessage(user.ability(references)).queue();
+	}
 
 	public void displayParty(MessageChannel channelUsed)
 	{
@@ -191,6 +209,11 @@ public class DiscordGame
 	public void addEvent(TownEvent event)
 	{
 		events.add(event);
+	}
+
+	public void removeEvent(TownEvent event)
+	{
+		events.remove(event);
 	}
 
 	public void startGame()
@@ -283,6 +306,14 @@ public class DiscordGame
 	{
 		for (Person person : persons)
 			if (person.getID() == member.getIdLong())
+				return person;
+		return null;
+	}
+
+	public Person getPerson(int refNum)
+	{
+		for (Person person : persons)
+			if (person.getNum() == refNum)
 				return person;
 		return null;
 	}
@@ -421,7 +452,7 @@ public class DiscordGame
 				TextChannel textChannel = getTextChannel(p.getChannelID());
 				textChannel.putPermissionOverride(getMemberFromGame(p)).setAllow(readPermissions() | writePermissions()).queue();
 				// TODO: Instead of sending test, send help information through p.sendMessage(p.helpMessage())
-				p.sendMessage("This is a test!");
+				p.sendMessage("Your role is " + p.getRoleName());
 				shouldKick = false;
 				break;
 			}

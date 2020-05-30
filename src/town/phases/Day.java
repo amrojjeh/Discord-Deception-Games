@@ -40,7 +40,7 @@ public class Day extends Phase
 	@Override
 	public Phase getNextPhase(PhaseManager pm)
 	{
-		return new Accusation(pm);
+		return new Night(pm);
 	}
 
 	//Duration: 50 seconds

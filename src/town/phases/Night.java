@@ -6,13 +6,20 @@ public class Night extends Phase
 	{
 		super(pm);
 	}
-	
+
 	@Override
-	public void start() 
+	public void start()
 	{
-		getGame().sendMessageToTextChannel("system", "The night has started");
+		getGame().sendMessageToTextChannel("system", "The night has started").queue();
 	}
-	
+
+	@Override
+	public void end()
+	{
+		getGame().dispatchEvents();
+		getGame().sendMessageToTextChannel("system", "The night has ended").queue();
+	}
+
 	@Override
 	public Phase getNextPhase(PhaseManager pm)
 	{

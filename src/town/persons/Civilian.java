@@ -1,5 +1,7 @@
 package town.persons;
 
+import java.util.ArrayList;
+
 import town.DiscordGame;
 
 // Civilian is NOT A REAL ROLE. This is a temporary useless town role to simulate games
@@ -35,5 +37,11 @@ public class Civilian extends Person
 	public void win()
 	{
 		getGame().sendMessageToTextChannel("system", "**Civilians have won!**").queue((msg) -> getGame().endGame());
+	}
+
+	@Override
+	public String ability(ArrayList<Person> references)
+	{
+		return "Civilian has no ability";
 	}
 }

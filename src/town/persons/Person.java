@@ -1,5 +1,7 @@
 package town.persons;
 
+import java.util.ArrayList;
+
 import town.DiscordGame;
 import town.events.MurderTownEvent;
 import town.events.TownEvent;
@@ -81,8 +83,10 @@ public abstract class Person
 
 	public void sendMessage(String msg)
 	{
-		// TODO: What if privateChannelID is null?
-		game.sendMessageToTextChannel(privateChannelID, msg).queue();
+		if (privateChannelID != null)
+			game.sendMessageToTextChannel(privateChannelID, msg).queue();
+		else
+			System.out.println("Could not send to private channel");
 	}
 
 	public void assignPrivateChannel(Long channelID)
@@ -113,6 +117,8 @@ public abstract class Person
 	{
 		privateChannelID = id;
 	}
+
+	public abstract String ability(ArrayList<Person> references);
 
 	public abstract boolean hasWon();
 
