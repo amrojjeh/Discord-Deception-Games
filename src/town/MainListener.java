@@ -93,11 +93,22 @@ public class MainListener extends ListenerAdapter
 		System.out.println("Joined new guild");
 		Guild guild = e.getGuild();
 		String roleName = guild.getRoles().get(0).getName();
-		DiscordGame game = parties.get(Long.parseLong(roleName));
+		long oldGuildID = 0;
+		try
+		{
+			oldGuildID = Long.parseLong(roleName);
+		}
+		catch (NumberFormatException exception)
+		{
+			return;
+		}
+
+		DiscordGame game = parties.get(oldGuildID);
 		if (game == null)
 			return;
 		game.getNewGuild(guild);
 		games.put(guild.getIdLong(), game);
+		parties.remove(oldGuildID);
 	}
 
 	// Bot should leave the game once the owner has changed
@@ -125,7 +136,7 @@ public class MainListener extends ListenerAdapter
 			startLobby(e.getJDA(), e.getGuild().getIdLong(), e.getChannel(), e.getMember());
 		// TODO: Replace endParty with endGame if the game starts (or just have them be the same)
 		else if (message.getContentRaw().contentEquals(prefix + "endParty"))
-			endLobby(e.getJDA(), e.getGuild().getIdLong(), e.getChannel());
+			endLobby(e.getGuild().getIdLong(), e.getChannel());
 		else if (message.getContentRaw().contentEquals(prefix + "help")) {
 			e.getChannel().sendMessage(helpTable()).queue();
 		}
@@ -163,7 +174,7 @@ public class MainListener extends ListenerAdapter
 		return embed;
 	}
 
-	private void endLobby(JDA jda, Long guildID, MessageChannel channelUsed)
+	private void endLobby(Long guildID, MessageChannel channelUsed)
 	{
 		if (!parties.containsKey(guildID))
 			channelUsed.sendMessage("There is no party to end").queue();
