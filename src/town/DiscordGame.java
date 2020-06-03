@@ -306,6 +306,13 @@ public class DiscordGame
 			return;
 		}
 
+		if (getPerson(id) != null)
+		{
+			String message = String.format("<@%s> already joined! Check party members with tos.party", id);
+			channelUsed.sendMessage(message).queue();
+			return;
+		}
+
 		persons.add(RoleAssigner.assignRole(this, persons.size() + 1, id));
 		String message = String.format("<@%s> joined the lobby", id);
 		channelUsed.sendMessage(message).queue();
@@ -313,16 +320,21 @@ public class DiscordGame
 
 	public Person getPerson(Member member)
 	{
-		for (Person person : persons)
-			if (person.getID() == member.getIdLong())
-				return person;
-		return null;
+		return getPerson(member.getIdLong());
 	}
 
 	public Person getPerson(int refNum)
 	{
 		for (Person person : persons)
 			if (person.getNum() == refNum)
+				return person;
+		return null;
+	}
+
+	public Person getPerson(long id)
+	{
+		for (Person person : persons)
+			if (person.getID() == id)
 				return person;
 		return null;
 	}
