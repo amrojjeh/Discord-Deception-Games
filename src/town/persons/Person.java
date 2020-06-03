@@ -120,6 +120,8 @@ public abstract class Person
 
 	public abstract String ability(ArrayList<Person> references);
 
+	public abstract String cancel();
+
 	public abstract boolean hasWon();
 
 	public abstract void win();

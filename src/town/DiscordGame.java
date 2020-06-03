@@ -81,6 +81,9 @@ public class DiscordGame
 
 		else if (started && isMessageFromGameGuild(message) && message.getContentRaw().startsWith(prefix + "ability"))
 			activateAbilityCommand(message);
+
+		else if (started && isMessageFromGameGuild(message) && message.getContentRaw().startsWith(prefix + "cancel"))
+			cancelAbilityCommand(message);
 	}
 
 	private boolean isMessageFromGameGuild(Message message)
@@ -133,6 +136,12 @@ public class DiscordGame
 		}
 		Person user = getPerson(message.getMember());
 		message.getChannel().sendMessage(user.ability(references)).queue();
+	}
+
+	private void cancelAbilityCommand(Message message)
+	{
+		Person user = getPerson(message.getMember());
+		message.getChannel().sendMessage(user.cancel()).queue();
 	}
 
 	public void displayParty(MessageChannel channelUsed)

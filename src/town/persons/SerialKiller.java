@@ -68,12 +68,20 @@ public class SerialKiller extends Person
 		if (event != null)
 		{
 			msg += "You've changed your mind.\n";
-			getGame().removeEvent(event);
+			cancel();
 		}
 
 		event = new MurderTownEvent(getGame(), this, references.get(0));
 		getGame().addEvent(event);
 
 		return msg + String.format("You will kill <@%d> tonight.", references.get(0).getID());
+	}
+
+	@Override
+	public String cancel()
+	{
+		if (event == null) return "There's no action to cancel";
+		getGame().removeEvent(event);
+		return "Action canceled";
 	}
 }

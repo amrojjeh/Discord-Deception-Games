@@ -44,4 +44,10 @@ public class Civilian extends Person
 	{
 		return "Civilian has no ability";
 	}
+
+	@Override
+	public String cancel()
+	{
+		return "Civilian has no ability";
+	}
 }
