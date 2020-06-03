@@ -84,6 +84,14 @@ public class DiscordGame
 
 		else if (started && isMessageFromGameGuild(message) && message.getContentRaw().startsWith(prefix + "cancel"))
 			cancelAbilityCommand(message);
+		else if (started && isMessageFromGameGuild(message) && message.getContentRaw().contentEquals(prefix + "roleHelp"))
+			roleHelpCommand(message);
+	}
+
+	private void roleHelpCommand(Message message)
+	{
+		Person user = getPerson(message.getMember());
+		user.sendMessage(user.getHelp());
 	}
 
 	private boolean isMessageFromGameGuild(Message message)
@@ -477,6 +485,7 @@ public class DiscordGame
 				textChannel.putPermissionOverride(getMemberFromGame(p)).setAllow(readPermissions() | writePermissions()).queue();
 				// TODO: Instead of sending test, send help information through p.sendMessage(p.helpMessage())
 				p.sendMessage("Your role is " + p.getRoleName());
+				p.sendMessage(p.getHelp());
 				shouldKick = false;
 				break;
 			}

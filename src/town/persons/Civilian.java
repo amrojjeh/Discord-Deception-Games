@@ -50,4 +50,10 @@ public class Civilian extends Person
 	{
 		return "Civilian has no ability";
 	}
+
+	@Override
+	public String getHelp()
+	{
+		return "Civilian is temporary. No commands, you just kind of die no matter what.";
+	}
 }

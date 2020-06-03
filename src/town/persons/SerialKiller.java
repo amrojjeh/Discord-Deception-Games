@@ -84,4 +84,12 @@ public class SerialKiller extends Person
 		getGame().removeEvent(event);
 		return "Action canceled";
 	}
+
+	@Override
+	public String getHelp()
+	{
+		return "SERIAL KILLER (SK)\n" +
+				"Serial Killer wins with other serial killers. His goal is to kill anyone who isn't an SK.\n" +
+				"Ability: Can kill one person every night. Ex: `tos.ability 2` kills person number two. Check a person's number with tos.party";
+	}
 }

@@ -125,4 +125,6 @@ public abstract class Person
 	public abstract boolean hasWon();
 
 	public abstract void win();
+
+	public abstract String getHelp();
 }
