@@ -163,12 +163,13 @@ public class MainListener extends ListenerAdapter
 
 	public MessageEmbed helpTable() {
 		String description = "```" +
-				prefix + "help........ " + "displays this message" + "\n" +
 				prefix + "startParty.. " + "starts a new party for players to join" + "\n" +
 				prefix + "endParty.... " + "cancels the current party" + "\n" +
 				prefix + "join........ " + "join the current party" + "\n" +
 				prefix + "party....... " + "displays all members currently in the party" + "\n" +
-				prefix + "startGame... " + "begins the game with current party members" + "```";
+				prefix + "startGame... " + "begins the game with current party members" + "\n" +
+				prefix + "roleHelp... " + "Displays the help message for your role. Only works when in game" + "\n" +
+				prefix + "help........ " + "displays this message" + "```";
 
 		MessageEmbed embed = new EmbedBuilder().setColor(Color.GREEN).setTitle("List of ToS Commands").setDescription(description).build();
 		return embed;
@@ -178,7 +179,7 @@ public class MainListener extends ListenerAdapter
 	{
 		if (!parties.containsKey(guildID))
 			channelUsed.sendMessage("There is no party to end").queue();
-		else
+		else if (!games.containsKey(guildID))
 		{
 			parties.remove(guildID);
 			channelUsed.sendMessage("Party ended").queue();
@@ -189,6 +190,8 @@ public class MainListener extends ListenerAdapter
 	{
 		if (parties.containsKey(guildID))
 			channelUsed.sendMessage("Party already started").queue();
+		else if (games.containsKey(guildID))
+			channelUsed.sendMessage("Can't start a party in a discord game!").queue();
 		else
 		{
 			DiscordGame game = new DiscordGame(jda, guildID, partyLeader.getIdLong());

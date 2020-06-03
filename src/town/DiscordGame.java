@@ -68,7 +68,7 @@ public class DiscordGame
 	public void processMessage(Message message)
 	{
 		// TODO: When game starts, allow ! as a prefix also
-		if (message.getContentRaw().contentEquals(prefix + "startGame"))
+		if (!isMessageFromGameGuild(message) && message.getContentRaw().contentEquals(prefix + "startGame"))
 			startGameCommand(message);
 
 		// TODO: Block people if they occupy a certain role
@@ -76,7 +76,7 @@ public class DiscordGame
 			displayParty(message.getChannel());
 		// TODO: Make sure the same person can't join twice
 		// TODO: Make sure his DM is open
-		else if (message.getContentRaw().contentEquals(prefix + "join"))
+		else if (!isMessageFromGameGuild(message) && message.getContentRaw().contentEquals(prefix + "join"))
 			joinGame(message.getMember().getIdLong(), message.getChannel());
 
 		else if (started && isMessageFromGameGuild(message) && message.getContentRaw().startsWith(prefix + "ability"))
@@ -88,7 +88,10 @@ public class DiscordGame
 
 	private boolean isMessageFromGameGuild(Message message)
 	{
-		return message.getGuild().getIdLong() == getGameGuild().getIdLong();
+		if (getGameGuild() != null)
+			return message.getGuild().getIdLong() == getGameGuild().getIdLong();
+		else
+			return false;
 	}
 
 	private void startGameCommand(Message message)
