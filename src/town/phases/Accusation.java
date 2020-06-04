@@ -108,6 +108,7 @@ public class Accusation extends Phase
 			return "No vote to cancel";
 
 		numOfVotes.put(previousAccused, numOfVotes.get(previousAccused) - 1);
+		updateMessage();
 		return "Vote cancelled";
 	}
 }
