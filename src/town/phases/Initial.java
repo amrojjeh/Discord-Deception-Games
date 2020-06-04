@@ -10,7 +10,7 @@ public class Initial extends Phase
 	@Override
 	public void start()
 	{
-		getGame().sendMessageToTextChannel("daytime_discussion", "Waiting for players...").queue();
+		getGame().sendMessageToTextChannel("daytime_discussion", "Waiting for players...");
 	}
 
 	@Override

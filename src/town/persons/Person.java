@@ -84,7 +84,7 @@ public abstract class Person
 	public void sendMessage(String msg)
 	{
 		if (privateChannelID != null)
-			game.sendMessageToTextChannel(privateChannelID, msg).queue();
+			game.sendMessageToTextChannel(privateChannelID, msg);
 		else
 			System.out.println("Could not send to private channel");
 	}

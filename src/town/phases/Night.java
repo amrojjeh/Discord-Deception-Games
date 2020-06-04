@@ -13,14 +13,14 @@ public class Night extends Phase
 		getGame().setChannelVisibility("daytime_discussion", true, false);
 		getGame().setChannelVisibility("Daytime", false, false);
 		getGame().discconectEveryoneFromVC("Daytime");
-		getGame().sendMessageToTextChannel("daytime_discussion", "The night has started").queue();
+		getGame().sendMessageToTextChannel("daytime_discussion", "The night has started");
 	}
 
 	@Override
 	public void end()
 	{
 		getGame().dispatchEvents();
-		getGame().sendMessageToTextChannel("daytime_discussion", "The night has ended").queue();
+		getGame().sendMessageToTextChannel("daytime_discussion", "The night has ended");
 	}
 
 	@Override

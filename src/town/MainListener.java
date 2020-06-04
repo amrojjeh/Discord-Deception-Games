@@ -125,9 +125,6 @@ public class MainListener extends ListenerAdapter
 	@Override
 	public void onMessageReceived(MessageReceivedEvent e)
 	{
-		// TODO: Make sure that when kicked, to delete the game from the hash table
-		// TODO: Add a help command
-		// TODO: Disable start party commands in game servers
 		Message message = e.getMessage();
 		if (e.isFromType(ChannelType.PRIVATE))
 			return;

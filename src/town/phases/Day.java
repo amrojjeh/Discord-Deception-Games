@@ -21,7 +21,7 @@ public class Day extends Phase
 
 	private void showDayChannels()
 	{
-		getGame().sendMessageToTextChannel("daytime_discussion", "Day started").queue();
+		getGame().sendMessageToTextChannel("daytime_discussion", "Day started");
 		getGame().setChannelVisibility("daytime_discussion", true, true);
 		getGame().setChannelVisibility("Daytime", true, true);
 	}

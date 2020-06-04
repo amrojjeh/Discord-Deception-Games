@@ -23,7 +23,6 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.VoiceChannel;
 import net.dv8tion.jda.api.requests.restaction.GuildAction;
 import net.dv8tion.jda.api.requests.restaction.GuildAction.RoleData;
-import net.dv8tion.jda.api.requests.restaction.MessageAction;
 import net.dv8tion.jda.api.requests.restaction.PermissionOverrideAction;
 import town.events.TownEvent;
 import town.persons.Person;
@@ -235,7 +234,7 @@ public class DiscordGame
 		Person accused = referenced.get(0);
 
 		Accusation acc = (Accusation)phase;
-		sendMessageToTextChannel("daytime_discussion", acc.vote(accuser, accused)).queue();
+		sendMessageToTextChannel("daytime_discussion", acc.vote(accuser, accused));
 	}
 
 	private void displayParty(MessageChannel channelUsed)
@@ -297,7 +296,7 @@ public class DiscordGame
 
 		//		textChannels.put("the_hideout", "");
 		//		textChannels.put("the_underground", "");
-		//the jailor's private text channel, where he can talk to the bot
+		// TODO: Do jailor talk in #private
 		//		textChannels.put("jailor", "");
 		//the "jail" where the bot transfers the jailor's text anonymously, and the jailed player can respond
 		//		textChannels.put("jail", "");
@@ -545,24 +544,44 @@ public class DiscordGame
 		jda.getUserById(person.getID()).openPrivateChannel().queue((channel) -> channel.sendMessage(msg).queue());
 	}
 
-	public MessageAction sendMessageToTextChannel(String channelName, String msg)
+	public void sendMessageToTextChannel(String channelName, String msg, Consumer<Message> consumer)
 	{
-		return getTextChannel(channelName).sendMessage(msg);
+		getTextChannel(channelName).sendMessage(msg).queue(consumer);
 	}
 
-	public MessageAction sendMessageToTextChannel(Long channelID, String msg)
+	public void  sendMessageToTextChannel(Long channelID, String msg, Consumer<Message> consumer)
 	{
-		return getTextChannel(channelID).sendMessage(msg);
+		getTextChannel(channelID).sendMessage(msg).queue(consumer);
 	}
 
-	public MessageAction sendMessageToTextChannel(String channelName, MessageEmbed embed)
+	public void sendMessageToTextChannel(String channelName, MessageEmbed embed, Consumer<Message> consumer)
 	{
-		return getTextChannel(channelName).sendMessage(embed);
+		getTextChannel(channelName).sendMessage(embed).queue(consumer);
 	}
 
-	public MessageAction sendMessageToTextChannel(Long channelID, MessageEmbed embed)
+	public void sendMessageToTextChannel(Long channelID, MessageEmbed embed, Consumer<Message> consumer)
 	{
-		return getTextChannel(channelID).sendMessage(embed);
+		getTextChannel(channelID).sendMessage(embed).queue(consumer);
+	}
+
+	public void sendMessageToTextChannel(String channelName, String msg)
+	{
+		getTextChannel(channelName).sendMessage(msg).queue();
+	}
+
+	public void  sendMessageToTextChannel(Long channelID, String msg)
+	{
+		getTextChannel(channelID).sendMessage(msg).queue();
+	}
+
+	public void sendMessageToTextChannel(String channelName, MessageEmbed embed)
+	{
+		getTextChannel(channelName).sendMessage(embed).queue();
+	}
+
+	public void sendMessageToTextChannel(Long channelID, MessageEmbed embed)
+	{
+		getTextChannel(channelID).sendMessage(embed).queue();
 	}
 
 	public void getMessage(String channelName, long messageID, Consumer<Message> consumer)

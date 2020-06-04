@@ -36,7 +36,7 @@ public class Civilian extends Person
 	@Override
 	public void win()
 	{
-		getGame().sendMessageToTextChannel("daytime_discussion", "**Civilians have won!**").queue((msg) -> getGame().endGame());
+		getGame().sendMessageToTextChannel("daytime_discussion", "**Civilians have won!**", (msg) -> getGame().endGame());
 	}
 
 	@Override

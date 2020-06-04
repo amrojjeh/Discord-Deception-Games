@@ -25,7 +25,7 @@ public class Accusation extends Phase
 	@Override
 	public void start()
 	{
-		getGame().sendMessageToTextChannel("daytime_discussion", "Accusation started").queue();
+		getGame().sendMessageToTextChannel("daytime_discussion", "Accusation started");
 		sendInitialMessage();
 	}
 
@@ -67,7 +67,7 @@ public class Accusation extends Phase
 
 	public void sendInitialMessage()
 	{
-		getGame().sendMessageToTextChannel("daytime_discussion", generateList()).queue(message -> msgID = message.getIdLong());
+		getGame().sendMessageToTextChannel("daytime_discussion", generateList(), message -> msgID = message.getIdLong());
 	}
 
 	public void updateMessage()
