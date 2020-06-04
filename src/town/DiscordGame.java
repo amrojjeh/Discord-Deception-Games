@@ -76,8 +76,6 @@ public class DiscordGame
 		// TODO: Block people if they occupy a certain role
 		else if (message.getContentRaw().contentEquals(prefix + "party"))
 			displayParty(message.getChannel());
-		// TODO: Make sure the same person can't join twice
-		// TODO: Make sure his DM is open
 		else if (!isMessageFromGameGuild(message) && message.getContentRaw().contentEquals(prefix + "join"))
 			joinGame(message.getMember().getIdLong(), message.getChannel());
 
@@ -90,6 +88,8 @@ public class DiscordGame
 			roleHelpCommand(message);
 		else if (started && isMessageFromGameGuild(message) && message.getContentRaw().startsWith(prefix + "vote"))
 			voteCommand(message);
+		// TODO: Add endgame
+		// TODO: Instead of transfering the server, offer the option to delete or tranfer. If no choice is made, delete
 	}
 
 	private boolean isMessageFromGameGuild(Message message)
@@ -202,7 +202,7 @@ public class DiscordGame
 		user.sendMessage(user.getHelp());
 	}
 
-	public void voteCommand(Message message)
+	private void voteCommand(Message message)
 	{
 		Phase phase = getCurrentPhase();
 		if (!(phase instanceof Accusation))
@@ -233,6 +233,11 @@ public class DiscordGame
 		Person accuser = getPerson(message.getMember());;
 		Person accused = referenced.get(0);
 
+		if (!accuser.isAlive())
+		{
+			message.getChannel().sendMessage(String.format("Dead men can't vote <@%d>", accuser.getID()));
+			return;
+		}
 		Accusation acc = (Accusation)phase;
 		sendMessageToTextChannel("daytime_discussion", acc.vote(accuser, accused));
 	}
@@ -344,8 +349,6 @@ public class DiscordGame
 
 		playerRoleID = guild.getRolesByName("Player", false).get(0).getIdLong();
 		botRoleID = guild.getRolesByName("Bot", false).get(0).getIdLong();
-
-		// TODO: Tell him role in specific channel
 	}
 
 	public Member getMemberFromGame(Person person)
@@ -589,7 +592,7 @@ public class DiscordGame
 		getTextChannel(channelName).retrieveMessageById(messageID).queue(consumer);
 	}
 
-	public void guildJoin(Member member)
+	public void gameGuildJoin(Member member)
 	{
 		// TODO: If the game starts, remove invite link?
 		// TODO: Otherwise boot? Other option is to make him spectator
@@ -600,11 +603,9 @@ public class DiscordGame
 		for (Person p : getPlayers())
 			if (p.getID().longValue() == member.getUser().getIdLong())
 			{
-				// TODO: Make a hashmap of roles
 				getGameGuild().addRoleToMember(member, getGameGuild().getRolesByName("Player", false).get(0)).queue();
 				TextChannel textChannel = getTextChannel(p.getChannelID());
 				textChannel.putPermissionOverride(getMemberFromGame(p)).setAllow(readPermissions() | writePermissions()).queue();
-				// TODO: Instead of sending test, send help information through p.sendMessage(p.helpMessage())
 				p.sendMessage("Your role is " + p.getRoleName());
 				p.sendMessage(p.getHelp());
 				shouldKick = false;

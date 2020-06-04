@@ -72,7 +72,7 @@ public class MainListener extends ListenerAdapter
 	@Override
 	public void onGuildMemberJoin(GuildMemberJoinEvent event)
 	{
-		games.get(event.getGuild().getIdLong()).guildJoin(event.getMember());
+		games.get(event.getGuild().getIdLong()).gameGuildJoin(event.getMember());
 	}
 
 	@Override
@@ -131,7 +131,6 @@ public class MainListener extends ListenerAdapter
 
 		if (message.getContentRaw().contentEquals(prefix + "startParty"))
 			startLobby(e.getJDA(), e.getGuild().getIdLong(), e.getChannel(), e.getMember());
-		// TODO: Replace endParty with endGame if the game starts (or just have them be the same)
 		else if (message.getContentRaw().contentEquals(prefix + "endParty"))
 			endLobby(e.getGuild().getIdLong(), e.getChannel());
 		else if (message.getContentRaw().contentEquals(prefix + "help")) {

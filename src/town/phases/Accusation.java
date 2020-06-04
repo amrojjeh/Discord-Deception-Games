@@ -82,11 +82,14 @@ public class Accusation extends Phase
 
 	public String vote(Person accuser, Person accused)
 	{
+		if (!accuser.isAlive())
+			return String.format("Dead men can't vote <@%d>", accuser.getID());
+
 		Person previousAccused = voters.get(accuser);
 		String message = "";
 
 		if (accused == accuser)
-			return "You can't vote against yourself";
+			return String.format("Can't vote against yourself <@%d>", accuser.getID());
 
 		if (previousAccused != null && previousAccused != accused)
 			message = String.format("<@%d> (%d) lost a vote from <@%d>\n", accused.getID(), numOfVotes.get(previousAccused), accuser.getID());
