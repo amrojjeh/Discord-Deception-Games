@@ -1,6 +1,6 @@
 package town.persons;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import town.DiscordGame;
 import town.events.MurderTownEvent;
@@ -50,7 +50,7 @@ public class SerialKiller extends Person
 	}
 
 	@Override
-	public String ability(ArrayList<Person> references)
+	public String ability(List<Person> references)
 	{
 		if (references.isEmpty())
 			return "There's no person to kill. `tos.kill 1` to kill the first person shown in `tos.party`.";

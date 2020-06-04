@@ -1,6 +1,6 @@
 package town.persons;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import town.DiscordGame;
 
@@ -40,7 +40,7 @@ public class Civilian extends Person
 	}
 
 	@Override
-	public String ability(ArrayList<Person> references)
+	public String ability(List<Person> references)
 	{
 		return "Civilian has no ability";
 	}

@@ -1,6 +1,6 @@
 package town.persons;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import town.DiscordGame;
 import town.events.MurderTownEvent;
@@ -118,7 +118,7 @@ public abstract class Person
 		privateChannelID = id;
 	}
 
-	public abstract String ability(ArrayList<Person> references);
+	public abstract String ability(List<Person> list);
 
 	public abstract String cancel();
 

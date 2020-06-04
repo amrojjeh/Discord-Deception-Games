@@ -15,10 +15,15 @@ public class Day extends Phase
 	@Override
 	public void start()
 	{
+		showDayChannels();
+		//		getGame().getPlayers().forEach((person) -> checkVictory(person));
+	}
+
+	private void showDayChannels()
+	{
 		getGame().sendMessageToTextChannel("system", "Day started").queue();
 		getGame().setChannelVisibility("daytime_discussion", true, true);
 		getGame().setChannelVisibility("Daytime", true, true);
-		getGame().getPlayers().forEach((person) -> checkVictory(person));
 	}
 
 	public void checkVictory(Person person)
@@ -31,22 +36,20 @@ public class Day extends Phase
 	@Override
 	public void end()
 	{
-		getGame().setChannelVisibility("daytime_discussion", true, false);
-		getGame().setChannelVisibility("Daytime", false, false);
-		getGame().discconectEveryoneFromVC("Daytime");
+
 	}
 
 	// After Daytime, the Accusation phase begins.
 	@Override
 	public Phase getNextPhase(PhaseManager pm)
 	{
-		return new Night(pm);
+		return new Accusation(pm);
 	}
 
 	//Duration: 50 seconds
 	@Override
 	public int getDurationInSeconds()
 	{
-		return 15;
+		return 2;
 	}
 }

@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.function.Consumer;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
@@ -26,6 +28,7 @@ import net.dv8tion.jda.api.requests.restaction.PermissionOverrideAction;
 import town.events.TownEvent;
 import town.persons.Person;
 import town.persons.assigner.RoleAssigner;
+import town.phases.Accusation;
 import town.phases.Phase;
 import town.phases.PhaseManager;
 
@@ -86,12 +89,8 @@ public class DiscordGame
 			cancelAbilityCommand(message);
 		else if (started && isMessageFromGameGuild(message) && message.getContentRaw().contentEquals(prefix + "roleHelp"))
 			roleHelpCommand(message);
-	}
-
-	private void roleHelpCommand(Message message)
-	{
-		Person user = getPerson(message.getMember());
-		user.sendMessage(user.getHelp());
+		else if (started && isMessageFromGameGuild(message) && message.getContentRaw().startsWith(prefix + "vote"))
+			voteCommand(message);
 	}
 
 	private boolean isMessageFromGameGuild(Message message)
@@ -100,6 +99,68 @@ public class DiscordGame
 			return message.getGuild().getIdLong() == getGameGuild().getIdLong();
 		else
 			return false;
+	}
+
+	private List<Person> getPersonsFromMessage(Message message)
+	{
+		List<Person> references = getPersonsFromMessageUsingNumReferences(message);
+		if (references != null)
+			return references;
+
+		return getPersonsFromMessageUsingMentions(message);
+	}
+
+	private List<Person> getPersonsFromMessageUsingMentions(Message message)
+	{
+		List<Member> members = message.getMentionedMembers();
+		ArrayList<Person> mentioned = new ArrayList<>();
+
+		if (members.size() == 0) return mentioned;
+
+		for (Member m : members)
+		{
+			Person p = getPerson(m);
+			if (p == null)
+			{
+				message.getChannel().sendMessage(String.format("Person <@%d> isn't a player", m.getIdLong())).queue();
+				return null;
+			}
+
+			mentioned.add(p);
+		}
+
+		return mentioned;
+
+	}
+
+	private List<Person> getPersonsFromMessageUsingNumReferences(Message message)
+	{
+		ArrayList<Person> references = new ArrayList<>();
+		String[] words = message.getContentStripped().split(" ");
+		if (words.length == 1) return references;
+		for (int x = 1; x < words.length; ++x)
+		{
+			// Check if parsable
+			int personNum = 0; // 0 can't exist as a ref
+			try
+			{
+				personNum = Integer.parseInt(words[x]);
+			}
+			catch (NumberFormatException e)
+			{
+				return null;
+			}
+
+			Person reference = getPerson(personNum);
+			if (reference == null)
+			{
+				message.getChannel().sendMessage(String.format("Person with number %d doesn't exist", personNum)).queue();
+				return null;
+			}
+			references.add(reference);
+		}
+
+		return references;
 	}
 
 	private void startGameCommand(Message message)
@@ -120,39 +181,56 @@ public class DiscordGame
 
 	private void activateAbilityCommand(Message message)
 	{
-		// TODO: Maybe support mentions again
-		ArrayList<Person> references = new ArrayList<>();
-		String[] words = message.getContentStripped().split(" ");
-		for (int x = 1; x < words.length; ++x)
-		{
-			// Check if parsable
-			int personNum = 0; // 0 can't exist as a ref
-			try
-			{
-				personNum = Integer.parseInt(words[x]);
-			}
-			catch (NumberFormatException e)
-			{
-				message.getChannel().sendMessage("Can only reference people by numbers. Use tos.party to get the list").queue();
-				return;
-			}
-
-			Person reference = getPerson(personNum);
-			if (reference == null)
-			{
-				message.getChannel().sendMessage(String.format("Person with number %d doesn't exist", personNum)).queue();
-				return;
-			}
-			references.add(reference);
-		}
 		Person user = getPerson(message.getMember());
-		message.getChannel().sendMessage(user.ability(references)).queue();
+		message.getChannel().sendMessage(user.ability(getPersonsFromMessage(message))).queue();
 	}
 
 	private void cancelAbilityCommand(Message message)
 	{
 		Person user = getPerson(message.getMember());
 		message.getChannel().sendMessage(user.cancel()).queue();
+	}
+
+	private void roleHelpCommand(Message message)
+	{
+		Person user = getPerson(message.getMember());
+		user.sendMessage(user.getHelp());
+	}
+
+	public void voteCommand(Message message)
+	{
+		Phase phase = getCurrentPhase();
+		if (!(phase instanceof Accusation))
+		{
+			message.getChannel().sendMessage("You can only vote for trial once the accusation phase starts!").queue();
+			return;
+		}
+
+		List<Person> referenced = getPersonsFromMessage(message);
+		if (referenced == null)
+		{
+			System.out.println("Thing was null mate");
+			return;
+		}
+
+		if (referenced.isEmpty())
+		{
+			message.getChannel().sendMessage("You have to vote one person! Ex: `tos.vote 2`").queue();
+			return;
+		}
+
+		if (referenced.size() > 1)
+		{
+			message.getChannel().sendMessage("You can only vote one person! Ex: `tos.vote 2`").queue();
+			return;
+		}
+
+		Person accuser = getPerson(message.getMember());;
+		Person accused = referenced.get(0);
+
+		Accusation acc = (Accusation)phase;
+		sendMessageToTextChannel("daytime_discussion", acc.vote(accuser, accused)).queue();
+
 	}
 
 	public void displayParty(MessageChannel channelUsed)
@@ -466,6 +544,21 @@ public class DiscordGame
 	public MessageAction sendMessageToTextChannel(Long channelID, String msg)
 	{
 		return getTextChannel(channelID).sendMessage(msg);
+	}
+
+	public MessageAction sendMessageToTextChannel(String channelName, MessageEmbed embed)
+	{
+		return getTextChannel(channelName).sendMessage(embed);
+	}
+
+	public MessageAction sendMessageToTextChannel(Long channelID, MessageEmbed embed)
+	{
+		return getTextChannel(channelID).sendMessage(embed);
+	}
+
+	public void getMessage(String channelName, long messageID, Consumer<Message> consumer)
+	{
+		getTextChannel(channelName).retrieveMessageById(messageID).queue(consumer);
 	}
 
 	public void guildJoin(Member member)
