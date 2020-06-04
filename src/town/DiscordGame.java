@@ -280,10 +280,6 @@ public class DiscordGame
 		// FIXME: WARNING: Unable to load JDK7 types (java.nio.file.Path): no Java7 type support added
 		// Is being caued by the addPermissionOverride method.
 		// FIXME: Setting position is not working
-		g.newChannel(ChannelType.TEXT, "system")
-		.setPosition(0)
-		.addPermissionOverride(playerRoleData, readPermissions(), writePermissions());
-
 		g.newChannel(ChannelType.VOICE, "Daytime")
 		.setPosition(2);
 

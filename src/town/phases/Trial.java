@@ -13,7 +13,7 @@ public class Trial extends Phase
 	@Override
 	public void start()
 	{
-		getGame().sendMessageToTextChannel("system", "[PLAYER NAME] has been put on trial!").queue();
+		getGame().sendMessageToTextChannel("daytime_discussion", "[PLAYER NAME] has been put on trial!").queue();
 	}
 
 	//ends the phase, sending out a global message of this fact.

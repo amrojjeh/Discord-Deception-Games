@@ -46,7 +46,7 @@ public class SerialKiller extends Person
 	@Override
 	public void win()
 	{
-		getGame().sendMessageToTextChannel("system", "**Serial Killers have won!**").queue((msg) -> getGame().endGame());
+		getGame().sendMessageToTextChannel("daytime_discussion", "**Serial Killers have won!**").queue((msg) -> getGame().endGame());
 	}
 
 	@Override

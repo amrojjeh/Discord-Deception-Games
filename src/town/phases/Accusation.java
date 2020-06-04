@@ -25,7 +25,7 @@ public class Accusation extends Phase
 	@Override
 	public void start()
 	{
-		getGame().sendMessageToTextChannel("system", "Accusation started").queue();
+		getGame().sendMessageToTextChannel("daytime_discussion", "Accusation started").queue();
 		sendInitialMessage();
 	}
 
@@ -67,12 +67,12 @@ public class Accusation extends Phase
 
 	public void sendInitialMessage()
 	{
-		getGame().sendMessageToTextChannel("system", generateList()).queue(message -> msgID = message.getIdLong());
+		getGame().sendMessageToTextChannel("daytime_discussion", generateList()).queue(message -> msgID = message.getIdLong());
 	}
 
 	public void updateMessage()
 	{
-		getGame().getMessage("system", msgID, (msg) -> updateMessage(msg));
+		getGame().getMessage("daytime_discussion", msgID, (msg) -> updateMessage(msg));
 	}
 
 	public void updateMessage(Message msg)
@@ -83,7 +83,6 @@ public class Accusation extends Phase
 	public String vote(Person accuser, Person accused)
 	{
 		// TODO: Make a command for dispalying current votes
-		// TODO: Merge system and daytime_discussion
 
 		Person previousAccused = voters.get(accuser);
 		String message = "";
