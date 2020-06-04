@@ -128,9 +128,7 @@ public class DiscordGame
 
 			mentioned.add(p);
 		}
-
 		return mentioned;
-
 	}
 
 	private List<Person> getPersonsFromMessageUsingNumReferences(Message message)
@@ -171,7 +169,7 @@ public class DiscordGame
 		else if (persons.isEmpty())
 			message.getChannel().sendMessage("Not enough players to start a server!").queue();
 		else if (message.getMember().getIdLong() != partyLeaderID)
-			message.getChannel().sendMessage(String.format("Only party leader (<@%d>) can start the game!", partyLeaderID));
+			message.getChannel().sendMessage(String.format("Only party leader (<@%d>) can start the game!", partyLeaderID)).queue();
 		else
 		{
 			message.getChannel().sendMessage("Game has started! Creating server...").queue();
@@ -188,6 +186,14 @@ public class DiscordGame
 	private void cancelAbilityCommand(Message message)
 	{
 		Person user = getPerson(message.getMember());
+		Phase currentPhase = getCurrentPhase();
+		if (currentPhase instanceof Accusation)
+		{
+			Accusation acc = (Accusation)currentPhase;
+			message.getChannel().sendMessage(acc.cancelVote(user)).queue();
+			return;
+		}
+
 		message.getChannel().sendMessage(user.cancel()).queue();
 	}
 
@@ -230,11 +236,18 @@ public class DiscordGame
 
 		Accusation acc = (Accusation)phase;
 		sendMessageToTextChannel("daytime_discussion", acc.vote(accuser, accused)).queue();
-
 	}
 
-	public void displayParty(MessageChannel channelUsed)
+	private void displayParty(MessageChannel channelUsed)
 	{
+		Phase currentPhase = getCurrentPhase();
+		if (currentPhase instanceof Accusation)
+		{
+			Accusation acc = (Accusation)currentPhase;
+			channelUsed.sendMessage(acc.generateList()).queue();
+			return;
+		}
+
 		String description = "";
 		String format = "%d. %s (%s)\n";
 		for (Person p : persons)

@@ -46,10 +46,10 @@ public class Accusation extends Phase
 	@Override
 	public int getDurationInSeconds()
 	{
-		return 3600;
+		return 30;
 	}
 
-	private MessageEmbed generateList()
+	public MessageEmbed generateList()
 	{
 		String description = "";
 		for (Person p : getGame().getAlivePlayers())
@@ -62,7 +62,6 @@ public class Accusation extends Phase
 				description += vote + " ";
 			description += ":  " + p.getNum() + ". " + p.getNickName() + "\n";
 		}
-
 		return new EmbedBuilder().setTitle("Players Alive").setColor(Color.YELLOW).setDescription(description).build();
 	}
 
@@ -83,21 +82,33 @@ public class Accusation extends Phase
 
 	public String vote(Person accuser, Person accused)
 	{
-		// TODO: Return another message if voting for the same person
 		// TODO: Make a command for dispalying current votes
 		// TODO: Merge system and daytime_discussion
 
 		Person previousAccused = voters.get(accuser);
 		String message = "";
-		if (previousAccused != null)
-		{
+
+		if (accused == accuser)
+			return "You can't vote against yourself";
+
+		if (previousAccused != null && previousAccused != accused)
 			message = String.format("<@%d> (%d) lost a vote from <@%d>\n", accused.getID(), numOfVotes.get(previousAccused), accuser.getID());
-			numOfVotes.computeIfPresent(previousAccused, (k, v) -> (v == 0) ? 0 : v - 1);
-		}
+
+		cancelVote(accuser);
 
 		voters.put(accuser, accused);
 		numOfVotes.compute(accused, (k, v) -> (v == null) ? 1 : v + 1);
 		updateMessage();
 		return message + String.format("<@%d> (%d) was accused by <@%d>", accused.getID(), numOfVotes.get(accused), accuser.getID());
+	}
+
+	public String cancelVote(Person accuser)
+	{
+		Person previousAccused = voters.get(accuser);
+		if (previousAccused == null)
+			return "No vote to cancel";
+
+		numOfVotes.put(previousAccused, numOfVotes.get(previousAccused) - 1);
+		return "Vote cancelled";
 	}
 }
