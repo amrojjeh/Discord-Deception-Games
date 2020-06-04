@@ -82,8 +82,6 @@ public class Accusation extends Phase
 
 	public String vote(Person accuser, Person accused)
 	{
-		// TODO: Make a command for dispalying current votes
-
 		Person previousAccused = voters.get(accuser);
 		String message = "";
 
