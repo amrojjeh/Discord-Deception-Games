@@ -235,7 +235,7 @@ public class DiscordGame
 
 		if (!accuser.isAlive())
 		{
-			message.getChannel().sendMessage(String.format("Dead men can't vote <@%d>", accuser.getID()));
+			message.getChannel().sendMessage(String.format("Dead men can't vote <@%d>", accuser.getID())).queue();
 			return;
 		}
 		Accusation acc = (Accusation)phase;

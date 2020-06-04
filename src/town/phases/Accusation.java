@@ -60,7 +60,7 @@ public class Accusation extends Phase
 				description += vote;
 			else
 				description += vote + " ";
-			description += ":  " + p.getNum() + ". " + p.getNickName() + "\n";
+			description += ": " + p.getNum() + ". " + p.getNickName() + "\n";
 		}
 		return new EmbedBuilder().setTitle("Players Alive").setColor(Color.YELLOW).setDescription(description).build();
 	}
@@ -82,11 +82,11 @@ public class Accusation extends Phase
 
 	public String vote(Person accuser, Person accused)
 	{
-		if (!accuser.isAlive())
-			return String.format("Dead men can't vote <@%d>", accuser.getID());
-
 		Person previousAccused = voters.get(accuser);
 		String message = "";
+
+		if (!accused.isAlive())
+			return String.format("Can't accuse a dead person <@%d>", accuser.getID());
 
 		if (accused == accuser)
 			return String.format("Can't vote against yourself <@%d>", accuser.getID());
@@ -109,6 +109,7 @@ public class Accusation extends Phase
 			return "No vote to cancel";
 
 		numOfVotes.put(previousAccused, numOfVotes.get(previousAccused) - 1);
+		voters.put(accuser, null);
 		updateMessage();
 		return "Vote cancelled";
 	}
