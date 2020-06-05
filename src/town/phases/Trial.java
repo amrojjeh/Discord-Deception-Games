@@ -23,7 +23,7 @@ public class Trial extends Phase
 		//mute all but the defendant in text / voice daytime channel
 		for(Person p : getGame().getAlivePlayers()) {
 			if(!p.equals(defendant)) {
-				getGame().setChannelVisibility(p, "Daytime", false, false);
+				getGame().muteExcept(defendant);
 				getGame().setChannelVisibility(p, "daytime_discussion", true, false);
 			}
 		}

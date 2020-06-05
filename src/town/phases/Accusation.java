@@ -58,7 +58,6 @@ public class Accusation extends Phase
 	public void putPlayerOnTrial(Person p) {
 		//ADDITION: "Start over" the phase cycle, from a trial phase.
 		pm.end();
-		System.out.println("HERE ---");
 		pm.startTrial(p);
 	}
 

@@ -18,9 +18,10 @@ public class Judgment extends Phase {
 	{
 		getGame().sendMessageToTextChannel("daytime_discussion", "Judgment phase starting");
 		for(Person p : getGame().getAlivePlayers()) {
-			getGame().setChannelVisibility(p, "Daytime", true, true);
+			getGame().restoreTalking();
 			getGame().setChannelVisibility(p, "daytime_discussion", true, true);
 		}
+		
 		//TODO: Implement the vote of fate.
 	}
 

@@ -677,4 +677,16 @@ public class DiscordGame
 		if (action != null)
 			action.queue();
 	}
+	
+	public void muteExcept(Person p) {
+		for(Person townie : getAlivePlayers()) {
+			if(p != townie) getMemberFromGame(townie).mute(true).queue();
+		}
+	}
+	
+	public void restoreTalking() {
+		for(Person townie : getAlivePlayers()) {
+			getMemberFromGame(townie).mute(false).queue();
+		}
+	}
 }
