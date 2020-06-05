@@ -15,10 +15,13 @@ public class Accusation extends Phase
 	long msgID;
 	HashMap<Person, Integer> numOfVotes = new HashMap<>();
 	HashMap<Person, Person> voters = new HashMap<>();
+	int numVotesNeeded;
+	PhaseManager pm;
 
 	public Accusation(PhaseManager pm)
 	{
 		super(pm);
+		this.pm = pm;
 	}
 
 	//begins Accusation. Players can now use the command to accuse other players. One accusation at a time!!
@@ -33,6 +36,7 @@ public class Accusation extends Phase
 	@Override
 	public void end()
 	{
+
 	}
 
 	//gets the next phase in line: could be Defense (if a player has enough votes) or Night
@@ -48,6 +52,12 @@ public class Accusation extends Phase
 	{
 		return 30;
 	}
+	
+	public void putPlayerOnTrial(Person p) {
+		//ADDITION: "Start over" the phase cycle, from a trial phase.
+		pm.end();
+		pm.startTrial(p);
+	}
 
 	public MessageEmbed generateList()
 	{
@@ -62,6 +72,8 @@ public class Accusation extends Phase
 				description += vote + " ";
 			description += ": " + p.getNum() + ". " + p.getNickName() + "\n";
 		}
+		//ADDITION: calculates number of votes needed to start a trial
+		numVotesNeeded = voters.size() / 2 + voters.size() % 2;
 		return new EmbedBuilder().setTitle("Players Alive").setColor(Color.YELLOW).setDescription(description).build();
 	}
 
@@ -99,6 +111,10 @@ public class Accusation extends Phase
 		voters.put(accuser, accused);
 		numOfVotes.compute(accused, (k, v) -> (v == null) ? 1 : v + 1);
 		updateMessage();
+		//ADDITION: Puts a player on trial if their number of votes exceed the threshold
+		if(numOfVotes.get(accused) > numVotesNeeded) {
+			putPlayerOnTrial(accused);
+		}
 		return message + String.format("<@%d> (%d) was accused by <@%d>", accused.getID(), numOfVotes.get(accused), accuser.getID());
 	}
 

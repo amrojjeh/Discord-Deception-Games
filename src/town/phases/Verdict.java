@@ -2,13 +2,11 @@ package town.phases;
 
 import town.persons.Person;
 
-//Trial occurs when the Town agrees to put someone under suspicion. They are given this phase, a small window,
-//to defend themselves without any outside noise. After this, their fate is judged by the town.
-public class Trial extends Phase
-{
+//the Verdict phase is short, it reveals who voted what- and what will happen to the defendant.
+public class Verdict extends Phase{
 	Person defendant;
 	
-	public Trial(PhaseManager pm, Person p)
+	public Verdict(PhaseManager pm, Person p)
 	{
 		super(pm);
 		defendant = p;
@@ -19,7 +17,7 @@ public class Trial extends Phase
 	public void start()
 	{
 		getGame().sendMessageToTextChannel("daytime_discussion", defendant.getNickName() + " has been put on trial!");
-		//TODO: Lock the chat for all users except the defendant. Mute all participants in VC except the defendant.
+		//TODO: Reveal the votes and the fate of the defendant.
 	}
 
 	//ends the phase, sending out a global message of this fact.
@@ -29,17 +27,18 @@ public class Trial extends Phase
 		//		System.out.println("Ending day...");
 	}
 
-	//After the defendant has spoken, players briefly discuss what to do and their fate is voted upon
+	//After the Verdict, either the Accusation phase restarts (Innocent) or the defendant is executed (Guilty)
 	@Override
 	public Phase getNextPhase(PhaseManager pm)
 	{
-		return new Judgment(pm, defendant);
+		//TODO: Move to Accusation or Last Words depending on the outcome.
+		return new Night(pm);
 	}
 
-	//Duration: 20-30 seconds
+	//Duration: very short
 	@Override
 	public int getDurationInSeconds()
 	{
-		return 15;
+		return 5;
 	}
 }

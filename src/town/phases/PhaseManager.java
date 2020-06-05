@@ -3,6 +3,7 @@ package town.phases;
 import java.util.Timer;
 
 import town.DiscordGame;
+import town.persons.Person;
 
 public class PhaseManager
 {
@@ -27,6 +28,15 @@ public class PhaseManager
 	{
 		timer = new Timer("Phase timer");
 		currentPhase = new Initial(this);
+		startNextPhase(currentPhase);
+		cancelled = false;
+	}
+	
+	//starts a trial phase cycle.
+	public void startTrial(Person p)
+	{
+		timer = new Timer("Phase timer");
+		currentPhase = new Trial(this, p);
 		startNextPhase(currentPhase);
 		cancelled = false;
 	}
