@@ -16,7 +16,7 @@ public class Verdict extends Phase{
 	@Override
 	public void start()
 	{
-		getGame().sendMessageToTextChannel("daytime_discussion", defendant.getNickName() + " has been put on trial!");
+		getGame().sendMessageToTextChannel("daytime_discussion", "And now, the verdict...");
 		//TODO: Reveal the votes and the fate of the defendant.
 	}
 

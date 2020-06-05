@@ -651,4 +651,30 @@ public class DiscordGame
 		if (action != null)
 			action.queue();
 	}
+	
+	// Write doesn't matter if we're setting a voice channel
+	public void setChannelVisibility(Person p, String channelName, boolean read, boolean write)
+	{
+		GuildChannel channel = getGuildChannel(channelName);
+		PermissionOverrideAction action = null;
+		Role playerRole = getRole(playerRoleID);
+		if (channel.getType().equals(ChannelType.VOICE))
+		{
+			if (read)
+				action = channel.putPermissionOverride(getMemberFromGame(p)).reset().setAllow(connectPermissions());
+			else
+				action = channel.putPermissionOverride(getMemberFromGame(p)).reset().setDeny(connectPermissions());
+		}
+		else if (channel.getType().equals(ChannelType.TEXT))
+		{
+			if (read && !write)
+				action = channel.putPermissionOverride(getMemberFromGame(p)).reset().setPermissions(readPermissions(), writePermissions());
+			else if (read && write)
+				action = channel.putPermissionOverride(getMemberFromGame(p)).reset().setPermissions(readPermissions() | writePermissions(), 0);
+			else
+				action = channel.putPermissionOverride(getMemberFromGame(p)).reset().setDeny(readPermissions() | writePermissions());
+		}
+		if (action != null)
+			action.queue();
+	}
 }

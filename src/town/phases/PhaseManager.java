@@ -37,8 +37,8 @@ public class PhaseManager
 	{
 		timer = new Timer("Phase timer");
 		currentPhase = new Trial(this, p);
-		startNextPhase(currentPhase);
 		cancelled = false;
+		startNextPhase(currentPhase);
 	}
 
 	//starts the next phase in the cycle.

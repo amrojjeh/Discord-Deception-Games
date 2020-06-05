@@ -18,8 +18,15 @@ public class Trial extends Phase
 	@Override
 	public void start()
 	{
-		getGame().sendMessageToTextChannel("daytime_discussion", defendant.getNickName() + " has been put on trial!");
-		//TODO: Lock the chat for all users except the defendant. Mute all participants in VC except the defendant.
+		getGame().sendMessageToTextChannel("daytime_discussion", defendant.getNickName() + ", your trial has begun. All "
+				+ "other players are muted. What is your defense? You have 30 seconds.");
+		//mute all but the defendant in text / voice daytime channel
+		for(Person p : getGame().getAlivePlayers()) {
+			if(!p.equals(defendant)) {
+				getGame().setChannelVisibility(p, "Daytime", false, false);
+				getGame().setChannelVisibility(p, "daytime_discussion", true, false);
+			}
+		}
 	}
 
 	//ends the phase, sending out a global message of this fact.

@@ -16,8 +16,11 @@ public class Judgment extends Phase {
 	@Override
 	public void start()
 	{
-		getGame().sendMessageToTextChannel("daytime_discussion", defendant.getNickName() + " has been put on trial!");
-		//TODO: Open daytime text/voice channel back up again.
+		getGame().sendMessageToTextChannel("daytime_discussion", "Judgment phase starting");
+		for(Person p : getGame().getAlivePlayers()) {
+			getGame().setChannelVisibility(p, "Daytime", true, true);
+			getGame().setChannelVisibility(p, "daytime_discussion", true, true);
+		}
 		//TODO: Implement the vote of fate.
 	}
 

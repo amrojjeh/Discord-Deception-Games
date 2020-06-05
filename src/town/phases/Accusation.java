@@ -22,6 +22,8 @@ public class Accusation extends Phase
 	{
 		super(pm);
 		this.pm = pm;
+		//ADDITION: calculates number of votes needed to start a trial
+		numVotesNeeded = getGame().getAlivePlayers().size() / 2 + 1;
 	}
 
 	//begins Accusation. Players can now use the command to accuse other players. One accusation at a time!!
@@ -56,6 +58,7 @@ public class Accusation extends Phase
 	public void putPlayerOnTrial(Person p) {
 		//ADDITION: "Start over" the phase cycle, from a trial phase.
 		pm.end();
+		System.out.println("HERE ---");
 		pm.startTrial(p);
 	}
 
@@ -72,8 +75,6 @@ public class Accusation extends Phase
 				description += vote + " ";
 			description += ": " + p.getNum() + ". " + p.getNickName() + "\n";
 		}
-		//ADDITION: calculates number of votes needed to start a trial
-		numVotesNeeded = voters.size() / 2 + voters.size() % 2;
 		return new EmbedBuilder().setTitle("Players Alive").setColor(Color.YELLOW).setDescription(description).build();
 	}
 
@@ -112,8 +113,9 @@ public class Accusation extends Phase
 		numOfVotes.compute(accused, (k, v) -> (v == null) ? 1 : v + 1);
 		updateMessage();
 		//ADDITION: Puts a player on trial if their number of votes exceed the threshold
-		if(numOfVotes.get(accused) > numVotesNeeded) {
+		if(numOfVotes.get(accused) >= numVotesNeeded) {
 			putPlayerOnTrial(accused);
+			return "**The Town has decided to put " + accused.getNickName() + "on trial!**";
 		}
 		return message + String.format("<@%d> (%d) was accused by <@%d>", accused.getID(), numOfVotes.get(accused), accuser.getID());
 	}
