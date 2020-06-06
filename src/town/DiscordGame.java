@@ -53,14 +53,12 @@ public class DiscordGame
 	long deadRoleID;
 
 	long partyLeaderID;
-	String prefix;
 
 	public DiscordGame(JDA jda, Long guildId, long partyLeaderId)
 	{
 		this.jda = jda;
 		guildID = guildId;
 		partyLeaderID = partyLeaderId;
-		prefix = "tos.";
 
 		phaseManager = new PhaseManager(this);
 		persons = new ArrayList<>();
@@ -71,6 +69,11 @@ public class DiscordGame
 	}
 
 	public void processMessage(Message message)
+	{
+		processMessage("tos.", message);
+	}
+
+	public void processMessage(String prefix, Message message)
 	{
 		// TODO: When game starts, allow ! as a prefix also
 		if (!isMessageFromGameGuild(message) && message.getContentRaw().contentEquals(prefix + "startGame"))

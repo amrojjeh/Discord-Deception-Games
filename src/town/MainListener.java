@@ -161,7 +161,7 @@ public class MainListener extends ListenerAdapter
 		{
 			DiscordGame game = games.get(e.getGuild().getIdLong());
 			if (game != null)
-				game.processMessage(e.getMessage());
+				game.processMessage("!", e.getMessage());
 		}
 		// TODO: When someone joins, check if they have an open private channel first.
 	}
