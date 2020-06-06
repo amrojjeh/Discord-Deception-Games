@@ -26,7 +26,7 @@ import net.dv8tion.jda.api.requests.restaction.GuildAction.RoleData;
 import net.dv8tion.jda.api.requests.restaction.PermissionOverrideAction;
 import town.events.TownEvent;
 import town.persons.Person;
-import town.persons.assigner.RoleAssigner;
+import town.persons.assigner.Assigner;
 import town.phases.Accusation;
 import town.phases.Phase;
 import town.phases.PhaseManager;
@@ -43,6 +43,7 @@ public class DiscordGame
 
 	// Important channels (Name : id)
 	HashMap<String, Long> channels;
+	Assigner assigner = Assigner.buildDefault(this);
 
 	long playerRoleID;
 	long botRoleID;
@@ -413,7 +414,7 @@ public class DiscordGame
 			return;
 		}
 
-		persons.add(RoleAssigner.assignRole(this, persons.size() + 1, id));
+		persons.add(assigner.generatePerson(persons.size() + 1, id));
 		String message = String.format("<@%s> joined the lobby", id);
 		channelUsed.sendMessage(message).queue();
 	}

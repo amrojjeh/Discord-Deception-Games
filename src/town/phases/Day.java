@@ -16,7 +16,7 @@ public class Day extends Phase
 	public void start()
 	{
 		showDayChannels();
-		//		getGame().getPlayers().forEach((person) -> checkVictory(person));
+		getGame().getPlayers().forEach((person) -> checkVictory(person));
 	}
 
 	private void showDayChannels()
