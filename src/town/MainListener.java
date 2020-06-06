@@ -186,7 +186,6 @@ public class MainListener extends ListenerAdapter
 			if (game != null)
 				game.processMessage("!", e.getMessage());
 		}
-		// TODO: When someone joins, check if they have an open private channel first.
 	}
 
 	public MessageEmbed helpTable() {

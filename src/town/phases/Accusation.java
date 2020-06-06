@@ -101,7 +101,7 @@ public class Accusation extends Phase
 			return String.format("Can't vote against yourself <@%d>", accuser.getID());
 
 		if (previousAccused != null && previousAccused != accused)
-			message = String.format("<@%d> (%d) lost a vote from <@%d>\n", accused.getID(), numOfVotes.get(previousAccused), accuser.getID());
+			message = String.format("<@%d> (%d) lost a vote from <@%d>\n", previousAccused.getID(), numOfVotes.get(previousAccused) - 1, accuser.getID());
 
 		cancelVote(accuser);
 

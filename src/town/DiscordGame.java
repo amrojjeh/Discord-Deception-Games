@@ -614,7 +614,6 @@ public class DiscordGame
 
 	public void gameGuildJoin(Member member)
 	{
-		// TODO: If the game starts, remove invite link?
 		// TODO: Otherwise boot? Other option is to make him spectator
 		// For now we'll boot.
 
