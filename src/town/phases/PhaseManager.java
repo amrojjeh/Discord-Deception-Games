@@ -45,7 +45,6 @@ public class PhaseManager
 		timer.schedule(phase, phase.getDurationInSeconds() * 1000);
 		//the start method of the phase type, not phase itself, is called
 		phase.start();
-
 	}
 
 	public Phase getCurrentPhase()

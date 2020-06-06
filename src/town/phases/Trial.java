@@ -27,11 +27,8 @@ public class Trial extends Phase
 				+ "other players are muted. What is your defense? You have 30 seconds.");
 		//mute all but the defendant in text / voice daytime channel
 		getGame().muteExcept("Daytime", defendant);
-		for(Person p : getGame().getAlivePlayers()) {
-			if(!p.equals(defendant)) {
-				getGame().setChannelVisibility(p, "daytime_discussion", true, false);
-			}
-		}
+		getGame().setChannelVisibility("daytime_discussion", true, false);
+		getGame().setChannelVisibility(defendant, "daytime_discussion", true, true);
 	}
 
 	//ends the phase, sending out a global message of this fact.

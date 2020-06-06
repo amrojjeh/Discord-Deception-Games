@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildChannel;
+import net.dv8tion.jda.api.entities.IPermissionHolder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
@@ -631,50 +632,36 @@ public class DiscordGame
 	// Write doesn't matter if we're setting a voice channel
 	public void setChannelVisibility(String channelName, boolean read, boolean write)
 	{
-		GuildChannel channel = getGuildChannel(channelName);
-		PermissionOverrideAction action = null;
 		Role playerRole = getRole(playerRoleID);
-		if (channel.getType().equals(ChannelType.VOICE))
-		{
-			if (read)
-				action = channel.putPermissionOverride(playerRole).reset().setAllow(connectPermissions());
-			else
-				action = channel.putPermissionOverride(playerRole).reset().setDeny(connectPermissions());
-		}
-		else if (channel.getType().equals(ChannelType.TEXT))
-		{
-			if (read && !write)
-				action = channel.putPermissionOverride(playerRole).reset().setPermissions(readPermissions(), writePermissions());
-			else if (read && write)
-				action = channel.putPermissionOverride(playerRole).reset().setPermissions(readPermissions() | writePermissions(), 0);
-			else
-				action = channel.putPermissionOverride(playerRole).reset().setDeny(readPermissions() | writePermissions());
-		}
-		if (action != null)
-			action.queue();
+		setChannelVisibility(playerRole, channelName, read, write);
 	}
 
-	// Write doesn't matter if we're setting a voice channel
 	public void setChannelVisibility(Person p, String channelName, boolean read, boolean write)
+	{
+		Member member = getMemberFromGame(p);
+		if (member == null) throw new IllegalArgumentException("Invalid person.");
+		setChannelVisibility(member, channelName, read, write);
+	}
+
+	private void setChannelVisibility(IPermissionHolder holder, String channelName, boolean read, boolean write)
 	{
 		GuildChannel channel = getGuildChannel(channelName);
 		PermissionOverrideAction action = null;
-		Role playerRole = getRole(playerRoleID);
 		if (channel.getType().equals(ChannelType.VOICE))
 		{
 			if (read)
-				action = channel.putPermissionOverride(playerRole).reset().setAllow(connectPermissions());
+				action = channel.putPermissionOverride(holder).reset().setAllow(connectPermissions());
 			else
-				action = channel.putPermissionOverride(playerRole).reset().setDeny(connectPermissions());
+				action = channel.putPermissionOverride(holder).reset().setDeny(connectPermissions());
 		}
 		else if (channel.getType().equals(ChannelType.TEXT))
 		{
 			if (read && !write)
-				action = channel.putPermissionOverride(playerRole).reset().setPermissions(readPermissions(), writePermissions());
+				action = channel.putPermissionOverride(holder).reset().setPermissions(readPermissions(), writePermissions());
 			else if (read && write)
-				action = channel.putPermissionOverride(playerRole).reset().setPermissions(readPermissions() | writePermissions(), 0);
+				action = channel.putPermissionOverride(holder).reset().setPermissions(readPermissions() | writePermissions(), 0);
 			else
-				action = channel.putPermissionOverride(playerRole).reset().setDeny(readPermissions() | writePermissions());
+				action = channel.putPermissionOverride(holder).reset().setDeny(readPermissions() | writePermissions());
 		}
 		if (action != null)
 			action.queue();
