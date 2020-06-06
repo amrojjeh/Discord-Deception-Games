@@ -1,19 +1,32 @@
 package town.phases;
 
-//Daytime is the phase where players can discuss what is happening. There are no features other than
-//a voice and text chat that all can use.
+import town.persons.Person;
+
+//Trial occurs when the Town agrees to put someone under suspicion. They are given this phase, a small window,
+//to defend themselves without any outside noise. After this, their fate is judged by the town.
 public class Trial extends Phase
 {
-	public Trial(PhaseManager pm)
+	Person defendant;
+	
+	public Trial(PhaseManager pm, Person p)
 	{
 		super(pm);
+		defendant = p;
 	}
 
 	//begins the phase. sends out a message, and opens up text channels and voice chat.
 	@Override
 	public void start()
 	{
-		getGame().sendMessageToTextChannel("daytime_discussion", "[PLAYER NAME] has been put on trial!");
+		getGame().sendMessageToTextChannel("daytime_discussion", defendant.getNickName() + ", your trial has begun. All "
+				+ "other players are muted. What is your defense? You have 30 seconds.");
+		//mute all but the defendant in text / voice daytime channel
+		for(Person p : getGame().getAlivePlayers()) {
+			if(!p.equals(defendant)) {
+				getGame().muteExcept(defendant);
+				getGame().setChannelVisibility(p, "daytime_discussion", true, false);
+			}
+		}
 	}
 
 	//ends the phase, sending out a global message of this fact.
@@ -23,14 +36,14 @@ public class Trial extends Phase
 		//		System.out.println("Ending day...");
 	}
 
-	//After Daytime, the Accusation phase begins.
+	//After the defendant has spoken, players briefly discuss what to do and their fate is voted upon
 	@Override
 	public Phase getNextPhase(PhaseManager pm)
 	{
-		return new Night(pm);
+		return new Judgment(pm, defendant);
 	}
 
-	//Duration: 50 seconds
+	//Duration: 20-30 seconds
 	@Override
 	public int getDurationInSeconds()
 	{
