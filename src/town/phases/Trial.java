@@ -7,11 +7,16 @@ import town.persons.Person;
 public class Trial extends Phase
 {
 	Person defendant;
-	
+
 	public Trial(PhaseManager pm, Person p)
 	{
 		super(pm);
 		defendant = p;
+	}
+
+	public Person getDefendant()
+	{
+		return defendant;
 	}
 
 	//begins the phase. sends out a message, and opens up text channels and voice chat.
@@ -21,9 +26,9 @@ public class Trial extends Phase
 		getGame().sendMessageToTextChannel("daytime_discussion", defendant.getNickName() + ", your trial has begun. All "
 				+ "other players are muted. What is your defense? You have 30 seconds.");
 		//mute all but the defendant in text / voice daytime channel
+		getGame().muteExcept("Daytime", defendant);
 		for(Person p : getGame().getAlivePlayers()) {
 			if(!p.equals(defendant)) {
-				getGame().muteExcept(defendant);
 				getGame().setChannelVisibility(p, "daytime_discussion", true, false);
 			}
 		}
@@ -33,7 +38,10 @@ public class Trial extends Phase
 	@Override
 	public void end()
 	{
-		//		System.out.println("Ending day...");
+		getGame().restoreTalking("Daytime");
+		for(Person p : getGame().getAlivePlayers()) {
+			getGame().setChannelVisibility(p, "daytime_discussion", true, true);
+		}
 	}
 
 	//After the defendant has spoken, players briefly discuss what to do and their fate is voted upon

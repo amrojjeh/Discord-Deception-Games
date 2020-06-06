@@ -5,7 +5,7 @@ import town.persons.Person;
 //Judgment is the moment of fate. All players still alive vote on the life of the defendant.
 public class Judgment extends Phase {
 	Person defendant;
-	
+
 	public Judgment(PhaseManager pm, Person p)
 	{
 		super(pm);
@@ -17,11 +17,6 @@ public class Judgment extends Phase {
 	public void start()
 	{
 		getGame().sendMessageToTextChannel("daytime_discussion", "Judgment phase starting");
-		for(Person p : getGame().getAlivePlayers()) {
-			getGame().restoreTalking();
-			getGame().setChannelVisibility(p, "daytime_discussion", true, true);
-		}
-		
 		//TODO: Implement the vote of fate.
 	}
 

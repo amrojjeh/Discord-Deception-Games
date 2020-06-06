@@ -21,6 +21,7 @@ import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.guild.update.GuildUpdateOwnerEvent;
+import net.dv8tion.jda.api.events.guild.voice.GuildVoiceJoinEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
@@ -120,6 +121,14 @@ public class MainListener extends ListenerAdapter
 		game.getGameGuild().leave().queue();
 		games.remove(game.getGameID());
 		parties.remove(game.getPartyID());
+	}
+
+	@Override
+	public void onGuildVoiceJoin(GuildVoiceJoinEvent event)
+	{
+		DiscordGame game = games.get(event.getGuild().getIdLong());
+		if (game == null) return;
+		game.gameGuildVoiceJoin(event.getMember());
 	}
 
 	@Override

@@ -16,13 +16,10 @@ public class Accusation extends Phase
 	HashMap<Person, Integer> numOfVotes = new HashMap<>();
 	HashMap<Person, Person> voters = new HashMap<>();
 	int numVotesNeeded;
-	PhaseManager pm;
 
 	public Accusation(PhaseManager pm)
 	{
 		super(pm);
-		this.pm = pm;
-		//ADDITION: calculates number of votes needed to start a trial
 		numVotesNeeded = getGame().getAlivePlayers().size() / 2 + 1;
 	}
 
@@ -54,11 +51,11 @@ public class Accusation extends Phase
 	{
 		return 30;
 	}
-	
+
 	public void putPlayerOnTrial(Person p) {
 		//ADDITION: "Start over" the phase cycle, from a trial phase.
-		pm.end();
-		pm.startTrial(p);
+		phaseManager.end();
+		phaseManager.start(new Trial(phaseManager, p));
 	}
 
 	public MessageEmbed generateList()

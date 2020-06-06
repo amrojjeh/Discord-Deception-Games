@@ -30,6 +30,7 @@ import town.persons.assigner.Assigner;
 import town.phases.Accusation;
 import town.phases.Phase;
 import town.phases.PhaseManager;
+import town.phases.Trial;
 
 public class DiscordGame
 {
@@ -652,7 +653,7 @@ public class DiscordGame
 		if (action != null)
 			action.queue();
 	}
-	
+
 	// Write doesn't matter if we're setting a voice channel
 	public void setChannelVisibility(Person p, String channelName, boolean read, boolean write)
 	{
@@ -662,32 +663,48 @@ public class DiscordGame
 		if (channel.getType().equals(ChannelType.VOICE))
 		{
 			if (read)
-				action = channel.putPermissionOverride(getMemberFromGame(p)).reset().setAllow(connectPermissions());
+				action = channel.putPermissionOverride(playerRole).reset().setAllow(connectPermissions());
 			else
-				action = channel.putPermissionOverride(getMemberFromGame(p)).reset().setDeny(connectPermissions());
+				action = channel.putPermissionOverride(playerRole).reset().setDeny(connectPermissions());
 		}
 		else if (channel.getType().equals(ChannelType.TEXT))
 		{
 			if (read && !write)
-				action = channel.putPermissionOverride(getMemberFromGame(p)).reset().setPermissions(readPermissions(), writePermissions());
+				action = channel.putPermissionOverride(playerRole).reset().setPermissions(readPermissions(), writePermissions());
 			else if (read && write)
-				action = channel.putPermissionOverride(getMemberFromGame(p)).reset().setPermissions(readPermissions() | writePermissions(), 0);
+				action = channel.putPermissionOverride(playerRole).reset().setPermissions(readPermissions() | writePermissions(), 0);
 			else
-				action = channel.putPermissionOverride(getMemberFromGame(p)).reset().setDeny(readPermissions() | writePermissions());
+				action = channel.putPermissionOverride(playerRole).reset().setDeny(readPermissions() | writePermissions());
 		}
 		if (action != null)
 			action.queue();
 	}
-	
-	public void muteExcept(Person p) {
-		for(Person townie : getAlivePlayers()) {
-			if(p != townie) getMemberFromGame(townie).mute(true).queue();
-		}
+
+	public void muteExcept(String channelName, Person p)
+	{
+		VoiceChannel channel = getVoiceChannel(channelName);
+		if (channel == null) throw new IllegalArgumentException("Can't pass a non-voice channel to muteExcept");
+		channel.getMembers().forEach(m -> {if (m.getIdLong() != p.getID()) m.mute(true).queue();} );
 	}
-	
-	public void restoreTalking() {
-		for(Person townie : getAlivePlayers()) {
-			getMemberFromGame(townie).mute(false).queue();
+
+	public void restoreTalking(String channelName)
+	{
+		VoiceChannel channel = getVoiceChannel(channelName);
+		if (channel == null) throw new IllegalArgumentException("Can't pass a non-voice channel to restoreTalking");
+		channel.getMembers().forEach(m -> {m.mute(false);} );
+	}
+
+	public void gameGuildVoiceJoin(Member m)
+	{
+		Phase phase = getCurrentPhase();
+		if (phase instanceof Trial)
+		{
+			Trial trial = (Trial)phase;
+			if (m.getIdLong() == trial.getDefendant().getID())
+				return;
+			m.mute(true).queue();
+			return;
 		}
+		m.mute(false).queue();
 	}
 }
