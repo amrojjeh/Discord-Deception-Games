@@ -138,14 +138,16 @@ public class MainListener extends ListenerAdapter
 		if (e.isFromType(ChannelType.PRIVATE))
 			return;
 
-		if (message.getContentRaw().contentEquals(prefix + "startParty"))
+		String lowerCaseMessage = message.getContentRaw().toLowerCase();
+
+		if (lowerCaseMessage.contentEquals(prefix + "startparty"))
 			startLobby(e.getJDA(), e.getGuild().getIdLong(), e.getChannel(), e.getMember());
-		else if (message.getContentRaw().contentEquals(prefix + "endParty"))
+		else if (lowerCaseMessage.contentEquals(prefix + "endparty"))
 			endLobby(e.getGuild().getIdLong(), e.getChannel());
-		else if (message.getContentRaw().contentEquals(prefix + "help")) {
+		else if (lowerCaseMessage.contentEquals(prefix + "help")) {
 			e.getChannel().sendMessage(helpTable()).queue();
 		}
-		else if (message.getContentRaw().contentEquals(prefix + "delete") || message.getContentRaw().contentEquals("!delete"))
+		else if (lowerCaseMessage.contentEquals(prefix + "delete") || lowerCaseMessage.contentEquals("!delete"))
 		{
 			DiscordGame game = games.get(message.getGuild().getIdLong());
 			if (game == null) return;
@@ -157,7 +159,7 @@ public class MainListener extends ListenerAdapter
 			games.remove(message.getGuild().getIdLong());
 			game.deleteServer();
 		}
-		else if (message.getContentRaw().contentEquals(prefix + "transfer") || message.getContentRaw().contentEquals("!transfer"))
+		else if (lowerCaseMessage.contentEquals(prefix + "transfer") || lowerCaseMessage.contentEquals("!transfer"))
 		{
 			DiscordGame game = games.get(message.getGuild().getIdLong());
 			if (game == null) return;
@@ -168,7 +170,7 @@ public class MainListener extends ListenerAdapter
 			}
 			game.transferOrDelete(); // Game gets removed from games when ownership updates
 		}
-		else if (message.getContentRaw().startsWith(prefix))
+		else if (lowerCaseMessage.startsWith(prefix))
 		{
 			DiscordGame party = parties.get(e.getGuild().getIdLong());
 			DiscordGame game = games.get(e.getGuild().getIdLong());
@@ -180,7 +182,7 @@ public class MainListener extends ListenerAdapter
 			else
 				e.getChannel().sendMessage("Party hasn't been created yet. Do so with tos.startParty").queue();
 		}
-		else if (message.getContentRaw().startsWith("!"))
+		else if (lowerCaseMessage.startsWith("!"))
 		{
 			DiscordGame game = games.get(e.getGuild().getIdLong());
 			if (game != null)

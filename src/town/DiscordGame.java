@@ -70,21 +70,23 @@ public class DiscordGame
 
 	public void processMessage(String prefix, Message message)
 	{
-		if (!isMessageFromGameGuild(message) && message.getContentRaw().contentEquals(prefix + "startGame"))
+		String lowerCaseMessage = message.getContentRaw().toLowerCase();
+
+		if (!isMessageFromGameGuild(message) && lowerCaseMessage.contentEquals(prefix + "startgame"))
 			startGameCommand(message);
 
 		// TODO: Block people if they occupy a certain role
 		else if (message.getContentRaw().contentEquals(prefix + "party"))
 			displayParty(message.getChannel());
-		else if (!isMessageFromGameGuild(message) && message.getContentRaw().contentEquals(prefix + "join"))
+		else if (!isMessageFromGameGuild(message) && lowerCaseMessage.contentEquals(prefix + "join"))
 			joinGame(message.getMember().getIdLong(), message.getChannel());
 
-		else if (started && isMessageFromGameGuild(message) && message.getContentRaw().startsWith(prefix + "ability"))
+		else if (started && isMessageFromGameGuild(message) && lowerCaseMessage.startsWith(prefix + "ability"))
 			activateAbilityCommand(message);
 
-		else if (started && isMessageFromGameGuild(message) && message.getContentRaw().startsWith(prefix + "cancel"))
+		else if (started && isMessageFromGameGuild(message) && lowerCaseMessage.startsWith(prefix + "cancel"))
 			cancelAbilityCommand(message);
-		else if (started && isMessageFromGameGuild(message) && message.getContentRaw().contentEquals(prefix + "roleHelp"))
+		else if (started && isMessageFromGameGuild(message) && lowerCaseMessage.contentEquals(prefix + "rolehelp"))
 			roleHelpCommand(message);
 		else if (started && isMessageFromGameGuild(message) && message.getContentRaw().startsWith(prefix + "vote"))
 			voteCommand(message);
