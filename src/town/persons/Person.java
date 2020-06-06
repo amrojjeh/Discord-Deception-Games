@@ -3,45 +3,42 @@ package town.persons;
 import java.util.List;
 
 import town.DiscordGame;
+import town.TownRole;
 import town.events.MurderTownEvent;
 import town.events.TownEvent;
 
 public abstract class Person
 {
-	Long ID; // Used to identify each person. For Discord, it's a snowflake
-	DiscordGame game; // Should be put into its own interface to seperate the game and discord
-	private int refNum; // This is how players can refer to other players without mentioning them
-	String roleName;
-	int attackStat;
-	int defenseStat;
-	int priority;
-	boolean alive = true;
-	private Long privateChannelID;
+	private final long ID; // Used to identify each person. For Discord, it's a snowflake
+	private final DiscordGame game; // Should be put into its own interface to seperate the game and discord
+	private final TownRole type;
 
-	Person(DiscordGame game, int refNum, Long id, String roleName, int attack, int defense, int priority)
+	private long privateChannelID = 0;
+	private int refNum; // This is how players can refer to other players without mentioning them
+
+	protected boolean alive = true;
+
+	Person(DiscordGame game, int refNum, long id, TownRole type)
 	{
 		this.game = game;
 		ID = id;
 		this.refNum = refNum;
-		this.roleName = roleName;
-		attackStat = attack;
-		defenseStat = defense;
-		this.priority = priority;
+		this.type = type;
 	}
 
-	public Long getID()
+	public long getID()
 	{
 		return ID;
-	}
-
-	public void setNum(int val)
-	{
-		refNum = val;
 	}
 
 	public int getNum()
 	{
 		return refNum;
+	}
+
+	public void setNum(int val)
+	{
+		refNum = val;
 	}
 
 	public DiscordGame getGame()
@@ -61,24 +58,9 @@ public abstract class Person
 		else return game.getPartyGuild().getMemberById(ID).getEffectiveName();
 	}
 
-	public String getRoleName()
+	public TownRole getType()
 	{
-		return roleName;
-	}
-
-	public int getAttackStat()
-	{
-		return attackStat;
-	}
-
-	public int getDefenseStat()
-	{
-		return defenseStat;
-	}
-
-	public int getPriority()
-	{
-		return priority;
+		return type;
 	}
 
 	public boolean isAlive()
@@ -88,7 +70,7 @@ public abstract class Person
 
 	public void sendMessage(String msg)
 	{
-		if (privateChannelID != null)
+		if (privateChannelID != 0)
 			game.sendMessageToTextChannel(privateChannelID, msg);
 		else
 			System.out.println("Could not send to private channel");
@@ -110,7 +92,6 @@ public abstract class Person
 	}
 
 	public void onMurder(MurderTownEvent event) { event.standard(this); }
-
 
 	public void onEvent(TownEvent event)
 	{

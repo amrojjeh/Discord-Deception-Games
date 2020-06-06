@@ -3,6 +3,7 @@ package town.persons;
 import java.util.List;
 
 import town.DiscordGame;
+import town.TownRole;
 
 // Civilian is NOT A REAL ROLE. This is a temporary useless town role to simulate games
 public class Civilian extends Person
@@ -11,7 +12,7 @@ public class Civilian extends Person
 
 	public Civilian(DiscordGame game, int num, Long id)
 	{
-		super(game, num, id, "Civilian", 0, 0, 6);
+		super(game, num, id, TownRole.CIVILIAN);
 	}
 
 	@Override

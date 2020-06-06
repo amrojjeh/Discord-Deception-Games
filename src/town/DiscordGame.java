@@ -643,12 +643,12 @@ public class DiscordGame
 		// Check if member was in the lobby
 		boolean shouldKick = true;
 		for (Person p : getPlayers())
-			if (p.getID().longValue() == member.getUser().getIdLong())
+			if (p.getID() == member.getUser().getIdLong())
 			{
 				getGameGuild().addRoleToMember(member, getGameGuild().getRolesByName("Player", false).get(0)).queue();
 				TextChannel textChannel = getTextChannel(p.getChannelID());
 				textChannel.putPermissionOverride(getMemberFromGame(p)).setAllow(readPermissions() | writePermissions()).queue();
-				p.sendMessage("Your role is " + p.getRoleName());
+				p.sendMessage("Your role is " + p.getType().getName());
 				p.sendMessage(p.getHelp());
 				shouldKick = false;
 				break;
