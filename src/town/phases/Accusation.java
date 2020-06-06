@@ -40,9 +40,9 @@ public class Accusation extends Phase
 
 	//gets the next phase in line: could be Defense (if a player has enough votes) or Night
 	@Override
-	public Phase getNextPhase(PhaseManager pm)
+	public Phase getNextPhase()
 	{
-		return new Night(pm);
+		return new Night(phaseManager);
 	}
 
 	//Duration: 30 seconds

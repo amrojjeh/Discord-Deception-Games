@@ -27,9 +27,9 @@ public abstract class Phase extends TimerTask
 	public void run()
 	{
 		end();
-		phaseManager.startNextPhase(getNextPhase(phaseManager));
+		phaseManager.startNextPhase(getNextPhase());
 	}
 
-	public abstract Phase getNextPhase(PhaseManager pm);
+	public abstract Phase getNextPhase();
 	public abstract int getDurationInSeconds();
 }

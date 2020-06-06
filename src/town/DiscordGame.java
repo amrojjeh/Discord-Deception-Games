@@ -29,43 +29,38 @@ import town.events.TownEvent;
 import town.persons.Person;
 import town.persons.assigner.Assigner;
 import town.phases.Accusation;
+import town.phases.End;
 import town.phases.Phase;
 import town.phases.PhaseManager;
 import town.phases.Trial;
 
 public class DiscordGame
 {
-	JDA jda;
-	long guildID;
-	long gameGuildID;
-	ArrayList<Person> persons; // TODO: Sort based on priority also (SortedSet?)
-	LinkedList<TownEvent> events; // TODO: PriorityQueue<E>
-	PhaseManager phaseManager;
-	boolean started;
+	private JDA jda;
+	private long guildID;
+	private long gameGuildID;
+	private ArrayList<Person> persons = new ArrayList<>(); // TODO: Sort based on priority also (SortedSet?)
+	private LinkedList<TownEvent> events = new LinkedList<>(); // TODO: PriorityQueue<E>
+	private PhaseManager phaseManager = new PhaseManager(this);
+	private boolean started = false;
+	private boolean ended = false;
 
 	// Important channels (Name : id)
-	HashMap<String, Long> channels;
-	Assigner assigner = Assigner.buildDefault(this);
+	private HashMap<String, Long> channels = new HashMap<>();
+	private Assigner assigner = Assigner.buildDefault(this);
 
-	long playerRoleID;
-	long botRoleID;
-	long aliveRoleID;
-	long deadRoleID;
+	private long playerRoleID;
+	private long botRoleID;
+	private long aliveRoleID;
+	private long deadRoleID;
 
-	long partyLeaderID;
+	private long partyLeaderID;
 
 	public DiscordGame(JDA jda, Long guildId, long partyLeaderId)
 	{
 		this.jda = jda;
 		guildID = guildId;
 		partyLeaderID = partyLeaderId;
-
-		phaseManager = new PhaseManager(this);
-		persons = new ArrayList<>();
-		events = new LinkedList<>();
-		channels = new HashMap<>();
-
-		started = false;
 	}
 
 	public void processMessage(Message message)
@@ -96,6 +91,16 @@ public class DiscordGame
 			voteCommand(message);
 		// TODO: Add endgame
 		// TODO: Instead of transfering the server, offer the option to delete or tranfer. If no choice is made, delete
+	}
+
+	public boolean hasStarted()
+	{
+		return started;
+	}
+
+	public boolean hasEnded()
+	{
+		return ended;
 	}
 
 	private boolean isMessageFromGameGuild(Message message)
@@ -388,19 +393,31 @@ public class DiscordGame
 	public void endGame()
 	{
 		phaseManager.end();
-		transferOrDelete();
+		phaseManager.start(new End(phaseManager));
+		ended = true;
 	}
 
 	public void transferOrDelete()
 	{
+		if (!transfer()) deleteServer();
+	}
+
+	public void deleteServer()
+	{
+		phaseManager.end();
+		getGameGuild().delete().queue();
+	}
+
+	public boolean transfer()
+	{
+		phaseManager.end();
 		Member partyLeader = getMemberFromGame(partyLeaderID);
 		if (partyLeader != null)
 		{
-			System.out.println(getGameGuild().getOwner().getEffectiveName());
 			getGameGuild().transferOwnership(partyLeader).reason("The game has ended").queue();
+			return true;
 		}
-
-		else getGameGuild().delete().queue();
+		return false;
 	}
 
 	public void joinGame(long id, MessageChannel channelUsed)

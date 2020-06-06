@@ -43,9 +43,9 @@ public class Trial extends Phase
 
 	//After the defendant has spoken, players briefly discuss what to do and their fate is voted upon
 	@Override
-	public Phase getNextPhase(PhaseManager pm)
+	public Phase getNextPhase()
 	{
-		return new Judgment(pm, defendant);
+		return new Judgment(phaseManager, defendant);
 	}
 
 	//Duration: 20-30 seconds

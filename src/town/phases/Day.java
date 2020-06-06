@@ -41,9 +41,9 @@ public class Day extends Phase
 
 	// After Daytime, the Accusation phase begins.
 	@Override
-	public Phase getNextPhase(PhaseManager pm)
+	public Phase getNextPhase()
 	{
-		return new Accusation(pm);
+		return new Accusation(phaseManager);
 	}
 
 	//Duration: 50 seconds

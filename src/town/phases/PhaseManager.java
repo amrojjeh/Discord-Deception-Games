@@ -39,7 +39,7 @@ public class PhaseManager
 	//starts the next phase in the cycle.
 	public void startNextPhase(Phase phase)
 	{
-		if (cancelled) return;
+		if (hasEnded()) return;
 		currentPhase = phase;
 		//schedule the next phase's run method AFTER the current phase is finished.
 		timer.schedule(phase, phase.getDurationInSeconds() * 1000);
@@ -54,6 +54,7 @@ public class PhaseManager
 
 	public void end()
 	{
+		if (hasEnded()) return;
 		timer.cancel();
 		timer.purge();
 		cancelled = true;

@@ -14,11 +14,11 @@ public class Initial extends Phase
 	}
 
 	@Override
-	public Phase getNextPhase(PhaseManager pm)
+	public Phase getNextPhase()
 	{
 		if (getGame().getPlayers().size() == getGame().getGameGuild().getMemberCount() - 1)
-			return new Day(pm);
-		return new Initial(pm);
+			return new Day(phaseManager);
+		return new Initial(phaseManager);
 	}
 
 	@Override

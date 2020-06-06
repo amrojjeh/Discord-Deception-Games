@@ -145,6 +145,29 @@ public class MainListener extends ListenerAdapter
 		else if (message.getContentRaw().contentEquals(prefix + "help")) {
 			e.getChannel().sendMessage(helpTable()).queue();
 		}
+		else if (message.getContentRaw().contentEquals(prefix + "delete") || message.getContentRaw().contentEquals("!delete"))
+		{
+			DiscordGame game = games.get(message.getGuild().getIdLong());
+			if (game == null) return;
+			if (!game.hasEnded())
+			{
+				message.getChannel().sendMessage("Game hasn't ended yet. If you no longer want to play, leave the server.").queue();
+				return;
+			}
+			games.remove(message.getGuild().getIdLong());
+			game.deleteServer();
+		}
+		else if (message.getContentRaw().contentEquals(prefix + "transfer") || message.getContentRaw().contentEquals("!transfer"))
+		{
+			DiscordGame game = games.get(message.getGuild().getIdLong());
+			if (game == null) return;
+			if (!game.hasEnded())
+			{
+				message.getChannel().sendMessage("Game hasn't ended yet. If you no longer want to play, leave the server.").queue();
+				return;
+			}
+			game.transferOrDelete(); // Game gets removed from games when ownership updates
+		}
 		else if (message.getContentRaw().startsWith(prefix))
 		{
 			DiscordGame party = parties.get(e.getGuild().getIdLong());

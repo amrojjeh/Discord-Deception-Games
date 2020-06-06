@@ -5,7 +5,7 @@ import town.persons.Person;
 //the Verdict phase is short, it reveals who voted what- and what will happen to the defendant.
 public class Verdict extends Phase{
 	Person defendant;
-	
+
 	public Verdict(PhaseManager pm, Person p)
 	{
 		super(pm);
@@ -29,10 +29,10 @@ public class Verdict extends Phase{
 
 	//After the Verdict, either the Accusation phase restarts (Innocent) or the defendant is executed (Guilty)
 	@Override
-	public Phase getNextPhase(PhaseManager pm)
+	public Phase getNextPhase()
 	{
 		//TODO: Move to Accusation or Last Words depending on the outcome.
-		return new Night(pm);
+		return new Night(phaseManager);
 	}
 
 	//Duration: very short

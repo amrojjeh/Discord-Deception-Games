@@ -24,9 +24,9 @@ public class Night extends Phase
 	}
 
 	@Override
-	public Phase getNextPhase(PhaseManager pm)
+	public Phase getNextPhase()
 	{
-		return new Day(pm);
+		return new Day(phaseManager);
 	}
 
 	@Override

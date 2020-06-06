@@ -29,9 +29,9 @@ public class Judgment extends Phase {
 
 	//After Judgment, the results are revealed (Verdict)
 	@Override
-	public Phase getNextPhase(PhaseManager pm)
+	public Phase getNextPhase()
 	{
-		return new Verdict(pm, defendant);
+		return new Verdict(phaseManager, defendant);
 	}
 
 	//Duration: 15-20 seconds
