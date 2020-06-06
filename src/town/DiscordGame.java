@@ -70,7 +70,6 @@ public class DiscordGame
 
 	public void processMessage(String prefix, Message message)
 	{
-		// TODO: When game starts, allow ! as a prefix also
 		if (!isMessageFromGameGuild(message) && message.getContentRaw().contentEquals(prefix + "startGame"))
 			startGameCommand(message);
 
@@ -89,8 +88,6 @@ public class DiscordGame
 			roleHelpCommand(message);
 		else if (started && isMessageFromGameGuild(message) && message.getContentRaw().startsWith(prefix + "vote"))
 			voteCommand(message);
-		// TODO: Add endgame
-		// TODO: Instead of transfering the server, offer the option to delete or tranfer. If no choice is made, delete
 	}
 
 	public boolean hasStarted()
