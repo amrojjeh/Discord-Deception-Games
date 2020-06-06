@@ -17,6 +17,7 @@ public class Day extends Phase
 	{
 		showDayChannels();
 		getGame().getPlayers().forEach((person) -> checkVictory(person));
+		phaseManager.setWarningInSeconds(5);
 	}
 
 	private void showDayChannels()

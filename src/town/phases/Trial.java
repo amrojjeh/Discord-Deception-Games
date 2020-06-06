@@ -29,6 +29,7 @@ public class Trial extends Phase
 		getGame().muteExcept("Daytime", defendant);
 		getGame().setChannelVisibility("daytime_discussion", true, false);
 		getGame().setChannelVisibility(defendant, "daytime_discussion", true, true);
+		phaseManager.setWarningInSeconds(5);
 	}
 
 	//ends the phase, sending out a global message of this fact.
@@ -36,9 +37,7 @@ public class Trial extends Phase
 	public void end()
 	{
 		getGame().restoreTalking("Daytime");
-		for(Person p : getGame().getAlivePlayers()) {
-			getGame().setChannelVisibility(p, "daytime_discussion", true, true);
-		}
+		getGame().setChannelVisibility("daytime_discussion", true, true);
 	}
 
 	//After the defendant has spoken, players briefly discuss what to do and their fate is voted upon

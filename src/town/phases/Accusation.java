@@ -29,6 +29,7 @@ public class Accusation extends Phase
 	{
 		getGame().sendMessageToTextChannel("daytime_discussion", "Accusation started");
 		sendInitialMessage();
+		phaseManager.setWarningInSeconds(5);
 	}
 
 	//ends the Accusation phase. HOWEVER, the phase may be resumed later, depending on if a trial has begun.

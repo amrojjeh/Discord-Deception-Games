@@ -14,6 +14,7 @@ public class Night extends Phase
 		getGame().setChannelVisibility("Daytime", false, false);
 		getGame().discconectEveryoneFromVC("Daytime");
 		getGame().sendMessageToTextChannel("daytime_discussion", "The night has started");
+		phaseManager.setWarningInSeconds(5);
 	}
 
 	@Override
