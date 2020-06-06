@@ -143,7 +143,7 @@ public class MainListener extends ListenerAdapter
 		if (lowerCaseMessage.contentEquals(prefix + "startparty"))
 			startLobby(e.getJDA(), e.getGuild().getIdLong(), e.getChannel(), e.getMember());
 		else if (lowerCaseMessage.contentEquals(prefix + "endparty"))
-			endLobby(e.getGuild().getIdLong(), e.getChannel());
+			endLobby(e.getGuild().getIdLong(), e.getChannel(), message.getMember());
 		else if (lowerCaseMessage.contentEquals(prefix + "help")) {
 			e.getChannel().sendMessage(helpTable()).queue();
 		}
@@ -151,7 +151,7 @@ public class MainListener extends ListenerAdapter
 		{
 			DiscordGame game = games.get(message.getGuild().getIdLong());
 			if (game == null) return;
-			if (!game.hasEnded())
+			if (!game.ended)
 			{
 				message.getChannel().sendMessage("Game hasn't ended yet. If you no longer want to play, leave the server.").queue();
 				return;
@@ -163,7 +163,7 @@ public class MainListener extends ListenerAdapter
 		{
 			DiscordGame game = games.get(message.getGuild().getIdLong());
 			if (game == null) return;
-			if (!game.hasEnded())
+			if (!game.ended)
 			{
 				message.getChannel().sendMessage("Game hasn't ended yet. If you no longer want to play, leave the server.").queue();
 				return;
@@ -204,7 +204,7 @@ public class MainListener extends ListenerAdapter
 		return embed;
 	}
 
-	private void endLobby(Long guildID, MessageChannel channelUsed)
+	private void endLobby(Long guildID, MessageChannel channelUsed, Member member)
 	{
 		if (!parties.containsKey(guildID))
 			channelUsed.sendMessage("There is no party to end").queue();

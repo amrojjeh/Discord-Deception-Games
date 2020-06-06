@@ -34,6 +34,11 @@ public abstract class Person
 		return ID;
 	}
 
+	public void setNum(int val)
+	{
+		refNum = val;
+	}
+
 	public int getNum()
 	{
 		return refNum;

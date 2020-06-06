@@ -42,8 +42,6 @@ public class DiscordGame
 	private ArrayList<Person> persons = new ArrayList<>(); // TODO: Sort based on priority also (SortedSet?)
 	private LinkedList<TownEvent> events = new LinkedList<>(); // TODO: PriorityQueue<E>
 	private PhaseManager phaseManager = new PhaseManager(this);
-	private boolean started = false;
-	private boolean ended = false;
 
 	// Important channels (Name : id)
 	private HashMap<String, Long> channels = new HashMap<>();
@@ -54,7 +52,9 @@ public class DiscordGame
 	private long aliveRoleID;
 	private long deadRoleID;
 
-	private long partyLeaderID;
+	long partyLeaderID;
+	boolean started = false;
+	boolean ended = false;
 
 	public DiscordGame(JDA jda, Long guildId, long partyLeaderId)
 	{
@@ -80,26 +80,16 @@ public class DiscordGame
 			displayParty(message.getChannel());
 		else if (!isMessageFromGameGuild(message) && lowerCaseMessage.contentEquals(prefix + "join"))
 			joinGame(message.getMember().getIdLong(), message.getChannel());
-
+		else if (!isMessageFromGameGuild(message) && lowerCaseMessage.contentEquals(prefix + "leave"))
+			leaveGameCommand(message.getMember().getIdLong(), message.getChannel());
 		else if (started && isMessageFromGameGuild(message) && lowerCaseMessage.startsWith(prefix + "ability"))
 			activateAbilityCommand(message);
-
 		else if (started && isMessageFromGameGuild(message) && lowerCaseMessage.startsWith(prefix + "cancel"))
 			cancelAbilityCommand(message);
 		else if (started && isMessageFromGameGuild(message) && lowerCaseMessage.contentEquals(prefix + "rolehelp"))
 			roleHelpCommand(message);
 		else if (started && isMessageFromGameGuild(message) && message.getContentRaw().startsWith(prefix + "vote"))
 			voteCommand(message);
-	}
-
-	public boolean hasStarted()
-	{
-		return started;
-	}
-
-	public boolean hasEnded()
-	{
-		return ended;
 	}
 
 	private boolean isMessageFromGameGuild(Message message)
@@ -423,20 +413,51 @@ public class DiscordGame
 	{
 		if (started)
 		{
-			String message = String.format("Can't join game until session is over <@%s>", id);
+			String message = String.format("Can't join game until session is over <@%d>", id);
 			channelUsed.sendMessage(message).queue();
 			return;
 		}
 
 		if (getPerson(id) != null)
 		{
-			String message = String.format("<@%s> already joined! Check party members with tos.party", id);
+			String message = String.format("<@%d> already joined! Check party members with tos.party", id);
 			channelUsed.sendMessage(message).queue();
 			return;
 		}
 
 		persons.add(assigner.generatePerson(persons.size() + 1, id));
-		String message = String.format("<@%s> joined the lobby", id);
+		String message = String.format("<@%d> joined the lobby", id);
+		channelUsed.sendMessage(message).queue();
+	}
+
+	private void leaveGameCommand(long id, MessageChannel channelUsed)
+	{
+		if (started)
+		{
+			String message = String.format("Can't leave a game after it has started. Leave the server instead. <@%d>", id);
+			channelUsed.sendMessage(message).queue();
+			return;
+		}
+
+		if (getPerson(id) == null)
+		{
+			String message = String.format("Can't leave a game you're not in <@%d>", id);
+			channelUsed.sendMessage(message).queue();
+			return;
+		}
+
+		if (id == partyLeaderID)
+		{
+			String message = String.format("Party leader can't leave the party. `tos.endParty` instead <@%d>", id);
+			channelUsed.sendMessage(message).queue();
+			return;
+		}
+
+		persons.remove(getPerson(id));
+		for (int x = 1; x <= persons.size(); ++x)
+			persons.get(x - 1).setNum(x);
+
+		String message = String.format("You've been removed from the party <@%d>", id);
 		channelUsed.sendMessage(message).queue();
 	}
 
