@@ -10,14 +10,13 @@ import town.phases.Night;
 // A Serial Killer can kill a person each night.
 public class SerialKiller extends Person
 {
-	static int amount = 0;
 	private TownEvent event;
 
+	private static boolean hasWon = false;
 
 	public SerialKiller(DiscordGame game, int num, Long id)
 	{
 		super(game, num, id, "Serial Killer", 1, 1, 3);
-		amount++;
 	}
 
 	@Override
@@ -26,26 +25,23 @@ public class SerialKiller extends Person
 		e.standard(this);
 	}
 
-	public static int getAmount()
-	{
-		return amount;
-	}
-
-	public static int getMaxAmount()
-	{
-		return 0;
-	}
-
 	@Override
-	public boolean hasWon()
+	public boolean canWin()
 	{
 		return getGame().getPlayers().stream().filter((person) -> person instanceof SerialKiller && person.alive).count() ==
 				getGame().getPlayers().stream().filter((person) -> person.alive).count();
 	}
 
 	@Override
+	public boolean hasWon()
+	{
+		return hasWon;
+	}
+
+	@Override
 	public void win()
 	{
+		hasWon = true;
 		getGame().sendMessageToTextChannel("daytime_discussion", "**Serial Killers have won!**", (msg) -> getGame().endGame());
 	}
 

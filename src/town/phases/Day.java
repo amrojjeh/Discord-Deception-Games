@@ -29,7 +29,7 @@ public class Day extends Phase
 
 	public void checkVictory(Person person)
 	{
-		if (person.hasWon())
+		if (!person.hasWon() && person.canWin())
 			person.win();
 	}
 
