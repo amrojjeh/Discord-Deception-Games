@@ -53,7 +53,8 @@ public class Accusation extends Phase
 		return 30;
 	}
 
-	public void putPlayerOnTrial(Person p) {
+	public void putPlayerOnTrial(Person p)
+	{
 		//ADDITION: "Start over" the phase cycle, from a trial phase.
 		phaseManager.end();
 		phaseManager.start(new Trial(phaseManager, p));
@@ -112,7 +113,7 @@ public class Accusation extends Phase
 		//ADDITION: Puts a player on trial if their number of votes exceed the threshold
 		if(numOfVotes.get(accused) >= numVotesNeeded) {
 			putPlayerOnTrial(accused);
-			return "**The Town has decided to put " + accused.getNickName() + "on trial!**";
+			return "**The Town has decided to put " + accused.getNickName() + " on trial!**";
 		}
 		return message + String.format("<@%d> (%d) was accused by <@%d>", accused.getID(), numOfVotes.get(accused), accuser.getID());
 	}

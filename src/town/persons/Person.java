@@ -88,7 +88,9 @@ public abstract class Person
 
 	public void die()
 	{
+		if (!alive) return;
 		alive = false;
+		getGame().personDied(this);
 	}
 
 	public void onMurder(MurderTownEvent event) { event.standard(this); }

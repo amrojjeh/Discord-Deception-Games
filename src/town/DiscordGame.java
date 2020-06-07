@@ -40,21 +40,21 @@ public class DiscordGame
 	private JDA jda;
 	private long guildID;
 	private long gameGuildID;
-	private ArrayList<Person> persons = new ArrayList<>(); // TODO: Sort based on priority also (SortedSet?)
-	private LinkedList<TownEvent> events = new LinkedList<>(); // TODO: PriorityQueue<E>
-	private PhaseManager phaseManager = new PhaseManager(this);
+	private long partyLeaderID;
 
 	// Important channels (Name : id)
 	private HashMap<String, Long> channels = new HashMap<>();
 	private Assigner assigner = Assigner.buildDefault(this);
-	private HashSet<TownRole> wonTownRoles;
+	private HashSet<TownRole> wonTownRoles = new HashSet<TownRole>();
+	private ArrayList<Person> persons = new ArrayList<>();
+	private LinkedList<TownEvent> events = new LinkedList<>(); // TODO: PriorityQueue<E>
+	private PhaseManager phaseManager = new PhaseManager(this);
 
 	private long playerRoleID;
 	private long botRoleID;
 	private long aliveRoleID;
 	private long deadRoleID;
 
-	long partyLeaderID;
 	boolean started = false;
 	boolean ended = false;
 
@@ -63,7 +63,6 @@ public class DiscordGame
 		this.jda = jda;
 		guildID = guildId;
 		partyLeaderID = partyLeaderId;
-		wonTownRoles = new HashSet<TownRole>();
 	}
 
 	public void processMessage(Message message)
@@ -283,22 +282,23 @@ public class DiscordGame
 		// this channel used for general game updates
 		g.newRole().setName("Bot").addPermissions(Permission.ADMINISTRATOR).setColor(Color.YELLOW);
 		RoleData playerRoleData = g.newRole().setName("Player").setColor(Color.CYAN);
+		RoleData deadPlayerRoleData = g.newRole().setName("Dead").setColor(Color.GRAY);
 
 		// FIXME: WARNING: Unable to load JDK7 types (java.nio.file.Path): no Java7 type support added
 		// Is being caued by the addPermissionOverride method.
-		// FIXME: Setting position is not working
-		g.newChannel(ChannelType.VOICE, "Daytime")
-		.setPosition(2);
+		g.newChannel(ChannelType.VOICE, "Daytime").setPosition(0);
 
-		// players discussing during the day
+		//		players discussing during the day
 		g.newChannel(ChannelType.TEXT, "daytime_discussion")
-		.setPosition(3);
+		.addPermissionOverride(deadPlayerRoleData, readPermissions(), writePermissions())
+		.setPosition(0);
 
 		for (Person p : getPlayers())
 		{
 			g.newChannel(ChannelType.TEXT, "private")
 			.setPosition(1)
 			.addPermissionOverride(playerRoleData, 0, readPermissions() | writePermissions())
+			.addPermissionOverride(deadPlayerRoleData, 0, readPermissions() | writePermissions())
 			.setTopic(p.getRealName()); // This will be used as an identifier
 		}
 
@@ -316,8 +316,15 @@ public class DiscordGame
 
 
 		//for dead players
-		//		voiceChannels.put("The Dead", "");
-		//		textChannels.put("the_afterlife", "");
+		g.newChannel(ChannelType.TEXT, "the_afterlife")
+		.setPosition(2)
+		.addPermissionOverride(playerRoleData, 0, readPermissions() | writePermissions())
+		.addPermissionOverride(deadPlayerRoleData, readPermissions() | writePermissions(), 0);
+
+		g.newChannel(ChannelType.VOICE, "The Dead")
+		.setPosition(1)
+		.addPermissionOverride(playerRoleData, 0, readPermissions() | writePermissions())
+		.addPermissionOverride(deadPlayerRoleData, readPermissions() | writePermissions(), 0);
 	}
 
 	public void addEvent(TownEvent event)
@@ -352,6 +359,7 @@ public class DiscordGame
 
 		playerRoleID = guild.getRolesByName("Player", false).get(0).getIdLong();
 		botRoleID = guild.getRolesByName("Bot", false).get(0).getIdLong();
+		deadRoleID = guild.getRolesByName("Dead", false).get(0).getIdLong();
 	}
 
 	public Member getMemberFromGame(Person person)
@@ -366,9 +374,9 @@ public class DiscordGame
 
 	public void assignChannel(GuildChannel channel)
 	{
-		for (Person p : getPlayers())
-		{
-			if (channel.getType() == ChannelType.TEXT)
+		if (!channel.getName().contentEquals("private")) channels.put(channel.getName(), channel.getIdLong());
+		else
+			for (Person p : getPlayers())
 			{
 				TextChannel textChannel = (TextChannel)channel;
 				String topic = textChannel.getTopic();
@@ -378,8 +386,6 @@ public class DiscordGame
 					return;
 				}
 			}
-		}
-		channels.put(channel.getName(), channel.getIdLong());
 	}
 
 	public void endGame()
@@ -404,6 +410,7 @@ public class DiscordGame
 	{
 		phaseManager.end();
 		Member partyLeader = getMemberFromGame(partyLeaderID);
+		// TODO: Make it transfer to the first found member instead of just to party leader
 		if (partyLeader != null)
 		{
 			getGameGuild().transferOwnership(partyLeader).reason("The game has ended").queue();
@@ -648,7 +655,7 @@ public class DiscordGame
 		for (Person p : getPlayers())
 			if (p.getID() == member.getUser().getIdLong())
 			{
-				getGameGuild().addRoleToMember(member, getGameGuild().getRolesByName("Player", false).get(0)).queue();
+				getGameGuild().addRoleToMember(member, getRole(playerRoleID)).queue();
 				TextChannel textChannel = getTextChannel(p.getChannelID());
 				textChannel.putPermissionOverride(getMemberFromGame(p)).setAllow(readPermissions() | writePermissions()).queue();
 				p.sendMessage("Your role is " + p.getType().getName());
@@ -745,5 +752,11 @@ public class DiscordGame
 	public boolean hasTownRoleWon(TownRole role)
 	{
 		return wonTownRoles.contains(role);
+	}
+
+	public void personDied(Person person)
+	{
+		getGameGuild().addRoleToMember(person.getID(), getRole(deadRoleID)).queue();
+		getGameGuild().removeRoleFromMember(person.getID(), getRole(playerRoleID)).queue();
 	}
 }
