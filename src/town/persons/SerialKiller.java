@@ -19,12 +19,6 @@ public class SerialKiller extends Person
 	}
 
 	@Override
-	public void onMurder(MurderTownEvent e)
-	{
-		e.standard(this);
-	}
-
-	@Override
 	public boolean canWin()
 	{
 		return getGame().getPlayers().stream().filter((person) -> person instanceof SerialKiller && person.alive).count() ==

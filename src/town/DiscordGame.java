@@ -597,7 +597,9 @@ public class DiscordGame
 
 	private void sendDMTo(Person person, String msg)
 	{
-		jda.getUserById(person.getID()).openPrivateChannel().queue((channel) -> channel.sendMessage(msg).queue());
+		jda.getUserById(person.getID()).openPrivateChannel()
+		.flatMap((channel) -> channel.sendMessage(msg))
+		.queue();
 	}
 
 	public void sendMessageToTextChannel(String channelName, String msg, Consumer<Message> consumer)
@@ -692,6 +694,15 @@ public class DiscordGame
 		setChannelVisibility(member, channelName, read, write);
 	}
 
+	public void resetVisibility(Person p, String channelName)
+	{
+		Member member = getMemberFromGame(p);
+		if (member == null) throw new IllegalArgumentException("Invalid person");
+		TextChannel tc = getTextChannel(channelName);
+		if (tc == null) throw new IllegalArgumentException("Text channel not available");
+		tc.getPermissionOverride(member).delete().queue();
+	}
+
 	private void setChannelVisibility(IPermissionHolder holder, String channelName, boolean read, boolean write)
 	{
 		GuildChannel channel = getGuildChannel(channelName);
@@ -727,7 +738,7 @@ public class DiscordGame
 	{
 		VoiceChannel channel = getVoiceChannel(channelName);
 		if (channel == null) throw new IllegalArgumentException("Can't pass a non-voice channel to restoreTalking");
-		channel.getMembers().forEach(m -> {m.mute(false);} );
+		channel.getMembers().forEach(m -> {m.mute(false).queue();} );
 	}
 
 	public void gameGuildVoiceJoin(Member m)

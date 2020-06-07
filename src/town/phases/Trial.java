@@ -37,6 +37,7 @@ public class Trial extends Phase
 	public void end()
 	{
 		getGame().restoreTalking("Daytime");
+		getGame().resetVisibility(defendant, "daytime_discussion");
 		getGame().setChannelVisibility("daytime_discussion", true, true);
 	}
 

@@ -73,7 +73,9 @@ public class MainListener extends ListenerAdapter
 	@Override
 	public void onGuildMemberJoin(GuildMemberJoinEvent event)
 	{
-		games.get(event.getGuild().getIdLong()).gameGuildJoin(event.getMember());
+		DiscordGame game = games.get(event.getGuild().getIdLong());
+		if (game != null)
+			games.get(event.getGuild().getIdLong()).gameGuildJoin(event.getMember());
 	}
 
 	@Override
