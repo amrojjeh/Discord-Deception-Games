@@ -46,7 +46,6 @@ public class MurderTownEvent implements TownEvent
 		murderer.sendMessage("You killed " + getVictim().getRealName() + " (" + getVictim().getNickName() + ")");
 		getVictim().sendMessage("You got killed by " + getMurderer().getRealName() + " (" + getVictim().getNickName() + ")");
 		getVictim().die();
-		System.out.println(getMurderer().getRealName() + " killed " + getVictim().getRealName());
 	}
 
 }

@@ -32,7 +32,7 @@ public class Trial extends Phase
 		phaseManager.setWarningInSeconds(5);
 	}
 
-	//ends the phase, sending out a global message of this fact.
+	// ends the phase, sending out a global message of this fact.
 	@Override
 	public void end()
 	{
