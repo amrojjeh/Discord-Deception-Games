@@ -3,6 +3,7 @@ package town;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -46,6 +47,7 @@ public class DiscordGame
 	// Important channels (Name : id)
 	private HashMap<String, Long> channels = new HashMap<>();
 	private Assigner assigner = Assigner.buildDefault(this);
+	private HashSet<TownRole> wonTownRoles;
 
 	private long playerRoleID;
 	private long botRoleID;
@@ -61,6 +63,7 @@ public class DiscordGame
 		this.jda = jda;
 		guildID = guildId;
 		partyLeaderID = partyLeaderId;
+		wonTownRoles = new HashSet<TownRole>();
 	}
 
 	public void processMessage(Message message)
@@ -560,12 +563,12 @@ public class DiscordGame
 		return jda.getUserById(person.getID());
 	}
 
-	public Long getPartyID()
+	public long getPartyID()
 	{
 		return guildID;
 	}
 
-	public Long getGameID()
+	public long getGameID()
 	{
 		return gameGuildID;
 	}
@@ -595,7 +598,7 @@ public class DiscordGame
 		getTextChannel(channelName).sendMessage(msg).queue(consumer);
 	}
 
-	public void  sendMessageToTextChannel(Long channelID, String msg, Consumer<Message> consumer)
+	public void sendMessageToTextChannel(Long channelID, String msg, Consumer<Message> consumer)
 	{
 		getTextChannel(channelID).sendMessage(msg).queue(consumer);
 	}
@@ -615,7 +618,7 @@ public class DiscordGame
 		getTextChannel(channelName).sendMessage(msg).queue();
 	}
 
-	public void  sendMessageToTextChannel(Long channelID, String msg)
+	public void sendMessageToTextChannel(Long channelID, String msg)
 	{
 		getTextChannel(channelID).sendMessage(msg).queue();
 	}
@@ -732,5 +735,15 @@ public class DiscordGame
 			return;
 		}
 		m.mute(false).queue();
+	}
+
+	public void winTownRole(TownRole role)
+	{
+		wonTownRoles.add(role);
+	}
+
+	public boolean hasTownRoleWon(TownRole role)
+	{
+		return wonTownRoles.contains(role);
 	}
 }

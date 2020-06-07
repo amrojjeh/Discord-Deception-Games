@@ -13,8 +13,6 @@ public class SerialKiller extends Person
 {
 	private TownEvent event;
 
-	private static boolean hasWon = false;
-
 	public SerialKiller(DiscordGame game, int num, Long id)
 	{
 		super(game, num, id, TownRole.SERIAL_KILLER);
@@ -36,13 +34,13 @@ public class SerialKiller extends Person
 	@Override
 	public boolean hasWon()
 	{
-		return hasWon;
+		return getGame().hasTownRoleWon(getType());
 	}
 
 	@Override
 	public void win()
 	{
-		hasWon = true;
+		getGame().winTownRole(getType());
 		getGame().sendMessageToTextChannel("daytime_discussion", "**Serial Killers have won!**", (msg) -> getGame().endGame());
 	}
 

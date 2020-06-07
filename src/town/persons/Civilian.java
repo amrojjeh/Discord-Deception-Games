@@ -8,8 +8,6 @@ import town.TownRole;
 // Civilian is NOT A REAL ROLE. This is a temporary useless town role to simulate games
 public class Civilian extends Person
 {
-	private static boolean hasWon = false;
-
 	public Civilian(DiscordGame game, int num, Long id)
 	{
 		super(game, num, id, TownRole.CIVILIAN);
@@ -26,13 +24,13 @@ public class Civilian extends Person
 	@Override
 	public boolean hasWon()
 	{
-		return hasWon;
+		return getGame().hasTownRoleWon(getType());
 	}
 
 	@Override
 	public void win()
 	{
-		hasWon = true;
+		getGame().winTownRole(getType());
 		getGame().sendMessageToTextChannel("daytime_discussion", "**Civilians have won!**", (msg) -> getGame().endGame());
 	}
 
