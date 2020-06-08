@@ -15,11 +15,13 @@ public class Judgment extends Phase
 	HashMap<Person, voteType> votes = new HashMap<>();
 	int guilty = 0;
 	int innocent = 0;
+	int numTrials;
 
-	public Judgment(PhaseManager pm, Person p)
+	public Judgment(PhaseManager pm, Person p, int numTrials)
 	{
 		super(pm);
 		defendant = p;
+		this.numTrials = numTrials;
 	}
 
 	//begins the phase. sends out a message, and opens up text channels and voice chat.
@@ -42,7 +44,9 @@ public class Judgment extends Phase
 	{
 		if (guilty > innocent)
 			return new LastWords(phaseManager, defendant);
-		else
+		else if(numTrials > 0)
+			return new Accusation(phaseManager, numTrials);
+		else 
 			return new Night(phaseManager);
 	}
 
