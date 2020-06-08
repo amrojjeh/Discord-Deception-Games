@@ -23,7 +23,7 @@ public class LastWords extends Phase
 	@Override
 	public void end()
 	{
-		defendant.die();
+		defendant.die(String.format("<@%d> was lynched in the open.", defendant.getID()));
 		getGame().restoreTalking("Daytime");
 		getGame().restoreRead(defendant, "daytime_discussion");
 	}

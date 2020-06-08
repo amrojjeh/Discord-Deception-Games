@@ -1,7 +1,14 @@
 package town.phases;
 
+import java.util.LinkedList;
+
+import town.persons.Person;
+
 public class Night extends Phase
 {
+	LinkedList<Person> deaths = new LinkedList<>();
+
+
 	public Night(PhaseManager pm)
 	{
 		super(pm);
@@ -27,12 +34,17 @@ public class Night extends Phase
 	@Override
 	public Phase getNextPhase()
 	{
-		return new Day(phaseManager);
+		return new Morning(phaseManager, deaths);
 	}
 
 	@Override
 	public int getDurationInSeconds()
 	{
 		return 15;
+	}
+
+	public void addDeath(Person person)
+	{
+		deaths.add(person);
 	}
 }

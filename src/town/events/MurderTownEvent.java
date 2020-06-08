@@ -10,7 +10,6 @@ public class MurderTownEvent implements TownEvent
 	private Person victim;
 	private DiscordGame game;
 
-
 	public MurderTownEvent(DiscordGame game, Person m, Person v)
 	{
 		this.game = game;
@@ -43,9 +42,7 @@ public class MurderTownEvent implements TownEvent
 
 	public void killVictim(Person person)
 	{
-		murderer.sendMessage("You killed " + getVictim().getRealName() + " (" + getVictim().getNickName() + ")");
-		getVictim().sendMessage("You got killed by " + getMurderer().getRealName() + " (" + getVictim().getNickName() + ")");
-		getVictim().die();
+		murderer.sendMessage("You killed <@" + murderer.getID() + ">");
+		victim.die(String.format("<@%d> was murdered by a serial killer.", victim.getID()));
 	}
-
 }

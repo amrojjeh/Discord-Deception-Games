@@ -35,6 +35,7 @@ import town.persons.assigner.Assigner;
 import town.phases.Accusation;
 import town.phases.End;
 import town.phases.Judgment;
+import town.phases.Night;
 import town.phases.Phase;
 import town.phases.PhaseManager;
 import town.phases.Trial;
@@ -842,9 +843,15 @@ public class DiscordGame
 		return wonTownRoles.contains(role);
 	}
 
-	public void personDied(Person person)
+	public void personDied(Person person, boolean saveForMorning)
 	{
+		// TODO: Optimize
 		getGameGuild().addRoleToMember(person.getID(), getRole(deadRoleID)).queue();
 		getGameGuild().removeRoleFromMember(person.getID(), getRole(playerRoleID)).queue();
+		if (saveForMorning && getCurrentPhase() instanceof Night)
+		{
+			Night night = (Night)getCurrentPhase();
+			night.addDeath(person);
+		}
 	}
 }

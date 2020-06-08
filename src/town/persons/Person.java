@@ -6,6 +6,7 @@ import town.DiscordGame;
 import town.TownRole;
 import town.events.MurderTownEvent;
 import town.events.TownEvent;
+import town.phases.Night;
 
 public abstract class Person
 {
@@ -17,6 +18,7 @@ public abstract class Person
 	private int refNum; // This is how players can refer to other players without mentioning them
 
 	protected boolean alive = true;
+	protected String causeOfDeath = String.format("<@%d> is still alive.", getID());
 
 	Person(DiscordGame game, int refNum, long id, TownRole type)
 	{
@@ -86,11 +88,15 @@ public abstract class Person
 		return privateChannelID;
 	}
 
-	public void die()
+	public void die(String reason)
 	{
 		if (!alive) return;
+		if (!reason.isBlank()) causeOfDeath = reason;
+		if (getGame().getCurrentPhase() instanceof Night)
+			getGame().personDied(this, true);
+		else
+			getGame().personDied(this, false);
 		alive = false;
-		getGame().personDied(this);
 	}
 
 	public void onMurder(MurderTownEvent event) { event.standard(this); }
@@ -104,6 +110,11 @@ public abstract class Person
 	public void setChannelID(Long id)
 	{
 		privateChannelID = id;
+	}
+
+	public String getCauseOfDeath()
+	{
+		return causeOfDeath;
 	}
 
 	public abstract String ability(List<Person> list);
