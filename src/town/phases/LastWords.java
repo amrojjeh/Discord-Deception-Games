@@ -17,8 +17,7 @@ public class LastWords extends Phase
 	{
 		getGame().sendMessageToTextChannel("daytime_discussion", String.format("What are your last words? <@%d>", defendant.getID()));
 		getGame().muteExcept("Daytime", defendant);
-		getGame().setChannelVisibility("daytime_discussion", true, false);
-		getGame().setChannelVisibility(defendant, "daytime_discussion", true, true);
+		getGame().removeReadExcept(defendant, "daytime_discussion");
 	}
 
 	@Override
@@ -26,8 +25,7 @@ public class LastWords extends Phase
 	{
 		defendant.die();
 		getGame().restoreTalking("Daytime");
-		getGame().setChannelVisibility("daytime_discussion", true, true);
-		getGame().resetVisibility(defendant, "daytime_discussion");
+		getGame().restoreRead(defendant, "daytime_discussion");
 	}
 
 	@Override

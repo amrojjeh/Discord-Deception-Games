@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
@@ -19,10 +20,12 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.PermissionOverride;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.VoiceChannel;
+import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.requests.restaction.GuildAction;
 import net.dv8tion.jda.api.requests.restaction.GuildAction.RoleData;
 import net.dv8tion.jda.api.requests.restaction.PermissionOverrideAction;
@@ -725,31 +728,40 @@ public class DiscordGame
 	}
 
 	// Write doesn't matter if we're setting a voice channel
+	public void setChannelVisibility(String channelName, boolean read, boolean write,
+			Function<PermissionOverride, RestAction<PermissionOverride>> func)
+	{
+		Role playerRole = getRole(playerRoleID);
+		setChannelVisibility(playerRole, channelName, read, write, func);
+	}
+
 	public void setChannelVisibility(String channelName, boolean read, boolean write)
 	{
 		Role playerRole = getRole(playerRoleID);
-		setChannelVisibility(playerRole, channelName, read, write);
+		setChannelVisibility(playerRole, channelName, read, write, null);
 	}
 
-	public void setChannelVisibility(Person p, String channelName, boolean read, boolean write)
+	public void removeReadExcept(Person p, String channelName)
 	{
 		Member member = getMemberFromGame(p);
 		if (member == null) throw new IllegalArgumentException("Invalid person.");
-		setChannelVisibility(member, channelName, read, write);
+		setChannelVisibility(channelName, true, false,
+				perm -> getGuildChannel(channelName).putPermissionOverride(member).setAllow(readPermissions() | writePermissions()));
 	}
 
-	public void resetVisibility(Person p, String channelName)
+	public void restoreRead(Person p, String channelName)
 	{
 		Member member = getMemberFromGame(p);
-		if (member == null) throw new IllegalArgumentException("Invalid person");
-		TextChannel tc = getTextChannel(channelName);
-		if (tc == null) throw new IllegalArgumentException("Text channel not available");
-		tc.getPermissionOverride(member).delete().queue();
+		if (member == null) throw new IllegalArgumentException("Invalid person.");
+		setChannelVisibility(channelName, true, true,
+				perm -> getGuildChannel(channelName).putPermissionOverride(member).reset());
 	}
 
-	private void setChannelVisibility(IPermissionHolder holder, String channelName, boolean read, boolean write)
+	private void setChannelVisibility(IPermissionHolder holder, String channelName, boolean read, boolean write,
+			Function<PermissionOverride, RestAction<PermissionOverride>> func)
 	{
 		GuildChannel channel = getGuildChannel(channelName);
+		if (channel == null) throw new IllegalArgumentException("Channel name doesn't exist");
 		PermissionOverrideAction action = null;
 		if (channel.getType().equals(ChannelType.VOICE))
 		{
@@ -767,7 +779,9 @@ public class DiscordGame
 			else
 				action = channel.putPermissionOverride(holder).reset().setDeny(readPermissions() | writePermissions());
 		}
-		if (action != null)
+		if (action != null && func != null)
+			action.flatMap(func).queue();
+		else if (action != null)
 			action.queue();
 	}
 
@@ -775,7 +789,15 @@ public class DiscordGame
 	{
 		VoiceChannel channel = getVoiceChannel(channelName);
 		if (channel == null) throw new IllegalArgumentException("Can't pass a non-voice channel to muteExcept");
-		channel.getMembers().forEach(m -> {if (m.getIdLong() != p.getID()) m.mute(true).queue();} );
+		List<Member> members = channel.getMembers();
+		if (members.isEmpty()) return;
+		RestAction<Void> action = members.get(0).getIdLong() != p.getID() ? members.get(0).mute(true) : members.get(0).mute(false);
+		for (int x = 1; x < members.size(); ++x)
+		{
+			final int y = x; // Finals are needed for lambdas
+			action = action.flatMap(perm -> members.get(y).getIdLong() != p.getID() ? members.get(y).mute(true) : members.get(y).mute(false));
+		}
+		action.queue();
 	}
 
 	public void restoreTalking(String channelName)
@@ -785,18 +807,29 @@ public class DiscordGame
 		channel.getMembers().forEach(m -> {m.mute(false).queue();} );
 	}
 
-	public void gameGuildVoiceJoin(Member m)
+	public void gameGuildVoiceJoin(Member m, VoiceChannel channel)
 	{
+		if (!started) return;
+		if (channel.getGuild().getIdLong() != getGameID()) return;
+
 		Phase phase = getCurrentPhase();
 		if (phase instanceof Trial)
 		{
 			Trial trial = (Trial)phase;
-			if (m.getIdLong() == trial.getDefendant().getID())
-				return;
-			m.mute(true).queue();
-			return;
+			if (m.getIdLong() != trial.getDefendant().getID())
+				m.mute(true).queue();
 		}
-		m.mute(false).queue();
+
+		else if (!getPerson(m).isAlive())
+		{
+			if (channel.getIdLong() == getVoiceChannel("Daytime").getIdLong())
+				m.mute(true).queue();
+			else
+				m.mute(false).queue();
+		}
+
+		else
+			m.mute(false).queue();
 	}
 
 	public void winTownRole(TownRole role)

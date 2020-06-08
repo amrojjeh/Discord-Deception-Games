@@ -26,8 +26,7 @@ public class Trial extends Phase
 				+ "other players are muted. What is your defense? You have 30 seconds.");
 		//mute all but the defendant in text / voice daytime channel
 		getGame().muteExcept("Daytime", defendant);
-		getGame().setChannelVisibility("daytime_discussion", true, false);
-		getGame().setChannelVisibility(defendant, "daytime_discussion", true, true);
+		getGame().removeReadExcept(defendant, "daytime_discussion");
 		phaseManager.setWarningInSeconds(5);
 	}
 
@@ -35,8 +34,7 @@ public class Trial extends Phase
 	public void end()
 	{
 		getGame().restoreTalking("Daytime");
-		getGame().setChannelVisibility("daytime_discussion", true, true);
-		getGame().resetVisibility(defendant, "daytime_discussion");
+		getGame().restoreRead(defendant, "daytime_discussion");
 	}
 
 	@Override

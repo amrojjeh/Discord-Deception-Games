@@ -53,7 +53,7 @@ public abstract class Person
 
 	public String getNickName()
 	{
-		if (game.getGameGuild() != null)
+		if (game.getGameGuild() != null && game.getGameGuild().getMemberById(ID) != null)
 			return game.getGameGuild().getMemberById(ID).getEffectiveName();
 		else return game.getPartyGuild().getMemberById(ID).getEffectiveName();
 	}
