@@ -31,6 +31,7 @@ import town.persons.Person;
 import town.persons.assigner.Assigner;
 import town.phases.Accusation;
 import town.phases.End;
+import town.phases.Judgment;
 import town.phases.Phase;
 import town.phases.PhaseManager;
 import town.phases.Trial;
@@ -90,8 +91,12 @@ public class DiscordGame
 			cancelAbilityCommand(message);
 		else if (started && isMessageFromGameGuild(message) && lowerCaseMessage.contentEquals(prefix + "rolehelp"))
 			roleHelpCommand(message);
-		else if (started && isMessageFromGameGuild(message) && message.getContentRaw().startsWith(prefix + "vote"))
+		else if (started && isMessageFromGameGuild(message) && lowerCaseMessage.startsWith(prefix + "vote"))
 			voteCommand(message);
+		else if (started && isMessageFromGameGuild(message) && lowerCaseMessage.contentEquals(prefix + "guilty"))
+			guiltyCommand(message);
+		else if (started && isMessageFromGameGuild(message) && lowerCaseMessage.contentEquals(prefix + "innocent"))
+			innocentCommand(message);
 	}
 
 	private boolean isMessageFromGameGuild(Message message)
@@ -195,6 +200,13 @@ public class DiscordGame
 			return;
 		}
 
+		if (currentPhase instanceof Judgment)
+		{
+			Judgment j = (Judgment)currentPhase;
+			message.getChannel().sendMessage(j.abstain(user)).queue();
+			return;
+		}
+
 		message.getChannel().sendMessage(user.cancel()).queue();
 	}
 
@@ -260,6 +272,38 @@ public class DiscordGame
 			description += String.format(format, p.getNum(), p.getRealName(), p.getNickName());
 		MessageEmbed embed = new EmbedBuilder().setColor(Color.YELLOW).setTitle("Party members").setDescription(description).build();
 		channelUsed.sendMessage(embed).queue();
+	}
+
+	private void guiltyCommand(Message message)
+	{
+		Person user = getPerson(message.getMember());
+		Phase currentPhase = getCurrentPhase();
+
+		if (!(currentPhase instanceof Judgment))
+		{
+			String msg = String.format("<@%d> can only vote guilty once someone's been accused.", user.getID());
+			message.getChannel().sendMessage(msg).queue();
+			return;
+		}
+
+		Judgment j = (Judgment)currentPhase;
+		message.getChannel().sendMessage(j.guilty(user)).queue();
+	}
+
+	private void innocentCommand(Message message)
+	{
+		Person user = getPerson(message.getMember());
+		Phase currentPhase = getCurrentPhase();
+
+		if (!(currentPhase instanceof Judgment))
+		{
+			String msg = String.format("<@%d> can only vote innocent once someone's been accused.", user.getID());
+			message.getChannel().sendMessage(msg).queue();
+			return;
+		}
+
+		Judgment j = (Judgment)currentPhase;
+		message.getChannel().sendMessage(j.innocent(user)).queue();
 	}
 
 	private long readPermissions()
@@ -719,7 +763,7 @@ public class DiscordGame
 			if (read && !write)
 				action = channel.putPermissionOverride(holder).reset().setPermissions(readPermissions(), writePermissions());
 			else if (read && write)
-				action = channel.putPermissionOverride(holder).reset().setPermissions(readPermissions() | writePermissions(), 0);
+				action = channel.putPermissionOverride(holder).reset().setAllow(readPermissions() | writePermissions());
 			else
 				action = channel.putPermissionOverride(holder).reset().setDeny(readPermissions() | writePermissions());
 		}

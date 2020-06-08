@@ -6,11 +6,10 @@ There will probably be more instances were we tweak the game design to fit our n
 Currently we're implementing all the phases:
 - [ ] Morning, explain deaths
 - [X] Discussion, also known as Day (For now, the discussion phase ends in 1-2 minutes, but we plan to make it based on majority vote)
-- [ ] Accusation, first voting round
-- [ ] Defense, accused person gives defense
-- [ ] Judgement, final voting round
-- [ ] Verdict, reveals votes
-- [ ] Last words
+- [X] Accusation, first voting round
+- [X] Defense, accused person gives defense
+- [X] Judgement, final voting round, also reveals voting at the end
+- [X] Last words
 - [X] Night
 
 Here are the roles that we currently support:

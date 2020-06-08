@@ -19,7 +19,6 @@ public class Trial extends Phase
 		return defendant;
 	}
 
-	//begins the phase. sends out a message, and opens up text channels and voice chat.
 	@Override
 	public void start()
 	{
@@ -32,16 +31,14 @@ public class Trial extends Phase
 		phaseManager.setWarningInSeconds(5);
 	}
 
-	// ends the phase, sending out a global message of this fact.
 	@Override
 	public void end()
 	{
 		getGame().restoreTalking("Daytime");
-		getGame().resetVisibility(defendant, "daytime_discussion");
 		getGame().setChannelVisibility("daytime_discussion", true, true);
+		getGame().resetVisibility(defendant, "daytime_discussion");
 	}
 
-	//After the defendant has spoken, players briefly discuss what to do and their fate is voted upon
 	@Override
 	public Phase getNextPhase()
 	{

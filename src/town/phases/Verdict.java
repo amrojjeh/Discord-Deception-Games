@@ -3,6 +3,8 @@ package town.phases;
 import town.persons.Person;
 
 //the Verdict phase is short, it reveals who voted what- and what will happen to the defendant.
+// Not requried, since we can do all of this at the end of Judgment
+// TODO: Delete
 public class Verdict extends Phase{
 	Person defendant;
 
