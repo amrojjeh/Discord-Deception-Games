@@ -5,12 +5,11 @@ import java.util.List;
 import town.DiscordGame;
 import town.TownRole;
 
-// Civilian is NOT A REAL ROLE. This is a temporary useless town role to simulate games
-public class Civilian extends Person
-{
-	public Civilian(DiscordGame game, int num, Long id)
+//Medium can talk to the dead at night.
+public class Medium extends Person{
+	public Medium(DiscordGame game, int num, Long id)
 	{
-		super(game, num, id, TownRole.CIVILIAN);
+		super(game, num, id, TownRole.MEDIUM);
 	}
 
 	@Override
@@ -37,18 +36,18 @@ public class Civilian extends Person
 	@Override
 	public String ability(List<Person> references)
 	{
-		return "Civilian has no ability";
+		return "The Medium has no action.";
 	}
 
 	@Override
 	public String cancel()
 	{
-		return "Civilian has no ability";
+		return "The Medium has no action.";
 	}
 
 	@Override
 	public String getHelp()
 	{
-		return "Civilian is temporary. No commands, you just kind of die no matter what.";
+		return "You can talk to the dead.";
 	}
 }

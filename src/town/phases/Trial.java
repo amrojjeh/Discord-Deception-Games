@@ -7,11 +7,13 @@ import town.persons.Person;
 public class Trial extends Phase
 {
 	Person defendant;
+	int numTrials;
 
-	public Trial(PhaseManager pm, Person p)
+	public Trial(PhaseManager pm, Person p, int numTrials)
 	{
 		super(pm);
 		defendant = p;
+		this.numTrials = numTrials;
 	}
 
 	public Person getDefendant()
@@ -40,7 +42,7 @@ public class Trial extends Phase
 	@Override
 	public Phase getNextPhase()
 	{
-		return new Judgment(phaseManager, defendant);
+		return new Judgment(phaseManager, defendant, numTrials);
 	}
 
 	//Duration: 20-30 seconds
