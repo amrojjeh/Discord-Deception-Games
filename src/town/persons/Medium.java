@@ -4,6 +4,7 @@ import java.util.List;
 
 import town.DiscordGame;
 import town.TownRole;
+import town.phases.Night;
 
 //Medium can talk to the dead at night.
 public class Medium extends Person{
@@ -36,7 +37,15 @@ public class Medium extends Person{
 	@Override
 	public String ability(List<Person> references)
 	{
-		return "The Medium has no action.";
+		/*
+		if ((getGame().getCurrentPhase() instanceof Night)) {
+			getGame().setChannelVisibility(this, "the_afterlife", true, true);
+		}
+		else {
+			getGame().setChannelVisibility(this, "the_afterlife", false, false);
+		}
+		*/
+		return "Mediums don't have an ability!";
 	}
 
 	@Override

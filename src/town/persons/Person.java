@@ -88,7 +88,7 @@ public abstract class Person
 	public void die(String reason)
 	{
 		if (!alive) return;
-		if (!reason.isBlank()) causeOfDeath = reason;
+		if (!reason.isEmpty()) causeOfDeath = reason; 
 		if (getGame().getCurrentPhase() instanceof Night)
 			getGame().personDied(this, true);
 		else

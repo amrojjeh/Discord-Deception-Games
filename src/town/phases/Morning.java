@@ -2,6 +2,7 @@ package town.phases;
 
 import java.util.LinkedList;
 
+import town.TownRole;
 import town.persons.Person;
 
 //Daytime is the phase where players can discuss what is happening. There are no features other than
@@ -24,6 +25,9 @@ public class Morning extends Phase
 	@Override
 	public void start()
 	{
+		for(Person p : getGame().findAllWithRole(TownRole.MEDIUM)){
+			getGame().setChannelVisibility(p, "the_afterlife", false, false);
+		}
 		if (deaths != null)
 			if (deaths.isEmpty())
 				getGame().sendMessageToTextChannel("daytime_discussion", "No one one died last night.");
