@@ -4,7 +4,7 @@ We *were* planning to try to make an exact copy of Town of Salem, however, we've
 There will probably be more instances were we tweak the game design to fit our needs, and as such, I don't think it would be fair to call this project a Town of Salem project, as we also want to avoid copying the name. That being said, this wouldn't have started if it wasn't for Town of Salem, credit is where it's due. Also a new name is currently pending.
 
 Currently we're implementing all the phases:
-- [ ] Morning, explain deaths
+- [X] Morning, explain deaths
 - [X] Discussion, also known as Day (For now, the discussion phase ends in 1-2 minutes, but we plan to make it based on majority vote)
 - [X] Accusation, first voting round
 - [X] Defense, accused person gives defense
@@ -15,6 +15,7 @@ Currently we're implementing all the phases:
 Here are the roles that we currently support:
 - Serial Killer
 - Civilian, a temporary townee
+- Lookout
 
 We're also working on getting the intial setup correctly. Here's how the game should start:
 - Anyone can start a lobby with `tos.startParty`
