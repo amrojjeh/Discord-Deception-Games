@@ -4,8 +4,6 @@ import java.util.List;
 
 import town.DiscordGame;
 import town.TownRole;
-import town.events.LookoutTownEvent;
-import town.events.MurderTownEvent;
 import town.events.TownEvent;
 import town.phases.Night;
 
@@ -96,16 +94,9 @@ public abstract class Person
 		alive = false;
 	}
 
-	public void onMurder(MurderTownEvent event) { event.standard(this); }
-
-	private void onLookoutEvent(LookoutTownEvent event) { event.standard(this); }
-
 	public void onEvent(TownEvent event)
 	{
-		if (event instanceof MurderTownEvent)
-			onMurder((MurderTownEvent)event);
-		if (event instanceof LookoutTownEvent)
-			onLookoutEvent((LookoutTownEvent)event);
+		event.standard(this);
 	}
 
 	public TownEvent getEvent()

@@ -190,7 +190,7 @@ public class DiscordGame
 	private void activateAbilityCommand(Message message)
 	{
 		Person user = getPerson(message.getMember());
-		message.getChannel().sendMessage(user.ability(getPersonsFromMessage(message))).queue();
+		user.sendMessage(user.ability(getPersonsFromMessage(message)));
 	}
 
 	private void cancelAbilityCommand(Message message)
