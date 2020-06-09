@@ -5,7 +5,9 @@ import java.util.List;
 import town.DiscordGame;
 import town.TownRole;
 import town.events.TownEvent;
+import town.phases.Day;
 import town.phases.Night;
+import town.phases.Phase;
 
 public abstract class Person
 {
@@ -86,7 +88,7 @@ public abstract class Person
 	public void die(String reason)
 	{
 		if (!alive) return;
-		if (!reason.isEmpty()) causeOfDeath = reason; 
+		if (!reason.isEmpty()) causeOfDeath = reason;
 		if (getGame().getCurrentPhase() instanceof Night)
 			getGame().personDied(this, true);
 		else
@@ -121,6 +123,11 @@ public abstract class Person
 		return "Action canceled";
 	}
 
+	public void onPhaseChange(Phase phase)
+	{
+		if (phase instanceof Day) event = null;
+	}
+
 	public abstract String ability(List<Person> list);
 
 	public abstract boolean hasWon();
@@ -130,4 +137,5 @@ public abstract class Person
 	public abstract void win();
 
 	public abstract String getHelp();
+
 }

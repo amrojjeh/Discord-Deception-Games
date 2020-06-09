@@ -46,7 +46,8 @@ public class Lookout extends Person
 			return "Cannot watch more than one person at once. `!ability 1` to watch the first person show in `!party`.";
 		if (!(getGame().getCurrentPhase() instanceof Night))
 			return "Lookouts can only watch visitors during the night.";
-
+		if (!references.get(0).isAlive())
+			return "Lookouts can't watch dead people.";
 		// You can't kill yourself
 		// In the real game, you can't track yourself
 		//		if (references.get(0) == this)

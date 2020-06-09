@@ -747,6 +747,13 @@ public class DiscordGame
 				perm -> getGuildChannel(channelName).putPermissionOverride(member).setAllow(readPermissions() | writePermissions()));
 	}
 
+	public void setChannelVisibility(Person p, String channelName, boolean read, boolean write)
+	{
+		Member member = getMemberFromGame(p);
+		if (member == null) throw new IllegalArgumentException("Invalid person.");
+		setChannelVisibility(member, channelName, read, write, null);
+	}
+
 	public void restoreRead(Person p, String channelName)
 	{
 		Member member = getMemberFromGame(p);
@@ -782,33 +789,7 @@ public class DiscordGame
 		else if (action != null)
 			action.queue();
 	}
-	
-	public void setChannelVisibility(Person p, String channelName, boolean read, boolean write)
-	{
-		Member m = getMemberFromGame(p);
-		GuildChannel channel = getGuildChannel(channelName);
-		if (channel == null) throw new IllegalArgumentException("Channel name doesn't exist");
-		PermissionOverrideAction action = null;
-		if (channel.getType().equals(ChannelType.VOICE))
-		{
-			if (read)
-				action = channel.putPermissionOverride(m).reset().setAllow(connectPermissions());
-			else
-				action = channel.putPermissionOverride(m).reset().setDeny(connectPermissions());
-		}
-		else if (channel.getType().equals(ChannelType.TEXT))
-		{
-			if (read && !write)
-				action = channel.putPermissionOverride(m).reset().setPermissions(readPermissions(), writePermissions());
-			else if (read && write)
-				action = channel.putPermissionOverride(m).reset().setAllow(readPermissions() | writePermissions());
-			else
-				action = channel.putPermissionOverride(m).reset().setDeny(readPermissions() | writePermissions());
-		}
-		if (action != null)
-			action.queue();
-	}
-	
+
 	public ArrayList<Person> findAllWithRole(TownRole role) {
 		ArrayList<Person> peeps = new ArrayList<>();
 		for(Person p : persons) {

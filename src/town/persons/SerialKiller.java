@@ -49,6 +49,9 @@ public class SerialKiller extends Person
 		if (references.get(0) == this)
 			return "You can't kill yourself.";
 
+		if (!references.get(0).isAlive())
+			return "You can't kill a dead guy.";
+
 		String msg = "";
 
 		if (event != null)
