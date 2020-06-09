@@ -30,8 +30,8 @@ public class Assigner
 	{
 		// Add default roles
 		Assigner assigner = new Assigner();
-		//		assigner.addRole(new CivilianAssigner(game));
-		assigner.addRole(new SerialKillerAssigner(game));
+		assigner.addRole(new CivilianAssigner(game));
+		//		assigner.addRole(new SerialKillerAssigner(game));
 		assigner.addRole(new LookoutAssigner(game));
 		return assigner;
 	}
