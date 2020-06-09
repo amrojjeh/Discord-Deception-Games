@@ -74,7 +74,7 @@ public class Accusation extends Phase
 				description += vote;
 			else
 				description += vote + " ";
-			description += ": " + p.getNum() + ". " + p.getNickName() + "\n";
+			description += ": " + p.getNum() + ". <@" + p.getID() + ">\n";
 		}
 		return new EmbedBuilder().setTitle("Players Alive").setColor(Color.YELLOW).setDescription(description).build();
 	}
@@ -116,7 +116,7 @@ public class Accusation extends Phase
 		//ADDITION: Puts a player on trial if their number of votes exceed the threshold
 		if(numOfVotes.get(accused) >= numVotesNeeded) {
 			putPlayerOnTrial(accused);
-			return "**The Town has decided to put " + accused.getNickName() + " on trial!**";
+			return "**The Town has decided to put <@" + accused.getID() + "> on trial!**";
 		}
 		return message + String.format("<@%d> (%d) was accused by <@%d>", accused.getID(), numOfVotes.get(accused), accuser.getID());
 	}

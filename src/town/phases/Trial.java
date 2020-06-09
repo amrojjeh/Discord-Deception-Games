@@ -24,7 +24,7 @@ public class Trial extends Phase
 	@Override
 	public void start()
 	{
-		getGame().sendMessageToTextChannel("daytime_discussion", defendant.getNickName() + ", your trial has begun. All "
+		getGame().sendMessageToTextChannel("daytime_discussion", "<@" + defendant.getID() + ">, your trial has begun. All "
 				+ "other players are muted. What is your defense? You have 30 seconds.");
 		//mute all but the defendant in text / voice daytime channel
 		getGame().muteExcept("Daytime", defendant);

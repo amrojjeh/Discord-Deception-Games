@@ -21,6 +21,7 @@ public abstract class Person
 	protected boolean alive = true;
 	protected String causeOfDeath = String.format("<@%d> is still alive.", getID());
 	protected TownEvent event;
+	String realName;
 
 	Person(DiscordGame game, int refNum, long id, TownRole type)
 	{
@@ -28,6 +29,7 @@ public abstract class Person
 		ID = id;
 		this.refNum = refNum;
 		this.type = type;
+		realName = game.getUser(this).getName();
 	}
 
 	public long getID()
@@ -52,14 +54,7 @@ public abstract class Person
 
 	public String getRealName()
 	{
-		return game.getUser(this).getName();
-	}
-
-	public String getNickName()
-	{
-		if (game.getGameGuild() != null && game.getGameGuild().getMemberById(ID) != null)
-			return game.getGameGuild().getMemberById(ID).getEffectiveName();
-		else return game.getPartyGuild().getMemberById(ID).getEffectiveName();
+		return realName;
 	}
 
 	public TownRole getType()

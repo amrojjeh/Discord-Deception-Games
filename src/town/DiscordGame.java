@@ -271,9 +271,9 @@ public class DiscordGame
 		}
 
 		String description = "";
-		String format = "%d. %s (%s)\n";
+		String format = "%d. <@%d>\n";
 		for (Person p : persons)
-			description += String.format(format, p.getNum(), p.getRealName(), p.getNickName());
+			description += String.format(format, p.getNum(), p.getID());
 		MessageEmbed embed = new EmbedBuilder().setColor(Color.YELLOW).setTitle("Party members").setDescription(description).build();
 		channelUsed.sendMessage(embed).queue();
 	}
