@@ -54,6 +54,7 @@ public class MurderTownEvent implements TownEvent
 
 	public void attackVictim(Person person)
 	{
+<<<<<<< HEAD
 		//POSSIBLE ERROR: Account for doctor
 		if(murderer.getType().getAttack() > victim.getType().getDefense()) {
 			murderer.sendMessage("You attacked <@" + murderer.getID() + ">");
@@ -62,5 +63,9 @@ public class MurderTownEvent implements TownEvent
 		else {
 			murderer.sendMessage("You attacked <@" + murderer.getID() + ">");
 		}
+=======
+		murderer.sendMessage("You killed <@" + victim.getID() + ">");
+		victim.die(String.format("<@%d> was murdered by a serial killer.", victim.getID()));
+>>>>>>> b2ce316c8a22594b4c170feff75b4ad566bb2f0d
 	}
 }
