@@ -2,6 +2,7 @@ package town.phases;
 
 import java.util.LinkedList;
 
+import town.TownRole;
 import town.persons.Person;
 
 public class Night extends Phase
@@ -19,6 +20,10 @@ public class Night extends Phase
 	{
 		getGame().setChannelVisibility("daytime_discussion", true, false);
 		getGame().setChannelVisibility("Daytime", false, false);
+		//for each medium, give access to dead chat
+		for(Person p : getGame().findAllWithRole(TownRole.MEDIUM)){
+			getGame().setChannelVisibility(p, "the_afterlife", true, true);
+		}
 		getGame().discconectEveryoneFromVC("Daytime");
 		getGame().sendMessageToTextChannel("daytime_discussion", "The night has started");
 		phaseManager.setWarningInSeconds(5);
