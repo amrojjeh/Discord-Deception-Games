@@ -37,7 +37,7 @@ public class MurderTownEvent implements TownEvent
 	public void standard(Person person)
 	{
 		if (person == getMurderer() && getGame().getCurrentPhase() instanceof Night)
-			killVictim(person);
+			attackVictim(person);
 	}
 
 	@Override
@@ -52,9 +52,15 @@ public class MurderTownEvent implements TownEvent
 		return murderer.getType().getPriority();
 	}
 
-	public void killVictim(Person person)
+	public void attackVictim(Person person)
 	{
-		murderer.sendMessage("You killed <@" + murderer.getID() + ">");
-		victim.die(String.format("<@%d> was murdered by a serial killer.", victim.getID()));
+		//POSSIBLE ERROR: Account for doctor
+		if(murderer.getType().getAttack() > victim.getType().getDefense()) {
+			murderer.sendMessage("You attacked <@" + murderer.getID() + ">");
+			victim.die(String.format("<@%d> was murdered by a serial killer.", victim.getID()));
+		}
+		else {
+			murderer.sendMessage("You attacked <@" + murderer.getID() + ">");
+		}
 	}
 }
