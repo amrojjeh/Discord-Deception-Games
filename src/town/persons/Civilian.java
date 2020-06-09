@@ -3,6 +3,7 @@ package town.persons;
 import java.util.List;
 
 import town.DiscordGame;
+import town.TownFaction;
 import town.TownRole;
 
 // Civilian is NOT A REAL ROLE. This is a temporary useless town role to simulate games
@@ -17,20 +18,20 @@ public class Civilian extends Person
 	public boolean canWin()
 	{
 		// TODO: We can put commonly used victories in a static class
-		return getGame().getPlayers().stream().filter((person) -> person.getType().getFaction().equals("Town") 
+		return getGame().getPlayers().stream().filter((person) -> person.getType().getFaction() == TownFaction.TOWN
 				&& person.alive).count() == getGame().getPlayers().stream().filter((person) -> person.alive).count();
 	}
 
 	@Override
 	public boolean hasWon()
 	{
-		return getGame().hasTownRoleWon(getType());
+		return getGame().hasTownFactionWon(getType().getFaction());
 	}
 
 	@Override
 	public void win()
 	{
-		getGame().winTownRole(getType());
+		getGame().winTownFaction(getType().getFaction());
 		getGame().sendMessageToTextChannel("daytime_discussion", "**Town has won!**", (msg) -> getGame().endGame());
 	}
 

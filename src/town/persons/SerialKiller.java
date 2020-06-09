@@ -25,13 +25,13 @@ public class SerialKiller extends Person
 	@Override
 	public boolean hasWon()
 	{
-		return getGame().hasTownRoleWon(getType());
+		return getGame().hasTownFactionWon(getType().getFaction());
 	}
 
 	@Override
 	public void win()
 	{
-		getGame().winTownRole(getType());
+		getGame().winTownFaction(getType().getFaction());
 		getGame().sendMessageToTextChannel("daytime_discussion", "**Serial Killers have won!**", (msg) -> getGame().endGame());
 	}
 

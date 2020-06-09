@@ -50,9 +50,9 @@ public class DiscordGame
 	// Important channels (Name : id)
 	private HashMap<String, Long> channels = new HashMap<>();
 	private Assigner assigner = Assigner.buildDefault(this);
-	private HashSet<TownRole> wonTownRoles = new HashSet<TownRole>();
+	private HashSet<TownFaction> wonTownRoles = new HashSet<TownFaction>();
 	private ArrayList<Person> persons = new ArrayList<>();
-	private PriorityQueue<TownEvent> events = new PriorityQueue<>(); // TODO: PriorityQueue<E>
+	private PriorityQueue<TownEvent> events = new PriorityQueue<>();
 	private PhaseManager phaseManager = new PhaseManager(this);
 
 	private long playerRoleID;
@@ -830,14 +830,14 @@ public class DiscordGame
 			m.mute(false).queue();
 	}
 
-	public void winTownRole(TownRole role)
+	public void winTownFaction(TownFaction faction)
 	{
-		wonTownRoles.add(role);
+		wonTownRoles.add(faction);
 	}
 
-	public boolean hasTownRoleWon(TownRole role)
+	public boolean hasTownFactionWon(TownFaction faction)
 	{
-		return wonTownRoles.contains(role);
+		return wonTownRoles.contains(faction);
 	}
 
 	public void personDied(Person person, boolean saveForMorning)

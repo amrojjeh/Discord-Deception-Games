@@ -28,7 +28,6 @@ public class Night extends Phase
 	public void end()
 	{
 		getGame().dispatchEvents();
-		getGame().sendMessageToTextChannel("daytime_discussion", "The night has ended");
 	}
 
 	@Override

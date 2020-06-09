@@ -2,15 +2,16 @@ package town;
 
 public enum TownRole
 {
-	SERIAL_KILLER("Serial Killer", "Serial Killer", 1, 1, 3),
-	CIVILIAN("Civilian", "Town", 0, 0, 6),
-	LOOKOUT("Lookout", "Town", 0, 0, 0),
-	MEDIUM("Medium", "Town", 0, 0, -1);
+	SERIAL_KILLER("Serial Killer", TownFaction.SERIAL_KILLER, 1, 1, 3),
+	CIVILIAN("Civilian", TownFaction.TOWN, 0, 0, 6),
+	LOOKOUT("Lookout", TownFaction.TOWN, 0, 0, 0),
+	MEDIUM("Medium", TownFaction.TOWN, 0, 0, -1);
 
-	private final String name, faction;
+	private final String name;
+	private final TownFaction faction;
 	private final int attack, defense, priority;
 
-	TownRole(String name, String faction, int attack, int defense, int priority)
+	TownRole(String name, TownFaction faction, int attack, int defense, int priority)
 	{
 		this.name = name;
 		this.faction = faction;
@@ -24,7 +25,7 @@ public enum TownRole
 		return name;
 	}
 
-	public String getFaction()
+	public TownFaction getFaction()
 	{
 		return faction;
 	}
