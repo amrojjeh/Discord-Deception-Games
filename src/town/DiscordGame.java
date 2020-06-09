@@ -368,11 +368,6 @@ public class DiscordGame
 		.setPosition(2)
 		.addPermissionOverride(playerRoleData, 0, readPermissions() | writePermissions())
 		.addPermissionOverride(deadPlayerRoleData, readPermissions() | writePermissions(), 0);
-
-		g.newChannel(ChannelType.VOICE, "The Dead")
-		.setPosition(1)
-		.addPermissionOverride(playerRoleData, 0, readPermissions() | writePermissions())
-		.addPermissionOverride(deadPlayerRoleData, readPermissions() | writePermissions(), 0);
 	}
 
 	public void addEvent(TownEvent event)
