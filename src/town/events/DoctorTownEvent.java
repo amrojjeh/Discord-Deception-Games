@@ -1,10 +1,7 @@
 package town.events;
 
-import java.util.ArrayList;
-
 import town.DiscordGame;
 import town.persons.Person;
-import town.phases.Night;
 
 public class DoctorTownEvent implements TownEvent
 {
@@ -37,18 +34,22 @@ public class DoctorTownEvent implements TownEvent
 	}
 
 	@Override
-	public void standard(Person person)
-	{
-		if (person.getEvent() != null && getGame().getCurrentPhase() instanceof Night) {
-			target.getType().setDefense(2);
-			//TODO: Take away the person's defense at night
-		}
-	}
-
-	@Override
 	public int getPriority()
 	{
 		return doc.getType().getPriority();
+	}
+
+	@Override
+	public void standard(Person person)
+	{
+		if (target == person) {
+			protect();
+		}
+	}
+
+	public void protect()
+	{
+		target.setDefense(2);
 	}
 
 }

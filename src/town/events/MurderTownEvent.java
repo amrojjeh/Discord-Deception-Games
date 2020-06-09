@@ -2,7 +2,6 @@ package town.events;
 
 import town.DiscordGame;
 import town.persons.Person;
-import town.phases.Night;
 
 public class MurderTownEvent implements TownEvent
 {
@@ -36,8 +35,8 @@ public class MurderTownEvent implements TownEvent
 	@Override
 	public void standard(Person person)
 	{
-		if (person == getMurderer() && getGame().getCurrentPhase() instanceof Night)
-			attackVictim(person);
+		if (person == getMurderer())
+			attackVictim();
 	}
 
 	@Override
@@ -52,20 +51,15 @@ public class MurderTownEvent implements TownEvent
 		return murderer.getType().getPriority();
 	}
 
-	public void attackVictim(Person person)
+	public void attackVictim()
 	{
-<<<<<<< HEAD
 		//POSSIBLE ERROR: Account for doctor
-		if(murderer.getType().getAttack() > victim.getType().getDefense()) {
+		if(murderer.getAttack() > victim.getDefense()) {
 			murderer.sendMessage("You attacked <@" + murderer.getID() + ">");
 			victim.die(String.format("<@%d> was murdered by a serial killer.", victim.getID()));
 		}
 		else {
 			murderer.sendMessage("You attacked <@" + murderer.getID() + ">");
 		}
-=======
-		murderer.sendMessage("You killed <@" + victim.getID() + ">");
-		victim.die(String.format("<@%d> was murdered by a serial killer.", victim.getID()));
->>>>>>> b2ce316c8a22594b4c170feff75b4ad566bb2f0d
 	}
 }

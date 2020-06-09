@@ -5,7 +5,7 @@ import java.util.List;
 import town.DiscordGame;
 import town.TownRole;
 import town.events.TownEvent;
-import town.phases.Day;
+import town.phases.Morning;
 import town.phases.Night;
 import town.phases.Phase;
 
@@ -17,6 +17,8 @@ public abstract class Person
 
 	private long privateChannelID = 0;
 	private int refNum; // This is how players can refer to other players without mentioning them
+	private int tempDefense = -1;
+	private int tempAttack = -1;
 
 	protected boolean alive = true;
 	protected String causeOfDeath = String.format("<@%d> is still alive.", getID());
@@ -125,7 +127,33 @@ public abstract class Person
 
 	public void onPhaseChange(Phase phase)
 	{
-		if (phase instanceof Day) event = null;
+		if (phase instanceof Morning)
+		{
+			event = null;
+			tempDefense = -1;
+		}
+	}
+
+	public int getDefense()
+	{
+		if (tempDefense < 0) return getType().getDefense();
+		return tempDefense;
+	}
+
+	public void setDefense(int val)
+	{
+		tempDefense = val;
+	}
+
+	public int getAttack()
+	{
+		if (tempAttack < 0) return getType().getAttack();
+		return tempAttack;
+	}
+
+	public void setAttack(int val)
+	{
+		tempAttack = val;
 	}
 
 	public abstract String ability(List<Person> list);
