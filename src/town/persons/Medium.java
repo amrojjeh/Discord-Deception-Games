@@ -16,7 +16,7 @@ public class Medium extends Person{
 	public boolean canWin()
 	{
 		// TODO: We can put commonly used victories in a static class
-		return getGame().getPlayers().stream().filter((person) -> person.getType().getFaction().equals("Town") 
+		return getGame().getPlayers().stream().filter((person) -> person.getType().getFaction().equals("Town")
 				&& person.alive).count() == getGame().getPlayers().stream().filter((person) -> person.alive).count();
 	}
 
@@ -48,6 +48,6 @@ public class Medium extends Person{
 	@Override
 	public String getHelp()
 	{
-		return "You can talk to the dead.";
+		return "You can talk to the dead during the night.";
 	}
 }

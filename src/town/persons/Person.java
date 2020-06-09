@@ -4,6 +4,7 @@ import java.util.List;
 
 import town.DiscordGame;
 import town.TownRole;
+import town.events.LookoutTownEvent;
 import town.events.MurderTownEvent;
 import town.events.TownEvent;
 import town.phases.Night;
@@ -19,6 +20,7 @@ public abstract class Person
 
 	protected boolean alive = true;
 	protected String causeOfDeath = String.format("<@%d> is still alive.", getID());
+	protected TownEvent event;
 
 	Person(DiscordGame game, int refNum, long id, TownRole type)
 	{
@@ -101,10 +103,19 @@ public abstract class Person
 
 	public void onMurder(MurderTownEvent event) { event.standard(this); }
 
+	private void onLookoutEvent(LookoutTownEvent event) { event.standard(this); }
+
 	public void onEvent(TownEvent event)
 	{
 		if (event instanceof MurderTownEvent)
 			onMurder((MurderTownEvent)event);
+		if (event instanceof LookoutTownEvent)
+			onLookoutEvent((LookoutTownEvent)event);
+	}
+
+	public TownEvent getEvent()
+	{
+		return event;
 	}
 
 	public void setChannelID(Long id)
@@ -117,9 +128,14 @@ public abstract class Person
 		return causeOfDeath;
 	}
 
-	public abstract String ability(List<Person> list);
+	public String cancel()
+	{
+		if (event == null) return "There's no action to cancel";
+		getGame().removeEvent(event);
+		return "Action canceled";
+	}
 
-	public abstract String cancel();
+	public abstract String ability(List<Person> list);
 
 	public abstract boolean hasWon();
 

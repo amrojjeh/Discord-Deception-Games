@@ -5,14 +5,11 @@ import java.util.List;
 import town.DiscordGame;
 import town.TownRole;
 import town.events.MurderTownEvent;
-import town.events.TownEvent;
 import town.phases.Night;
 
 // A Serial Killer can kill a person each night.
 public class SerialKiller extends Person
 {
-	private TownEvent event;
-
 	public SerialKiller(DiscordGame game, int num, Long id)
 	{
 		super(game, num, id, TownRole.SERIAL_KILLER);
@@ -42,9 +39,9 @@ public class SerialKiller extends Person
 	public String ability(List<Person> references)
 	{
 		if (references.isEmpty())
-			return "There's no person to kill. `tos.kill 1` to kill the first person shown in `tos.party`.";
+			return "There's no person to kill. `!ability 1` to kill the first person shown in `!party`.";
 		if (references.size() > 1)
-			return "Cannot kill more than one person at once. `tos.kill 1` to kill the first person show in `tos.party`.";
+			return "Cannot kill more than one person at once. `!ability 1` to kill the first person show in `!party`.";
 		if (!(getGame().getCurrentPhase() instanceof Night))
 			return "Serial Killers can only kill during the night.";
 
@@ -67,18 +64,10 @@ public class SerialKiller extends Person
 	}
 
 	@Override
-	public String cancel()
-	{
-		if (event == null) return "There's no action to cancel";
-		getGame().removeEvent(event);
-		return "Action canceled";
-	}
-
-	@Override
 	public String getHelp()
 	{
 		return "SERIAL KILLER (SK)\n" +
 				"Serial Killer wins with other serial killers. His goal is to kill anyone who isn't an SK.\n" +
-				"Ability: Can kill one person every night. Ex: `tos.ability 2` kills person number two. Check a person's number with tos.party";
+				"Ability: Can kill one person every night. Ex: `!ability 2` kills person number two. Check a person's number with !party";
 	}
 }

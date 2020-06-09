@@ -16,11 +16,4 @@ public class SerialKillerAssigner extends RoleAssigner
 	{
 		return new SerialKiller(game, refNum, ID);
 	}
-
-	@Override
-	public boolean check()
-	{
-		return true;
-	}
-
 }

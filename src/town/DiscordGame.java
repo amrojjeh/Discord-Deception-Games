@@ -4,8 +4,8 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.PriorityQueue;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -52,7 +52,7 @@ public class DiscordGame
 	private Assigner assigner = Assigner.buildDefault(this);
 	private HashSet<TownRole> wonTownRoles = new HashSet<TownRole>();
 	private ArrayList<Person> persons = new ArrayList<>();
-	private LinkedList<TownEvent> events = new LinkedList<>(); // TODO: PriorityQueue<E>
+	private PriorityQueue<TownEvent> events = new PriorityQueue<>(); // TODO: PriorityQueue<E>
 	private PhaseManager phaseManager = new PhaseManager(this);
 
 	private long playerRoleID;
@@ -378,6 +378,7 @@ public class DiscordGame
 	public void addEvent(TownEvent event)
 	{
 		events.add(event);
+		events.forEach(e -> System.out.println(e.toString()));
 	}
 
 	public void removeEvent(TownEvent event)
@@ -605,6 +606,7 @@ public class DiscordGame
 		for (Person person : persons)
 			person.onEvent(event);
 
+		event.postDispatch();
 		dispatchEvents();
 	}
 

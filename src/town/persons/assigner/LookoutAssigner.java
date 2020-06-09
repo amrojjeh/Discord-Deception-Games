@@ -1,12 +1,12 @@
 package town.persons.assigner;
 
 import town.DiscordGame;
-import town.persons.Civilian;
+import town.persons.Lookout;
 import town.persons.Person;
 
-public class CivilianAssigner extends RoleAssigner
+public class LookoutAssigner extends RoleAssigner
 {
-	public CivilianAssigner(DiscordGame g)
+	public LookoutAssigner(DiscordGame g)
 	{
 		super(g);
 	}
@@ -14,6 +14,6 @@ public class CivilianAssigner extends RoleAssigner
 	@Override
 	public Person getPerson(int ref, long ID)
 	{
-		return new Civilian(game, ref, ID);
+		return new Lookout(game, ref, ID);
 	}
 }

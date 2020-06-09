@@ -40,6 +40,18 @@ public class MurderTownEvent implements TownEvent
 			killVictim(person);
 	}
 
+	@Override
+	public Person getTarget()
+	{
+		return victim;
+	}
+
+	@Override
+	public int getPriority()
+	{
+		return murderer.getType().getPriority();
+	}
+
 	public void killVictim(Person person)
 	{
 		murderer.sendMessage("You killed <@" + murderer.getID() + ">");

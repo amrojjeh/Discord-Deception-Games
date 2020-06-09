@@ -12,7 +12,7 @@ public abstract class RoleAssigner
 		game = g;
 	}
 
-	abstract Person getPerson(int ref, long id);
+	public boolean check() {return true;}
 
-	abstract public boolean check();
+	abstract Person getPerson(int ref, long id);
 }
