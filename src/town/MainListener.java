@@ -11,6 +11,7 @@ import javax.security.auth.login.LoginException;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -46,7 +47,6 @@ public class MainListener extends ListenerAdapter
 			throws InterruptedException
 	{
 		String token;
-		JDA jda;
 		try
 		{
 			token = loadToken();
@@ -62,14 +62,13 @@ public class MainListener extends ListenerAdapter
 
 		try
 		{
-			jda = new JDABuilder(token).addEventListeners(new MainListener()).build();
+			new JDABuilder(token).addEventListeners(new MainListener()).setActivity(Activity.playing("Try pg.help")).build();
 		}
 		catch (LoginException e)
 		{
 			System.out.println("Couldn't login: " + e);
 			return;
 		}
-		jda.awaitReady();
 	}
 
 	@Override
