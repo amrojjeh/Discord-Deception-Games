@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.function.Consumer;
@@ -36,7 +37,6 @@ import town.persons.Person;
 import town.phases.Accusation;
 import town.phases.End;
 import town.phases.Judgment;
-import town.phases.Night;
 import town.phases.Phase;
 import town.phases.PhaseManager;
 import town.phases.Trial;
@@ -47,19 +47,19 @@ public class DiscordGame
 	private long guildID;
 	private long gameGuildID;
 	private long partyLeaderID;
+	private PartyGame gameMode;
 
 	// Important channels (Name : id)
 	private HashMap<String, Long> channels = new HashMap<>();
 
 	private HashSet<TownFaction> wonTownRoles = new HashSet<TownFaction>();
 	private ArrayList<Person> persons = new ArrayList<>();
+	private LinkedList<Person> savedForMorning = new LinkedList<>();
 	private PriorityQueue<TownEvent> events = new PriorityQueue<>();
 	private PhaseManager phaseManager = new PhaseManager(this);
-	private PartyGame gameMode;
+	private boolean noMinimumPlayers = false;
 
 	private long playerRoleID;
-	private long botRoleID;
-	private long aliveRoleID;
 	private long deadRoleID;
 
 	boolean started = false;
@@ -92,6 +92,8 @@ public class DiscordGame
 			joinGame(message.getMember().getIdLong(), message.getChannel());
 		else if (!isMessageFromGameGuild(message) && lowerCaseMessage.contentEquals(prefix + "leave"))
 			leaveGameCommand(message.getMember().getIdLong(), message.getChannel());
+		else if (!isMessageFromGameGuild(message) && lowerCaseMessage.startsWith(prefix + "nomin"))
+			noMinCommand(message);
 		else if (started && isMessageFromGameGuild(message) && lowerCaseMessage.startsWith(prefix + "ability"))
 			activateAbilityCommand(message);
 		else if (started && isMessageFromGameGuild(message) && lowerCaseMessage.startsWith(prefix + "cancel"))
@@ -174,6 +176,35 @@ public class DiscordGame
 		return references;
 	}
 
+	private void noMinCommand(Message message)
+	{
+		if (message.getMember().getIdLong() != partyLeaderID)
+		{
+			message.getChannel().sendMessage(String.format("Only party leader (<@%d>) can configure the game!", partyLeaderID)).queue();
+			return;
+		}
+
+		String syntax = "Syntax is: tos.nomin [1|0]";
+		String words[] = message.getContentRaw().split(" ");
+		int activator = 0;
+		if (words.length != 2) message.getChannel().sendMessage(syntax).queue();
+		else
+		{
+			try
+			{
+				activator = Integer.parseInt(words[1]);
+			}
+			catch (NumberFormatException e)
+			{
+				message.getChannel().sendMessage(syntax).queue();
+				return;
+			}
+			noMinimumPlayers = activator == 1;
+			if (noMinimumPlayers) message.getChannel().sendMessage("No minimum players requried anymore.").queue();
+			else message.getChannel().sendMessage("Default minimum players required.").queue();
+		}
+	}
+
 	private void startGameCommand(Message message)
 	{
 		if (started)
@@ -182,7 +213,7 @@ public class DiscordGame
 			message.getChannel().sendMessage("Not enough players to start a server!").queue();
 		else if (message.getMember().getIdLong() != partyLeaderID)
 			message.getChannel().sendMessage(String.format("Only party leader (<@%d>) can start the game!", partyLeaderID)).queue();
-		else if (getPlayers().size() < gameMode.getMinimum())
+		else if (!noMinimumPlayers && getPlayers().size() < gameMode.getMinimum())
 			message.getChannel().sendMessage("Not enough players to play " + gameMode.getName() + "!").queue();
 		else
 		{
@@ -277,9 +308,9 @@ public class DiscordGame
 		}
 
 		String description = "";
-		String format = "%d. <@%d>\n";
+		String format = "%d. <@%d> ";
 		for (Person p : persons)
-			description += String.format(format, p.getNum(), p.getID());
+			description += String.format(format, p.getNum(), p.getID()) + (p.isDisconnected() ? "(d)\n" : "\n");
 		MessageEmbed embed = new EmbedBuilder().setColor(Color.YELLOW).setTitle("Party members").setDescription(description).build();
 		channelUsed.sendMessage(embed).queue();
 	}
@@ -413,7 +444,7 @@ public class DiscordGame
 		getGameGuild().addRoleToMember(jda.getSelfUser().getIdLong(), guild.getRolesByName("Bot", false).get(0)).queue();
 
 		playerRoleID = guild.getRolesByName("Player", false).get(0).getIdLong();
-		botRoleID = guild.getRolesByName("Bot", false).get(0).getIdLong();
+		guild.getRolesByName("Bot", false).get(0).getIdLong();
 		deadRoleID = guild.getRolesByName("Dead", false).get(0).getIdLong();
 
 		for (Person p : getPlayers())
@@ -890,15 +921,32 @@ public class DiscordGame
 
 	public void personDied(Person person, boolean saveForMorning)
 	{
-		getGameGuild()
-		.addRoleToMember(person.getID(), getRole(deadRoleID))
-		.flatMap((rest) -> getGameGuild().removeRoleFromMember(person.getID(), getRole(playerRoleID)))
-		.queue();
+		if (!person.isDisconnected())
+			getGameGuild()
+			.addRoleToMember(person.getID(), getRole(deadRoleID))
+			.flatMap((rest) -> getGameGuild().removeRoleFromMember(person.getID(), getRole(playerRoleID)))
+			.queue();
 
-		if (saveForMorning && getCurrentPhase() instanceof Night)
-		{
-			Night night = (Night)getCurrentPhase();
-			night.addDeath(person);
-		}
+		if (saveForMorning)
+			savedForMorning.add(person);
+	}
+
+	public Person getDeathForMorning()
+	{
+		if (savedForMorning.isEmpty())
+			return null;
+		return savedForMorning.pop();
+	}
+
+	public Person peekDeathForMorning()
+	{
+		return savedForMorning.peek();
+	}
+
+	public void gameGuildPersonLeave(Member member)
+	{
+		Person person = getPerson(member);
+		person.disconnect();
+		person.die(String.format("<@%d> (%d) committed suicide.", person.getID(), person.getNum()), true);
 	}
 }

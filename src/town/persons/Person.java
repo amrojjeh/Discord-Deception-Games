@@ -19,8 +19,9 @@ public abstract class Person
 	private int refNum; // This is how players can refer to other players without mentioning them
 	private int tempDefense = -1;
 	private int tempAttack = -1;
-	private TownRole type;
 
+	protected TownRole type;
+	protected boolean disconnected = false;
 	protected boolean alive = true;
 	protected String causeOfDeath = String.format("<@%d> is still alive.", getID());
 	protected TownEvent event;
@@ -103,12 +104,17 @@ public abstract class Person
 
 	public void die(String reason)
 	{
+		if (getGame().getCurrentPhase() instanceof Night)
+			die(reason, true);
+		else
+			die(reason, false);
+	}
+
+	public void die(String reason, boolean saveForMorning)
+	{
 		if (!alive) return;
 		if (!reason.isEmpty()) causeOfDeath = reason;
-		if (getGame().getCurrentPhase() instanceof Night)
-			getGame().personDied(this, true);
-		else
-			getGame().personDied(this, false);
+		getGame().personDied(this, saveForMorning);
 		alive = false;
 	}
 
@@ -170,6 +176,16 @@ public abstract class Person
 		tempAttack = val;
 	}
 
+	public boolean isDisconnected()
+	{
+		return disconnected;
+	}
+
+	public void disconnect()
+	{
+		disconnected = true;
+	}
+
 	public abstract String ability(List<Person> list);
 
 	public abstract boolean hasWon();
@@ -179,5 +195,4 @@ public abstract class Person
 	public abstract void win();
 
 	public abstract String getHelp();
-
 }

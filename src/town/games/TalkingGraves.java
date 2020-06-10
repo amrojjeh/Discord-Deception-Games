@@ -13,8 +13,7 @@ public class TalkingGraves
 	{
 		int totalPlayers = game.getPlayers().size();
 		Assigner assigner;
-		if (totalPlayers < PartyGame.TALKING_GRAVES.getMinimum()) throw new IllegalArgumentException("Not enough players to play Talking Graves");
-		else if (totalPlayers <= 5) assigner = lowAmount(game, totalPlayers);
+		if (totalPlayers <= 5) assigner = lowAmount(game, totalPlayers);
 		else if (totalPlayers <= 8) assigner = medAmount(game, totalPlayers);
 		else assigner = random(game);
 
