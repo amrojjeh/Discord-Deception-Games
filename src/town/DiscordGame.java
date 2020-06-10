@@ -351,21 +351,6 @@ public class DiscordGame
 		message.getChannel().sendMessage(j.innocent(user)).queue();
 	}
 
-	private long readPermissions()
-	{
-		return Permission.getRaw(Permission.MESSAGE_READ, Permission.MESSAGE_HISTORY, Permission.VIEW_CHANNEL);
-	}
-
-	private long writePermissions()
-	{
-		return Permission.getRaw(Permission.MESSAGE_WRITE, Permission.MESSAGE_ADD_REACTION);
-	}
-
-	private long connectPermissions()
-	{
-		return Permission.getRaw(Permission.VOICE_CONNECT, Permission.VIEW_CHANNEL);
-	}
-
 	public void createNewChannels(GuildAction g)
 	{
 		// this channel used for general game updates
@@ -379,36 +364,23 @@ public class DiscordGame
 
 		//		players discussing during the day
 		g.newChannel(ChannelType.TEXT, "daytime_discussion")
-		.addPermissionOverride(deadPlayerRoleData, readPermissions(), writePermissions())
+		.addPermissionOverride(deadPlayerRoleData, QP.readPermissions(), QP.writePermissions())
 		.setPosition(0);
 
 		for (Person p : getPlayers())
 		{
 			g.newChannel(ChannelType.TEXT, "private")
 			.setPosition(1)
-			.addPermissionOverride(playerRoleData, 0, readPermissions() | writePermissions())
-			.addPermissionOverride(deadPlayerRoleData, 0, readPermissions() | writePermissions())
+			.addPermissionOverride(playerRoleData, 0, QP.readPermissions() | QP.writePermissions())
+			.addPermissionOverride(deadPlayerRoleData, 0, QP.readPermissions() | QP.writePermissions())
 			.setTopic(p.getRealName()); // This will be used as an identifier
 		}
-
-		//		textChannels.put("the_hideout", "");
-		//		textChannels.put("the_underground", "");
-		// TODO: Do jailor talk in #private
-		//		textChannels.put("jailor", "");
-		//the "jail" where the bot transfers the jailor's text anonymously, and the jailed player can respond
-		//		textChannels.put("jail", "");
-
-		// mafia private chat at night
-		//		voiceChannels.put("Mafia", "");
-		// vampire private chat at night
-		//		voiceChannels.put("Vampires", "");
-
 
 		//for dead players
 		g.newChannel(ChannelType.TEXT, "the_afterlife")
 		.setPosition(2)
-		.addPermissionOverride(playerRoleData, 0, readPermissions() | writePermissions())
-		.addPermissionOverride(deadPlayerRoleData, readPermissions() | writePermissions(), 0);
+		.addPermissionOverride(playerRoleData, 0, QP.readPermissions() | QP.writePermissions())
+		.addPermissionOverride(deadPlayerRoleData, QP.readPermissions() | QP.writePermissions(), 0);
 	}
 
 	public void addEvent(TownEvent event)
@@ -752,7 +724,7 @@ public class DiscordGame
 			{
 				getGameGuild().addRoleToMember(member, getRole(playerRoleID)).queue();
 				TextChannel textChannel = getTextChannel(p.getChannelID());
-				textChannel.putPermissionOverride(getMemberFromGame(p)).setAllow(readPermissions() | writePermissions()).queue();
+				textChannel.putPermissionOverride(getMemberFromGame(p)).setAllow(QP.readPermissions() | QP.writePermissions()).queue();
 				shouldKick = false;
 				break;
 			}
@@ -798,7 +770,7 @@ public class DiscordGame
 		Member member = getMemberFromGame(p);
 		if (member == null) throw new IllegalArgumentException("Invalid person.");
 		setChannelVisibility(channelName, true, false,
-				perm -> getGuildChannel(channelName).putPermissionOverride(member).setAllow(readPermissions() | writePermissions()));
+				perm -> getGuildChannel(channelName).putPermissionOverride(member).setAllow(QP.readPermissions() | QP.writePermissions()));
 	}
 
 	public void setChannelVisibility(Person p, String channelName, boolean read, boolean write)
@@ -825,18 +797,18 @@ public class DiscordGame
 		if (channel.getType().equals(ChannelType.VOICE))
 		{
 			if (read)
-				action = channel.putPermissionOverride(holder).reset().setAllow(connectPermissions());
+				action = channel.putPermissionOverride(holder).reset().setAllow(QP.connectPermissions());
 			else
-				action = channel.putPermissionOverride(holder).reset().setDeny(connectPermissions());
+				action = channel.putPermissionOverride(holder).reset().setDeny(QP.connectPermissions());
 		}
 		else if (channel.getType().equals(ChannelType.TEXT))
 		{
 			if (read && !write)
-				action = channel.putPermissionOverride(holder).reset().setPermissions(readPermissions(), writePermissions());
+				action = channel.putPermissionOverride(holder).reset().setPermissions(QP.readPermissions(), QP.writePermissions());
 			else if (read && write)
-				action = channel.putPermissionOverride(holder).reset().setAllow(readPermissions() | writePermissions());
+				action = channel.putPermissionOverride(holder).reset().setAllow(QP.readPermissions() | QP.writePermissions());
 			else
-				action = channel.putPermissionOverride(holder).reset().setDeny(readPermissions() | writePermissions());
+				action = channel.putPermissionOverride(holder).reset().setDeny(QP.readPermissions() | QP.writePermissions());
 		}
 		if (action != null && func != null)
 			action.flatMap(func).queue();
@@ -948,5 +920,24 @@ public class DiscordGame
 		Person person = getPerson(member);
 		person.disconnect();
 		person.die(String.format("<@%d> (%d) committed suicide.", person.getID(), person.getNum()), true);
+	}
+
+	// Quick Permissions
+	private static class QP
+	{
+		public static long readPermissions()
+		{
+			return Permission.getRaw(Permission.MESSAGE_READ, Permission.MESSAGE_HISTORY, Permission.VIEW_CHANNEL);
+		}
+
+		public static long writePermissions()
+		{
+			return Permission.getRaw(Permission.MESSAGE_WRITE, Permission.MESSAGE_ADD_REACTION);
+		}
+
+		public static long connectPermissions()
+		{
+			return Permission.getRaw(Permission.VOICE_CONNECT, Permission.VIEW_CHANNEL);
+		}
 	}
 }
