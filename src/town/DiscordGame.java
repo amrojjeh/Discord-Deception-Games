@@ -473,11 +473,11 @@ public class DiscordGame
 	public boolean transfer()
 	{
 		phaseManager.end();
-		Member partyLeader = getMemberFromGame(partyLeaderID);
-		// TODO: Make it transfer to the first found member instead of just to party leader
-		if (partyLeader != null)
+		for (Person p : getPlayers())
 		{
-			getGameGuild().transferOwnership(partyLeader).reason("The game has ended").queue();
+			Member member = getMemberFromGame(p);
+			if (member == null) continue;
+			getGameGuild().transferOwnership(member).reason("The game has ended").queue();
 			return true;
 		}
 		return false;
