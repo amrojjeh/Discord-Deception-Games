@@ -828,7 +828,15 @@ public class DiscordGame
 	{
 		VoiceChannel channel = getVoiceChannel(channelName);
 		if (channel == null) throw new IllegalArgumentException("Can't pass a non-voice channel to restoreTalking");
-		channel.getMembers().forEach(m -> {m.mute(false).queue();} );
+		List<Member> members = channel.getMembers();
+		if (members.isEmpty()) return;
+		RestAction<?> action = members.get(0).mute(false);
+		for (int x = 1; x < members.size(); ++x)
+		{
+			final int y = x;
+			action.flatMap(muteAction -> members.get(y).mute(false));
+		}
+		action.queue();
 	}
 
 	public void gameGuildVoiceJoin(Member m, VoiceChannel channel)
