@@ -52,7 +52,8 @@ public class TalkingGraves
 		assigner.addRole(new SerialKillerAssigner(game, 1));
 		assigner.addRole(new LookoutAssigner(game, 1));
 		assigner.addRole(new MediumAssigner(game, 1));
-		assigner.addRole(new CivilianAssigner(game, totalPlayers - 3));
+		int civAmount = totalPlayers > 3 ? totalPlayers - 3 : 1;
+		assigner.addRole(new CivilianAssigner(game, civAmount));
 		return assigner;
 	}
 }
