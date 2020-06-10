@@ -53,13 +53,8 @@ public class MurderTownEvent implements TownEvent
 
 	public void attackVictim()
 	{
-		//POSSIBLE ERROR: Account for doctor
-		if(murderer.getAttack() > victim.getDefense()) {
-			murderer.sendMessage("You attacked <@" + murderer.getID() + ">");
-			victim.die(String.format("<@%d> was murdered by a serial killer.", victim.getID()));
-		}
-		else {
-			murderer.sendMessage("You attacked <@" + murderer.getID() + ">");
-		}
+		murderer.sendMessage("You attacked <@" + murderer.getID() + ">");
+		if(murderer.getAttack() > victim.getDefense())
+			victim.die(String.format("<@%d> (%d) was murdered by a serial killer.", victim.getID(), victim.getNum()));
 	}
 }
