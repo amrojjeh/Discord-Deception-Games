@@ -401,7 +401,7 @@ public class DiscordGame
 		// TODO: Add an icon to the server
 		gameMode.build(this);
 
-		GuildAction ga = jda.createGuild("Town of Salem");
+		GuildAction ga = jda.createGuild(gameMode.getName());
 		createNewChannels(ga);
 		ga.newRole().setName("" + guildID);
 		ga.queue();
