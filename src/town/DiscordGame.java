@@ -731,7 +731,15 @@ public class DiscordGame
 
 	public void discconectEveryoneFromVC(VoiceChannel channel)
 	{
-		channel.getMembers().forEach(p -> p.getGuild().kickVoiceMember(p).queue());
+		List<Member> members = channel.getMembers();
+		if (members.isEmpty()) return;
+		RestAction<?> action = members.get(0).getGuild().kickVoiceMember(members.get(0));
+		for (int x = 1; x < members.size(); ++x)
+		{
+			final int y = x;
+			action.flatMap(kickAction -> members.get(y).getGuild().kickVoiceMember(members.get(y)));
+		}
+		action.queue();
 	}
 
 	// Write doesn't matter if we're setting a voice channel
