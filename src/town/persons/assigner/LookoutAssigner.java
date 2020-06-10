@@ -11,9 +11,15 @@ public class LookoutAssigner extends RoleAssigner
 		super(g);
 	}
 
+	public LookoutAssigner(DiscordGame g, int max)
+	{
+		super(g, max);
+	}
+
 	@Override
 	public Person getPerson(int ref, long ID)
 	{
+		++amount;
 		return new Lookout(game, ref, ID);
 	}
 }

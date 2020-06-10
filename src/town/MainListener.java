@@ -235,7 +235,7 @@ public class MainListener extends ListenerAdapter
 		else
 		{
 			DiscordGame game = new DiscordGame(jda, guildID, partyLeader.getIdLong());
-			channelUsed.sendMessage("Party started").queue();
+			channelUsed.sendMessage("Party started with game mode **Talking Graves**").queue();
 			game.joinGame(partyLeader.getIdLong(), channelUsed);
 			parties.put(guildID, game);
 		}

@@ -11,9 +11,15 @@ public class SerialKillerAssigner extends RoleAssigner
 		super(g);
 	}
 
+	public SerialKillerAssigner(DiscordGame g, int max)
+	{
+		super(g, max);
+	}
+
 	@Override
 	public Person getPerson(int refNum, long ID)
 	{
+		++amount;
 		return new SerialKiller(game, refNum, ID);
 	}
 }

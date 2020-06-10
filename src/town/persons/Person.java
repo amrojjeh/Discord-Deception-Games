@@ -13,17 +13,26 @@ public abstract class Person
 {
 	private final long ID; // Used to identify each person. For Discord, it's a snowflake
 	private final DiscordGame game; // Should be put into its own interface to seperate the game and discord
-	private final TownRole type;
+	private final String realName;
 
 	private long privateChannelID = 0;
 	private int refNum; // This is how players can refer to other players without mentioning them
 	private int tempDefense = -1;
 	private int tempAttack = -1;
+	private TownRole type;
 
 	protected boolean alive = true;
 	protected String causeOfDeath = String.format("<@%d> is still alive.", getID());
 	protected TownEvent event;
-	String realName;
+
+	// In case the role hasn't been yet figured out
+	Person(DiscordGame game, int refNum, long id)
+	{
+		this.game = game;
+		ID = id;
+		this.refNum = refNum;
+		realName = game.getUser(this).getName();
+	}
 
 	Person(DiscordGame game, int refNum, long id, TownRole type)
 	{
@@ -62,6 +71,11 @@ public abstract class Person
 	public TownRole getType()
 	{
 		return type;
+	}
+
+	public void setType(TownRole role)
+	{
+		type = role;
 	}
 
 	public boolean isAlive()

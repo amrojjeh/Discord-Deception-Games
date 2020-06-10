@@ -30,8 +30,9 @@ import net.dv8tion.jda.api.requests.restaction.GuildAction;
 import net.dv8tion.jda.api.requests.restaction.GuildAction.RoleData;
 import net.dv8tion.jda.api.requests.restaction.PermissionOverrideAction;
 import town.events.TownEvent;
+import town.games.PartyGame;
+import town.persons.LobbyPerson;
 import town.persons.Person;
-import town.persons.assigner.Assigner;
 import town.phases.Accusation;
 import town.phases.End;
 import town.phases.Judgment;
@@ -49,11 +50,12 @@ public class DiscordGame
 
 	// Important channels (Name : id)
 	private HashMap<String, Long> channels = new HashMap<>();
-	private Assigner assigner = Assigner.buildDefault(this);
+
 	private HashSet<TownFaction> wonTownRoles = new HashSet<TownFaction>();
 	private ArrayList<Person> persons = new ArrayList<>();
 	private PriorityQueue<TownEvent> events = new PriorityQueue<>();
 	private PhaseManager phaseManager = new PhaseManager(this);
+	private PartyGame gameMode;
 
 	private long playerRoleID;
 	private long botRoleID;
@@ -68,6 +70,7 @@ public class DiscordGame
 		this.jda = jda;
 		guildID = guildId;
 		partyLeaderID = partyLeaderId;
+		gameMode = PartyGame.TALKING_GRAVES;
 	}
 
 	public void processMessage(Message message)
@@ -175,11 +178,12 @@ public class DiscordGame
 	{
 		if (started)
 			message.getChannel().sendMessage("Game is already running!").queue();
-		// TODO: 5 people min.
 		else if (persons.isEmpty())
 			message.getChannel().sendMessage("Not enough players to start a server!").queue();
 		else if (message.getMember().getIdLong() != partyLeaderID)
 			message.getChannel().sendMessage(String.format("Only party leader (<@%d>) can start the game!", partyLeaderID)).queue();
+		else if (getPlayers().size() < gameMode.getMinimum())
+			message.getChannel().sendMessage("Not enough players to play " + gameMode.getName() + "!").queue();
 		else
 		{
 			message.getChannel().sendMessage("Game has started! Creating server...").queue();
@@ -386,6 +390,7 @@ public class DiscordGame
 		started = true;
 
 		// TODO: Add an icon to the server
+		gameMode.build(this);
 
 		GuildAction ga = jda.createGuild("Town of Salem");
 		createNewChannels(ga);
@@ -404,6 +409,12 @@ public class DiscordGame
 		playerRoleID = guild.getRolesByName("Player", false).get(0).getIdLong();
 		botRoleID = guild.getRolesByName("Bot", false).get(0).getIdLong();
 		deadRoleID = guild.getRolesByName("Dead", false).get(0).getIdLong();
+
+		for (Person p : getPlayers())
+		{
+			p.sendMessage("Your role is " + p.getType().getName());
+			p.sendMessage(p.getHelp());
+		}
 	}
 
 	public Member getMemberFromGame(Person person)
@@ -479,7 +490,7 @@ public class DiscordGame
 			return;
 		}
 
-		persons.add(assigner.generatePerson(persons.size() + 1, id));
+		persons.add(new LobbyPerson(this, persons.size() + 1, id));
 		String message = String.format("<@%d> joined the lobby", id);
 		channelUsed.sendMessage(message).queue();
 	}
@@ -705,8 +716,6 @@ public class DiscordGame
 				getGameGuild().addRoleToMember(member, getRole(playerRoleID)).queue();
 				TextChannel textChannel = getTextChannel(p.getChannelID());
 				textChannel.putPermissionOverride(getMemberFromGame(p)).setAllow(readPermissions() | writePermissions()).queue();
-				p.sendMessage("Your role is " + p.getType().getName());
-				p.sendMessage(p.getHelp());
 				shouldKick = false;
 				break;
 			}
@@ -859,9 +868,11 @@ public class DiscordGame
 
 	public void personDied(Person person, boolean saveForMorning)
 	{
-		// TODO: Optimize
-		getGameGuild().addRoleToMember(person.getID(), getRole(deadRoleID)).queue();
-		getGameGuild().removeRoleFromMember(person.getID(), getRole(playerRoleID)).queue();
+		getGameGuild()
+		.addRoleToMember(person.getID(), getRole(deadRoleID))
+		.flatMap((rest) -> getGameGuild().removeRoleFromMember(person.getID(), getRole(playerRoleID)))
+		.queue();
+
 		if (saveForMorning && getCurrentPhase() instanceof Night)
 		{
 			Night night = (Night)getCurrentPhase();

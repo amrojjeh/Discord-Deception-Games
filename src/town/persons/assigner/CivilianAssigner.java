@@ -11,9 +11,15 @@ public class CivilianAssigner extends RoleAssigner
 		super(g);
 	}
 
+	public CivilianAssigner(DiscordGame g, int maxAmount)
+	{
+		super(g, maxAmount);
+	}
+
 	@Override
 	public Person getPerson(int ref, long ID)
 	{
+		amount++;
 		return new Civilian(game, ref, ID);
 	}
 }
