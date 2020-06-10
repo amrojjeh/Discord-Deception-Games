@@ -51,7 +51,7 @@ public class DiscordGame
 
 	// Important channels (Name : id)
 	private HashMap<String, Long> channels = new HashMap<>();
-
+	private String prefix = "pg.";
 	private HashSet<TownFaction> wonTownRoles = new HashSet<TownFaction>();
 	private ArrayList<Person> persons = new ArrayList<>();
 	private LinkedList<Person> savedForMorning = new LinkedList<>();
@@ -75,7 +75,7 @@ public class DiscordGame
 
 	public void processMessage(Message message)
 	{
-		processMessage("tos.", message);
+		processMessage(prefix, message);
 	}
 
 	public void processMessage(String prefix, Message message)
@@ -184,7 +184,7 @@ public class DiscordGame
 			return;
 		}
 
-		String syntax = "Syntax is: tos.nomin [1|0]";
+		String syntax = "Syntax is: " + prefix + "nomin [1|0]";
 		String words[] = message.getContentRaw().split(" ");
 		int activator = 0;
 		if (words.length != 2) message.getChannel().sendMessage(syntax).queue();
@@ -275,13 +275,13 @@ public class DiscordGame
 
 		if (referenced.isEmpty())
 		{
-			message.getChannel().sendMessage("You have to vote one person! Ex: `tos.vote 2`").queue();
+			message.getChannel().sendMessage("You have to vote one person! Ex: `" + prefix + "vote 2`").queue();
 			return;
 		}
 
 		if (referenced.size() > 1)
 		{
-			message.getChannel().sendMessage("You can only vote one person! Ex: `tos.vote 2`").queue();
+			message.getChannel().sendMessage("You can only vote one person! Ex: `" + prefix + "vote 2`").queue();
 			return;
 		}
 
@@ -494,7 +494,7 @@ public class DiscordGame
 
 		if (getPerson(id) != null)
 		{
-			String message = String.format("<@%d> already joined! Check party members with tos.party", id);
+			String message = String.format("<@%d> already joined! Check party members with " + prefix + "party", id);
 			channelUsed.sendMessage(message).queue();
 			return;
 		}
@@ -522,7 +522,7 @@ public class DiscordGame
 
 		if (id == partyLeaderID)
 		{
-			String message = String.format("Party leader can't leave the party. `tos.endParty` instead <@%d>", id);
+			String message = String.format("Party leader can't leave the party. `" + prefix + "endParty` instead <@%d>", id);
 			channelUsed.sendMessage(message).queue();
 			return;
 		}

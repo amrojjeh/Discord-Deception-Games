@@ -16,9 +16,9 @@ Here are the roles that we currently support:
 - Lookout
 
 We're done working on getting the intial setup correctly. Here's how the game starts:
-- Anyone can start a lobby with `tos.startParty`
-- Anyone can join with `tos.join` (party host automatically joins)
-- The party leader is then able to start the game with `tos.startGame`
+- Anyone can start a lobby with `pg.startParty`
+- Anyone can join with `pg.join` (party host automatically joins)
+- The party leader is then able to start the game with `pg.startGame`
 - The bot will create a new server with the appropriate channels
 - Game would commence once all the players join
 - Once the game ends, the server gets transferred to the party owner.

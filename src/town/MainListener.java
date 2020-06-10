@@ -37,7 +37,7 @@ public class MainListener extends ListenerAdapter
 
 	public MainListener()
 	{
-		prefix = "tos.";
+		prefix = "pg.";
 		parties = new HashMap<>();
 		games = new HashMap<>();
 	}
@@ -201,7 +201,7 @@ public class MainListener extends ListenerAdapter
 			else if (game != null)
 				game.processMessage(e.getMessage());
 			else
-				e.getChannel().sendMessage("Party hasn't been created yet. Do so with tos.startParty").queue();
+				e.getChannel().sendMessage("Party hasn't been created yet. Do so with " + prefix + "startParty").queue();
 		}
 		else if (lowerCaseMessage.startsWith("!"))
 		{
