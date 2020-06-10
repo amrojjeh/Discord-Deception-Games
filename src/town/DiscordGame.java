@@ -95,7 +95,7 @@ public class DiscordGame
 		else if (started && isMessageFromGameGuild(message) && lowerCaseMessage.startsWith(prefix + "ability"))
 			activateAbilityCommand(message);
 		else if (started && isMessageFromGameGuild(message) && lowerCaseMessage.startsWith(prefix + "cancel"))
-			cancelAbilityCommand(message);
+			cancelCommand(message);
 		else if (started && isMessageFromGameGuild(message) && lowerCaseMessage.contentEquals(prefix + "rolehelp"))
 			roleHelpCommand(message);
 		else if (started && isMessageFromGameGuild(message) && lowerCaseMessage.startsWith(prefix + "vote"))
@@ -197,7 +197,7 @@ public class DiscordGame
 		user.sendMessage(user.ability(getPersonsFromMessage(message)));
 	}
 
-	private void cancelAbilityCommand(Message message)
+	private void cancelCommand(Message message)
 	{
 		Person user = getPerson(message.getMember());
 		Phase currentPhase = getCurrentPhase();
@@ -210,6 +210,8 @@ public class DiscordGame
 
 		if (currentPhase instanceof Judgment)
 		{
+			if (!user.isAlive()) message.getChannel().sendMessage(String.format("Can't vote if you're dead <@%d>.", user.getID())).queue();
+
 			Judgment j = (Judgment)currentPhase;
 			message.getChannel().sendMessage(j.abstain(user)).queue();
 			return;
@@ -294,6 +296,8 @@ public class DiscordGame
 			return;
 		}
 
+		if (!user.isAlive()) message.getChannel().sendMessage(String.format("Can't vote if you're dead <@%d>.", user.getID())).queue();
+
 		Judgment j = (Judgment)currentPhase;
 		message.getChannel().sendMessage(j.guilty(user)).queue();
 	}
@@ -309,6 +313,8 @@ public class DiscordGame
 			message.getChannel().sendMessage(msg).queue();
 			return;
 		}
+
+		if (!user.isAlive()) message.getChannel().sendMessage(String.format("Can't vote if you're dead <@%d>.", user.getID())).queue();
 
 		Judgment j = (Judgment)currentPhase;
 		message.getChannel().sendMessage(j.innocent(user)).queue();
