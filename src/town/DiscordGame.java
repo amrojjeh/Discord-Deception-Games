@@ -434,7 +434,6 @@ public class DiscordGame
 		guild.getChannels().get(0).createInvite().queue((invite) -> persons.forEach((person) -> sendDMTo(person, invite.getUrl())));
 		gameGuildID = guild.getIdLong();
 		guild.getChannels(true).forEach((channel) -> assignChannel(channel));
-		phaseManager.start();
 		getGameGuild().addRoleToMember(jda.getSelfUser().getIdLong(), guild.getRolesByName("Bot", false).get(0)).queue();
 
 		playerRoleID = guild.getRolesByName("Player", false).get(0).getIdLong();
@@ -446,6 +445,8 @@ public class DiscordGame
 			p.sendMessage("Your role is " + p.getType().getName());
 			p.sendMessage(p.getHelp());
 		}
+
+		sendMessageToTextChannel("daytime_discussion", "Waiting for players...");
 	}
 
 	public Member getMemberFromGame(Person person)
@@ -741,9 +742,6 @@ public class DiscordGame
 
 	public void gameGuildJoin(Member member)
 	{
-		// TODO: Otherwise boot? Other option is to make him spectator
-		// For now we'll boot.
-
 		// Check if member was in the lobby
 		boolean shouldKick = true;
 		for (Person p : getPlayers())
@@ -753,6 +751,8 @@ public class DiscordGame
 				TextChannel textChannel = getTextChannel(p.getChannelID());
 				textChannel.putPermissionOverride(getMemberFromGame(p)).setAllow(QP.readPermissions() | QP.writePermissions()).queue();
 				shouldKick = false;
+				if (getPlayers().size() == getGameGuild().getMemberCount() - 1)
+					phaseManager.start();
 				break;
 			}
 

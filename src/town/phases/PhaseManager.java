@@ -27,7 +27,7 @@ public class PhaseManager
 	//starts the phase cycle, initially with a new day.
 	public void start()
 	{
-		start(new Initial(this));
+		start(new FirstDay(this));
 	}
 
 	public void start(Phase startingPhase)
