@@ -15,6 +15,7 @@ public class Day extends Phase
 	@Override
 	public void start()
 	{
+		getGame().sendMessageToTextChannel("daytime_discussion", "Day " + getGame().getDayNum() + " started");
 		showDayChannels();
 		getGame().getPlayers().forEach((person) -> checkVictory(person));
 		phaseManager.setWarningInSeconds(5);
@@ -22,7 +23,6 @@ public class Day extends Phase
 
 	private void showDayChannels()
 	{
-		getGame().sendMessageToTextChannel("daytime_discussion", "Day started");
 		getGame().setChannelVisibility("daytime_discussion", true, true);
 		getGame().setChannelVisibility("Daytime", true, true);
 	}

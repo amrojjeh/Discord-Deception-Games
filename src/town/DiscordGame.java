@@ -58,6 +58,7 @@ public class DiscordGame
 	private PriorityQueue<TownEvent> events = new PriorityQueue<>();
 	private PhaseManager phaseManager = new PhaseManager(this);
 	private boolean noMinimumPlayers = false;
+	private int dayNum = 1;
 
 	private long playerRoleID;
 	private long deadRoleID;
@@ -180,7 +181,6 @@ public class DiscordGame
 
 	private void getPossibleTargetsCommand(Message message)
 	{
-		MessageChannel channelUsed = message.getChannel();
 		Person user = getPerson(message.getMember());
 		List<Person> targets = user.getPossibleTargets();
 
@@ -947,6 +947,16 @@ public class DiscordGame
 		Person person = getPerson(member);
 		person.disconnect();
 		person.die(String.format("<@%d> (%d) committed suicide.", person.getID(), person.getNum()), true);
+	}
+
+	public int getDayNum()
+	{
+		return dayNum;
+	}
+
+	public void nextDayStarted()
+	{
+		dayNum++;
 	}
 
 	// Quick Permissions
