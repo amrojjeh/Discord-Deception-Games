@@ -1,33 +1,29 @@
 # Town of Salem Inspired Discord bot
-We *were* planning to try to make an exact copy of Town of Salem, however, we've noticed that there are features that we can improve upon (or some roles be removed).
-For one, most of the time in Town of Salem, it's not fun being a dead player, especially when you die on the first night.
-There's also not much point to a medium when you could directly DM each other.
-Some mechanics also just don't work well on Discord, for instance the day phase.
-Having a 50 second time limit is going to be nightmarish for large groups in voice chat,
-
-There will probably be more instances were we tweak the game design to fit our needs, and as such,
-I don't think it would be fair to call this project a Town of Salem project,as we also want to avoid copying the name.
-That being said, this wouldn't have started if it wasn't for Town of Salem, credit is where it's due.
-Also a new name is currently pending.
-
-Here are the roles that we currently support:
-- Serial Killer
-- Civilian, a temporary townee
+This is a Town of Salem inspired discord bot. This will become a collection of party games that fundamentally have more or less the same rules, but will vary by the roles that will be available. We're just finishing up **Talking Graves**, which has the roles:
+- Civilian
+- Medium
 - Lookout
+- Serial Killer
+The number of each role that can exist will differ depending on the party size, but generally speaking Civilian is the most common role and Medium is the least common (Only one per game that isn't random). This game mode was made specifically because of the nice combination that a Medium and a Lookout can make. Because I lookout can see who visits him overnight, a Medium would be vital for seeing who killed the lookout. And since there can only be one Medium at most (if it isn't random), conflicts could arise on who's the medium and who's the lookout.
 
-We're done working on getting the intial setup correctly. Here's how the game starts:
-- Anyone can start a lobby with `pg.startParty`
-- Anyone can join with `pg.join` (party host automatically joins)
-- The party leader is then able to start the game with `pg.startGame`
-- The bot will create a new server with the appropriate channels
-- Game would commence once all the players join
-- Once the game ends, the server gets transferred to the party owner.
-	- What if the party owner leaves before the game ends? We delete the server.
+We also have another game mode called Mashup, which simply combines all the currently existing roles, but it's not ready for release yet.
 
-We create a new server so that the admin is able to play without being able to peek at other channels.
-It also moves all the clutter away from the main channel.
-We start the game once all players have joined and Day takes two minutes, so most people should have enough time to settle down with their new roles.
-An option to cut the day short with a command is going to be soon implemented.
+## Tutorial
+Assuming you've invited the bot to your server, instructions on that later, you can view most of the commands with `pg.help`, but here's the run of the mill walkthrough on how to start a game:
+- pg.startparty -> starts the lobby, there can only be one lobby in a server. (The one who starts the lobby becomes the party leader)
+- pg.join -> joins the current lobby in the server. Note: if you started the party, you automatically join.
+- pg.party -> to check who's currently in the lobby. Can also be used in the game.
+- pg.startgame -> starts the game. Everyone in the lobby should get an invite to a new server. Only the party leader can start a game.
+- pg.endparty -> if you want to remove the party and not start the game. Note: This is automatically done when starting a game.
+(This command can be activated by anybody. This is done in the case that the party leader is AFK)
 
-Note: Since people can DM each other, we're considering embracing the concept by removing any (or most) role reveals. That way dead people can continue to plea and frame others.
-Note on note: We've scratched the idea, but not completely. We might add it as a fun option soon, but for now we're going to have to beg users to not cheat.
+Here are commands used once you are in the game (The pg. prefix can be replaced with ! once in the game):
+- !ability (mention|num) (or !a) -> Uses your role ability. Some roles don't have one, others require a parameter.
+- !targets -> Gives you a list of people that you could use your ability on.
+- !vote [mention|num] -> Accuse a person during the accusation phase, either by mentioning him or using the number given by !party
+- !guilty and !innocent -> Once someone has been put on trial, you can either vote guilty or innocent
+
+Some of the more advanced commands:
+- pg.nomin 1 -> Bypasses the minimum required players set by the game mode. Obviously not recommended, but whatever floats your boat.
+
+If you have suggestions for roles that could make an interesting game, or any questions, you can reach me at amrojjeh@outlook.com
