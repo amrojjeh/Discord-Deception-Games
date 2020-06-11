@@ -26,6 +26,13 @@ public class LastWords extends Phase
 		defendant.die(String.format("<@%d> was lynched in the open.", defendant.getID()));
 		getGame().restoreTalking("Daytime");
 		getGame().restoreRead(defendant, "daytime_discussion");
+		getGame().getPlayers().forEach(person -> checkVictory(person));
+	}
+
+	public void checkVictory(Person person)
+	{
+		if (!person.hasWon() && person.canWin())
+			person.win();
 	}
 
 	@Override
