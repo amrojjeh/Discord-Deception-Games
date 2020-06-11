@@ -31,5 +31,5 @@ public abstract class RoleAssigner
 		return amount;
 	}
 
-	abstract Person getPerson(int ref, long id);
+	public abstract Person getPerson(int ref, long id);
 }
