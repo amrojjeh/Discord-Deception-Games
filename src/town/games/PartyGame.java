@@ -6,7 +6,8 @@ import town.DiscordGame;
 
 public enum PartyGame
 {
-	TALKING_GRAVES("Talking Graves", 4, TalkingGraves::build);
+	TALKING_GRAVES("Talking Graves", 4, TalkingGraves::build),
+	MASHUP("Mashup", 4, Mashup::build);
 
 	private final String name;
 	private final int minimum;
