@@ -11,7 +11,6 @@ public class Day extends Phase
 		super(pm);
 	}
 
-	// begins the phase. sends out a message, and opens up text channels and voice chat.
 	@Override
 	public void start()
 	{
@@ -33,24 +32,15 @@ public class Day extends Phase
 			person.win();
 	}
 
-	// ends the phase, sending out a global message of this fact.
-	@Override
-	public void end()
-	{
-
-	}
-
-	// After Daytime, the Accusation phase begins.
 	@Override
 	public Phase getNextPhase()
 	{
 		return new Accusation(phaseManager, 3);
 	}
 
-	//Duration: 50 seconds
 	@Override
 	public int getDurationInSeconds()
 	{
-		return 20;
+		return 60;
 	}
 }

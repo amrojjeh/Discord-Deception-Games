@@ -49,6 +49,6 @@ public class Trial extends Phase
 	@Override
 	public int getDurationInSeconds()
 	{
-		return 15;
+		return 30;
 	}
 }

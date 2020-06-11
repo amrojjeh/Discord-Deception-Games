@@ -18,6 +18,6 @@ public class FirstDay extends Day
 	@Override
 	public int getDurationInSeconds()
 	{
-		return 20;
+		return 15;
 	}
 }
