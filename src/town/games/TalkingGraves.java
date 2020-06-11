@@ -17,7 +17,7 @@ public class TalkingGraves
 		else if (totalPlayers <= 8) assigner = medAmount(game, totalPlayers);
 		else assigner = random(game);
 
-		game.getPlayers().replaceAll(person -> assigner.generatePerson(person.getNum(), person.getID()));
+		game.getPlayersCache().replaceAll(person -> assigner.generatePerson(person.getNum(), person.getID()));
 	}
 
 	private static Assigner random(DiscordGame game)

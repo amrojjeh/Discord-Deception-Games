@@ -67,6 +67,14 @@ public class SerialKiller extends Person
 	}
 
 	@Override
+	public List<Person> getPossibleTargets()
+	{
+		List<Person> targets = getGame().getAlivePlayers();
+		targets.remove(this);
+		return targets;
+	}
+
+	@Override
 	public String getHelp()
 	{
 		return "SERIAL KILLER (SK)\n" +

@@ -1,7 +1,5 @@
 package town.persons;
 
-import java.util.List;
-
 import town.DiscordGame;
 import town.TownFaction;
 import town.TownRole;
@@ -35,18 +33,6 @@ public class Medium extends Person{
 	{
 		getGame().winTownFaction(getType().getFaction());
 		getGame().sendMessageToTextChannel("daytime_discussion", "**Town has won!**", (msg) -> getGame().endGame());
-	}
-
-	@Override
-	public String ability(List<Person> references)
-	{
-		return "Mediums don't have an ability!";
-	}
-
-	@Override
-	public String cancel()
-	{
-		return "The Medium has no action.";
 	}
 
 	@Override

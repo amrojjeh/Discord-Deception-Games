@@ -17,7 +17,7 @@ public class Initial extends Phase
 	public Phase getNextPhase()
 	{
 		if (getGame().getPlayers().size() == getGame().getGameGuild().getMemberCount() - 1)
-			return new Day(phaseManager);
+			return new FirstDay(phaseManager);
 		return new Initial(phaseManager);
 	}
 

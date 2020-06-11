@@ -68,6 +68,12 @@ public class Lookout extends Person
 	}
 
 	@Override
+	public List<Person> getPossibleTargets()
+	{
+		return getGame().getAlivePlayers();
+	}
+
+	@Override
 	public String getHelp()
 	{
 		return "LOOKOUT\n" +

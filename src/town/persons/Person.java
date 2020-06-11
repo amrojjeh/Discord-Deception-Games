@@ -2,6 +2,7 @@ package town.persons;
 
 import java.util.List;
 
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import town.DiscordGame;
 import town.TownRole;
 import town.events.TownEvent;
@@ -92,6 +93,14 @@ public abstract class Person
 			System.out.println("Could not send to private channel");
 	}
 
+	public void sendMessage(MessageEmbed msg)
+	{
+		if (privateChannelID != 0)
+			game.sendMessageToTextChannel(privateChannelID, msg);
+		else
+			System.out.println("Could not send to private channel");
+	}
+
 	public void assignPrivateChannel(Long channelID)
 	{
 		privateChannelID = channelID;
@@ -138,22 +147,6 @@ public abstract class Person
 		return causeOfDeath;
 	}
 
-	public String cancel()
-	{
-		if (event == null) return "There's no action to cancel";
-		getGame().removeEvent(event);
-		return "Action canceled";
-	}
-
-	public void onPhaseChange(Phase phase)
-	{
-		if (phase instanceof Morning)
-		{
-			event = null;
-			tempDefense = -1;
-		}
-	}
-
 	public int getDefense()
 	{
 		if (tempDefense < 0) return getType().getDefense();
@@ -186,7 +179,31 @@ public abstract class Person
 		disconnected = true;
 	}
 
-	public abstract String ability(List<Person> list);
+	public String cancel()
+	{
+		if (event == null) return "There's no action to cancel";
+		getGame().removeEvent(event);
+		return "Action canceled";
+	}
+
+	public void onPhaseChange(Phase phase)
+	{
+		if (phase instanceof Morning)
+		{
+			event = null;
+			tempDefense = -1;
+		}
+	}
+
+	public List<Person> getPossibleTargets()
+	{
+		return null;
+	}
+
+	public String ability(List<Person> list)
+	{
+		return type.getName() + " has no ability";
+	}
 
 	public abstract boolean hasWon();
 

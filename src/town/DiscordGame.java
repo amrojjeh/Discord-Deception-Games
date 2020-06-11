@@ -94,7 +94,7 @@ public class DiscordGame
 			leaveGameCommand(message.getMember().getIdLong(), message.getChannel());
 		else if (!isMessageFromGameGuild(message) && lowerCaseMessage.startsWith(prefix + "nomin"))
 			noMinCommand(message);
-		else if (started && isMessageFromGameGuild(message) && lowerCaseMessage.startsWith(prefix + "ability"))
+		else if (started && isMessageFromGameGuild(message) && (lowerCaseMessage.startsWith(prefix + "ability") || lowerCaseMessage.startsWith(prefix + "a")))
 			activateAbilityCommand(message);
 		else if (started && isMessageFromGameGuild(message) && lowerCaseMessage.startsWith(prefix + "cancel"))
 			cancelCommand(message);
@@ -106,6 +106,8 @@ public class DiscordGame
 			guiltyCommand(message);
 		else if (started && isMessageFromGameGuild(message) && lowerCaseMessage.contentEquals(prefix + "innocent"))
 			innocentCommand(message);
+		else if (started && isMessageFromGameGuild(message) && lowerCaseMessage.contentEquals(prefix + "targets"))
+			getPossibleTargetsCommand(message);
 	}
 
 	private boolean isMessageFromGameGuild(Message message)
@@ -174,6 +176,26 @@ public class DiscordGame
 		}
 
 		return references;
+	}
+
+	private void getPossibleTargetsCommand(Message message)
+	{
+		MessageChannel channelUsed = message.getChannel();
+		Person user = getPerson(message.getMember());
+		List<Person> targets = user.getPossibleTargets();
+
+		if (targets == null || targets.isEmpty())
+		{
+			user.sendMessage("No possible targets");
+			return;
+		}
+
+		String description = "";
+		String format = "%d. <@%d> ";
+		for (Person p : targets)
+			description += String.format(format, p.getNum(), p.getID()) + (p.isDisconnected() ? "(d)\n" : "\n");
+		MessageEmbed embed = new EmbedBuilder().setColor(Color.YELLOW).setTitle("Possible targets").setDescription(description).build();
+		user.sendMessage(embed);
 	}
 
 	private void noMinCommand(Message message)
@@ -556,19 +578,24 @@ public class DiscordGame
 		return null;
 	}
 
-	public ArrayList<Person> getPlayers()
+	public List<Person> getPlayersCache()
 	{
 		return persons;
 	}
 
-	public ArrayList<Person> getAlivePlayers()
+	public List<Person> getPlayers()
+	{
+		return new ArrayList<>(persons);
+	}
+
+	public List<Person> getAlivePlayers()
 	{
 		ArrayList<Person> alive = new ArrayList<>();
 		persons.stream().filter(p -> p.isAlive()).forEach(p -> alive.add(p));
 		return alive;
 	}
 
-	public ArrayList<Person> getDeadPlayers()
+	public List<Person> getDeadPlayers()
 	{
 		ArrayList<Person> dead = new ArrayList<>();
 		persons.stream().filter(p -> !p.isAlive()).forEach(p -> dead.add(p));

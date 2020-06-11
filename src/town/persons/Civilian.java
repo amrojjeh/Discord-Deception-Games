@@ -1,7 +1,5 @@
 package town.persons;
 
-import java.util.List;
-
 import town.DiscordGame;
 import town.TownFaction;
 import town.TownRole;
@@ -33,18 +31,6 @@ public class Civilian extends Person
 	{
 		getGame().winTownFaction(getType().getFaction());
 		getGame().sendMessageToTextChannel("daytime_discussion", "**Town has won!**", (msg) -> getGame().endGame());
-	}
-
-	@Override
-	public String ability(List<Person> references)
-	{
-		return "Civilian has no ability";
-	}
-
-	@Override
-	public String cancel()
-	{
-		return "Civilian has no ability";
 	}
 
 	@Override

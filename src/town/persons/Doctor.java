@@ -9,12 +9,11 @@ import town.events.DoctorTownEvent;
 import town.phases.Night;
 
 public class Doctor extends Person {
-	int selfHeal;
-	
+	int selfHeal = 1;
+
 	public Doctor(DiscordGame game, int num, Long id)
 	{
 		super(game, num, id, TownRole.DOCTOR);
-		selfHeal = 1;
 	}
 
 	@Override
@@ -52,7 +51,7 @@ public class Doctor extends Person {
 			return "You already used your self-heal!";
 		else if(references.get(0) == this)
 			return "Remember, you only get one self-heal.";
-			
+
 		String msg = "";
 
 		if (event != null)
@@ -65,6 +64,15 @@ public class Doctor extends Person {
 		getGame().addEvent(event);
 
 		return msg + String.format("You will heal <@%d> tonight.", references.get(0).getID());
+	}
+
+	@Override
+	public List<Person> getPossibleTargets()
+	{
+		List<Person> targets = getGame().getAlivePlayers();
+		if (selfHeal <= 0)
+			targets.remove(this);
+		return targets;
 	}
 
 	@Override
