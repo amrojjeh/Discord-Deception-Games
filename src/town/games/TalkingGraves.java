@@ -22,6 +22,12 @@ public class TalkingGraves
 
 	private static Assigner random(DiscordGame game)
 	{
+		//    +---------------+----------------+----------+---------+-----------+
+		//    | Total Players | Serial Killers | Lookouts | Mediums | Civilians |
+		//    +---------------+----------------+----------+---------+-----------+
+		//    |      X        |      RAND      |   RAND   |   RAND  |    RAND   |
+		//    +---------------+----------------+----------+---------+-----------+
+
 		Assigner assigner = new Assigner();
 
 		assigner.addRole(new SerialKillerAssigner(game));
@@ -34,12 +40,21 @@ public class TalkingGraves
 
 	private static Assigner medAmount(DiscordGame game, int totalPlayers)
 	{
-		Assigner assigner = new Assigner();
-		int serialKillerAmount = (int)Math.round(Math.random()) + 2;
+		//    +---------------+----------------+----------+---------+-----------+
+		//    | Total Players | Serial Killers | Lookouts | Mediums | Civilians |
+		//    +---------------+----------------+----------+---------+-----------+
+		//    |      8        |      2-3       |    2-3   |    1    |     2     |
+		//	  |      7        |      2-3       |    1-2   |    1    |     2     |
+		//	  |      6        |      1-2       |    1-2   |    1    |     2     |
+		//    +---------------+----------------+----------+---------+-----------+
 
-		// TODO: Actually make it be able to 6
-		assigner.addRole(new SerialKillerAssigner(game, serialKillerAmount)); // 2-3 Serial killers
-		assigner.addRole(new LookoutAssigner(game, 5 - serialKillerAmount)); // 2-3 Lookouts (but 5 has to be the total)
+		Assigner assigner = new Assigner();
+		int lookoutAndSK = totalPlayers - 3;
+		int skAmount = (int)Math.round(Math.random()) + lookoutAndSK / 2;
+		int lookoutAmount = lookoutAndSK - skAmount;
+
+		assigner.addRole(new SerialKillerAssigner(game, skAmount));
+		assigner.addRole(new LookoutAssigner(game, lookoutAmount));
 		assigner.addRole(new MediumAssigner(game, 1));
 		assigner.addRole(new CivilianAssigner(game, 2));
 
@@ -48,6 +63,14 @@ public class TalkingGraves
 
 	private static Assigner lowAmount(DiscordGame game, int totalPlayers)
 	{
+		//    +---------------+----------------+----------+---------+-----------+
+		//    | Total Players | Serial Killers | Lookouts | Mediums | Civilians |
+		//    +---------------+----------------+----------+---------+-----------+
+		//    |      5        |       1        |     1    |    1    |     2     |
+		//	  |      4        |       1        |     1    |    1    |     1     |
+		//	  |     <4        |       1        |     1    |    1    |     1     |
+		//    +---------------+----------------+----------+---------+-----------+
+
 		Assigner assigner = new Assigner();
 		assigner.addRole(new SerialKillerAssigner(game, 1));
 		assigner.addRole(new LookoutAssigner(game, 1));
