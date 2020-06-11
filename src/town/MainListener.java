@@ -1,5 +1,6 @@
 package town;
 
+import java.awt.Color;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
@@ -7,6 +8,7 @@ import java.util.Scanner;
 
 import javax.security.auth.login.LoginException;
 
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
@@ -15,6 +17,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
@@ -24,6 +27,7 @@ import net.dv8tion.jda.api.events.guild.voice.GuildVoiceJoinEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceMoveEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import town.games.PartyGame;
 
 
 public class MainListener extends ListenerAdapter
@@ -157,13 +161,15 @@ public class MainListener extends ListenerAdapter
 
 		String lowerCaseMessage = message.getContentRaw().toLowerCase();
 
-		if (lowerCaseMessage.contentEquals(prefix + "startparty"))
-			startLobby(e.getJDA(), e.getGuild().getIdLong(), e.getChannel(), e.getMember());
+		if (lowerCaseMessage.startsWith(prefix + "startparty"))
+			startLobby(e.getJDA(), e.getGuild().getIdLong(), e.getMessage().getContentRaw(), e.getChannel(), e.getMember());
 		else if (lowerCaseMessage.contentEquals(prefix + "endparty"))
 			endLobby(e.getGuild().getIdLong(), e.getChannel(), message.getMember());
 		else if (lowerCaseMessage.contentEquals(prefix + "help")) {
 			e.getChannel().sendMessage(helpTable()).queue();
 		}
+		else if (lowerCaseMessage.contentEquals(prefix + "games"))
+				e.getChannel().sendMessage(displayGames()).queue();
 		else if (lowerCaseMessage.contentEquals(prefix + "delete") || lowerCaseMessage.contentEquals("!delete"))
 		{
 			DiscordGame game = games.get(message.getGuild().getIdLong());
@@ -207,6 +213,14 @@ public class MainListener extends ListenerAdapter
 		}
 	}
 
+	private MessageEmbed displayGames()
+	{
+		EmbedBuilder builder = new EmbedBuilder().setTitle("Party Games").setColor(Color.GREEN);
+		for (PartyGame g : PartyGame.values())
+			builder.addField(g.getReference() + ". " + g.getName(), g.getDescription(), false);
+		return builder.build();
+	}
+
 	private String helpTable()
 	{
 		String commands =
@@ -216,7 +230,7 @@ public class MainListener extends ListenerAdapter
 				"  " + prefix + "join       | join the current party\n" +
 				"  " + prefix + "party      | displays all members currently in the party\n" +
 				"  " + prefix + "startGame  | begins the game with current party members\n" +
-				"\nGame commands:\n" +
+				"\nGame commands (can also use ! for prefix):\n" +
 				"  " + prefix + "ability    | activates your role ability\n" +
 				"  " + prefix + "targets    | lists everyone you can use your ability on\n" +
 				"  " + prefix + "roleHelp   | displays the help message for your role.\n";
@@ -235,7 +249,7 @@ public class MainListener extends ListenerAdapter
 		}
 	}
 
-	public void startLobby(JDA jda, Long guildID, MessageChannel channelUsed, Member partyLeader)
+	public void startLobby(JDA jda, Long guildID, String message, MessageChannel channelUsed, Member partyLeader)
 	{
 		if (parties.containsKey(guildID))
 			channelUsed.sendMessage("Party already started").queue();
@@ -243,8 +257,21 @@ public class MainListener extends ListenerAdapter
 			channelUsed.sendMessage("Can't start a party in a discord game!").queue();
 		else
 		{
-			DiscordGame game = new DiscordGame(jda, guildID, partyLeader.getIdLong());
-			channelUsed.sendMessage("Party started with game mode **Talking Graves**").queue();
+			DiscordGame game;
+			String[] words = message.split(" ", 2);
+			if (words.length == 2)
+			{
+				PartyGame mode = PartyGame.getGame(words[1]);
+				if (mode == null)
+				{
+					channelUsed.sendMessage("Game mode not found").queue();
+					return;
+				}
+				else game = new DiscordGame(jda, guildID, partyLeader.getIdLong(), mode);
+			}
+			else
+				game = new DiscordGame(jda, guildID, partyLeader.getIdLong());
+			channelUsed.sendMessage("Party started with game mode **" + game.getGameType().getName() + "**").queue();
 			game.joinGame(partyLeader.getIdLong(), channelUsed);
 			parties.put(guildID, game);
 		}

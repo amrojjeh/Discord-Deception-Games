@@ -18,7 +18,6 @@ public class Mashup
 
 	public static Assigner getAssigner(DiscordGame game)
 	{
-		// Add default roles
 		Assigner assigner = new Assigner();
 		assigner.addRole(new CivilianAssigner(game));
 		assigner.addRole(new SerialKillerAssigner(game));

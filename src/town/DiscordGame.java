@@ -74,6 +74,14 @@ public class DiscordGame
 		gameMode = PartyGame.TALKING_GRAVES;
 	}
 
+	public DiscordGame(JDA jda, Long guildId, long partyLeaderId, PartyGame type)
+	{
+		this.jda = jda;
+		guildID = guildId;
+		partyLeaderID = partyLeaderId;
+		gameMode = type;
+	}
+
 	public void processMessage(Message message)
 	{
 		processMessage(prefix, message);
@@ -95,6 +103,8 @@ public class DiscordGame
 			leaveGameCommand(message.getMember().getIdLong(), message.getChannel());
 		else if (!isMessageFromGameGuild(message) && lowerCaseMessage.startsWith(prefix + "nomin"))
 			noMinCommand(message);
+		else if (!isMessageFromGameGuild(message) && lowerCaseMessage.startsWith(prefix + "setgame"))
+			setGameTypeCommand(message);
 		else if (started && isMessageFromGameGuild(message) && (lowerCaseMessage.startsWith(prefix + "ability") || lowerCaseMessage.startsWith(prefix + "a")))
 			activateAbilityCommand(message);
 		else if (started && isMessageFromGameGuild(message) && lowerCaseMessage.startsWith(prefix + "cancel"))
@@ -177,6 +187,26 @@ public class DiscordGame
 		}
 
 		return references;
+	}
+
+	private void setGameTypeCommand(Message message)
+	{
+		String words[] = message.getContentRaw().split(" ", 2);
+
+		if (words.length != 2)
+		{
+			message.getChannel().sendMessage("Syntax is: `" + prefix + "setGame 2` OR `" + prefix + "setGame Mashup`").queue();
+			return;
+		}
+
+		PartyGame gameToChangeTo = PartyGame.getGame(words[1]);
+		if (gameToChangeTo == null)
+			message.getChannel().sendMessage("Game " + words[1] + " was not found.").queue();
+		else
+		{
+			message.getChannel().sendMessage("Game mode was set to " + gameToChangeTo.getName() + ".").queue();
+			gameMode = gameToChangeTo;
+		}
 	}
 
 	private void getPossibleTargetsCommand(Message message)
@@ -957,6 +987,11 @@ public class DiscordGame
 	public void nextDayStarted()
 	{
 		dayNum++;
+	}
+
+	public PartyGame getGameType()
+	{
+		return gameMode;
 	}
 
 	// Quick Permissions
