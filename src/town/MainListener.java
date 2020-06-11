@@ -1,6 +1,5 @@
 package town;
 
-import java.awt.Color;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
@@ -8,7 +7,6 @@ import java.util.Scanner;
 
 import javax.security.auth.login.LoginException;
 
-import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
@@ -17,7 +15,6 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
@@ -210,18 +207,21 @@ public class MainListener extends ListenerAdapter
 		}
 	}
 
-	public MessageEmbed helpTable() {
-		String description = "```" +
-				prefix + "startParty.. " + "starts a new party for players to join" + "\n" +
-				prefix + "endParty.... " + "cancels the current party" + "\n" +
-				prefix + "join........ " + "join the current party" + "\n" +
-				prefix + "party....... " + "displays all members currently in the party" + "\n" +
-				prefix + "startGame... " + "begins the game with current party members" + "\n" +
-				prefix + "roleHelp... " + "Displays the help message for your role. Only works when in game" + "\n" +
-				prefix + "help........ " + "displays this message" + "```";
+	private String helpTable()
+	{
+		String commands =
+				"Lobby:\n" +
+				"  " + prefix + "startParty | starts a new party for players to join\n" +
+				"  " + prefix + "endParty   | cancels the current party\n" +
+				"  " + prefix + "join       | join the current party\n" +
+				"  " + prefix + "party      | displays all members currently in the party\n" +
+				"  " + prefix + "startGame  | begins the game with current party members\n" +
+				"\nGame commands:\n" +
+				"  " + prefix + "ability    | activates your role ability\n" +
+				"  " + prefix + "targets    | lists everyone you can use your ability on\n" +
+				"  " + prefix + "roleHelp   | displays the help message for your role.\n";
 
-		MessageEmbed embed = new EmbedBuilder().setColor(Color.GREEN).setTitle("List of ToS Commands").setDescription(description).build();
-		return embed;
+		return "```\n" + commands + "```";
 	}
 
 	private void endLobby(Long guildID, MessageChannel channelUsed, Member member)
