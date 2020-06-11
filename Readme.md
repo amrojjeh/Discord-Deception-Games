@@ -1,4 +1,4 @@
-# Town of Salem Inspired Discord bot
+# Discord Deception Games (DDG)
 This is a Town of Salem inspired discord bot. This will become a collection of party games that fundamentally have more or less the same rules, but will vary by the roles that will be available. We're just finishing up **Talking Graves**, which has the roles:
 - Civilian
 - Medium
