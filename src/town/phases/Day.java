@@ -35,7 +35,13 @@ public class Day extends Phase
 	@Override
 	public Phase getNextPhase()
 	{
+		if (getGame().getPlayersCache().size() > 2)
 		return new Accusation(phaseManager, 3);
+		else
+		{
+			getGame().sendMessageToTextChannel("daytime_discussion", "Accusation was skipped because there were only two people.");
+			return new Night(phaseManager);
+		}
 	}
 
 	@Override
