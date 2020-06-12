@@ -1,15 +1,16 @@
 package town.events;
 
 import town.DiscordGame;
+import town.persons.Doctor;
 import town.persons.Person;
 
 public class DoctorTownEvent implements TownEvent
 {
-	private Person doc;
+	private Doctor doc;
 	private Person target;
 	private DiscordGame game;
 
-	public DoctorTownEvent(DiscordGame game, Person d, Person t)
+	public DoctorTownEvent(DiscordGame game, Doctor d, Person t)
 	{
 		this.game = game;
 		doc = d;
@@ -44,6 +45,8 @@ public class DoctorTownEvent implements TownEvent
 	{
 		if (target == person) {
 			protect();
+			if (person == doc)
+				doc.selfHealed();
 		}
 	}
 

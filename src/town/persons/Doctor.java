@@ -16,6 +16,11 @@ public class Doctor extends Person {
 		super(game, num, id, TownRole.DOCTOR);
 	}
 
+	public void selfHealed()
+	{
+		--selfHeal;
+	}
+
 	@Override
 	public boolean canWin()
 	{
