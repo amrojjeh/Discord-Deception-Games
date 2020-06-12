@@ -58,6 +58,13 @@ public class PhaseManager
 		timer.schedule(currentWarning, (currentPhase.getDurationInSeconds() - seconds) * 1000);
 	}
 
+	public void setWarningToAll(int seconds)
+	{
+		if (cancelled) throw new IllegalStateException("PhaseManager is currently cancelled, can't set a warning.");
+		if (currentPhase == null) throw new IllegalStateException("There's no phase to warn before ending.");
+		timer.schedule(new Warning(this, true), (currentPhase.getDurationInSeconds() - seconds) * 1000);
+	}
+
 	public void cancelWarning()
 	{
 		currentWarning.cancel();
@@ -87,16 +94,29 @@ public class PhaseManager
 
 class Warning extends TimerTask
 {
-	PhaseManager pm;
+	final PhaseManager pm;
+	final boolean ALL_FLAG;
+
 	Warning(PhaseManager manager)
 	{
+		this(manager, false);
+	}
+
+	Warning(PhaseManager manager, boolean sendToAll)
+	{
 		pm = manager;
+		ALL_FLAG = sendToAll;
 	}
 
 	@Override
 	public void run()
 	{
-		pm.getGame().sendMessageToTextChannel("daytime_discussion", "5 seconds before the phase ends!");
-		pm.cancelWarning();
+		if (!ALL_FLAG)
+		{
+			pm.getGame().sendMessageToTextChannel("daytime_discussion", "5 seconds before the phase ends!");
+			pm.cancelWarning();
+		}
+		else
+			pm.getGame().getPlayersCache().forEach(person -> person.sendMessage("5 seconds before the phase ends!"));
 	}
 }

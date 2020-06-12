@@ -14,7 +14,7 @@ public class Night extends Phase
 		getGame().setChannelVisibility("Daytime", false, false);
 		getGame().discconectEveryoneFromVC("Daytime");
 		getGame().getPlayers().forEach(person -> person.sendMessage("Night " + getGame().getDayNum() + " started"));
-		phaseManager.setWarningInSeconds(5);
+		phaseManager.setWarningToAll(5);
 	}
 
 	@Override
