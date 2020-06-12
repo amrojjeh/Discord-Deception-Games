@@ -45,6 +45,6 @@ public class LastWords extends Phase
 	@Override
 	public int getDurationInSeconds()
 	{
-		return 10;
+		return 6;
 	}
 }

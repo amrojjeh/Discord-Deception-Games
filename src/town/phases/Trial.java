@@ -45,10 +45,9 @@ public class Trial extends Phase
 		return new Judgment(phaseManager, defendant, numTrials);
 	}
 
-	//Duration: 20-30 seconds
 	@Override
 	public int getDurationInSeconds()
 	{
-		return 30;
+		return 10;
 	}
 }
