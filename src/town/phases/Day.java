@@ -35,7 +35,7 @@ public class Day extends Phase
 	@Override
 	public Phase getNextPhase()
 	{
-		if (getGame().getPlayersCache().size() > 2)
+		if (getGame().getAlivePlayers().size() > 2)
 		return new Accusation(phaseManager, 3);
 		else
 		{
