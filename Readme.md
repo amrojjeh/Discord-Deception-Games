@@ -5,7 +5,7 @@ This is a Town of Salem inspired discord bot. This will become a collection of p
 - Lookout
 - Serial Killer
 
-The number of each role that can exist will differ depending on the party size, but generally speaking Civilian is the most common role and Medium is the least common (Only one per game that isn't random). This game mode was made specifically because of the nice combination that a Medium and a Lookout can make. Because I lookout can see who visits him overnight, a Medium would be vital for seeing who killed the lookout. And since there can only be one Medium at most (if it isn't random), conflicts could arise on who's the medium and who's the lookout.
+The number of each role that can exist will differ depending on the party size, but generally speaking Civilian is the most common role and Medium is the least common (Only one per game that isn't random). This game mode was made specifically because of the nice combination that a Medium and a Lookout can make. Because a lookout can see who visits him overnight, a Medium would be vital for seeing who killed the lookout. And since there can only be one Medium at most (if it isn't random), conflicts could arise on who's the medium and who's the lookout.
 
 ## Tutorial
 Assuming you've invited the bot to your server, instructions on that later, you can view most of the commands with `pg.help`, but here's the run of the mill walkthrough on how to start a game:
