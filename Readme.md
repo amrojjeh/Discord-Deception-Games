@@ -1,4 +1,4 @@
-# Town of Salem Inspired Discord bot
+# Discord Deception Games (DDG)
 This is a Town of Salem inspired discord bot. This will become a collection of party games that fundamentally have more or less the same rules, but will vary by the roles that will be available. We're just finishing up **Talking Graves**, which has the roles:
 - Civilian
 - Medium
@@ -26,6 +26,13 @@ Here are commands used once you are in the game (The pg. prefix can be replaced 
 
 Some of the more advanced commands:
 - `pg.nomin [1|0]` -> Bypasses the minimum required players set by the game mode. Obviously not recommended, but whatever floats your boat.
+
+## Inviting and running the bot
+Unlike most other bots, we can't just give you the invitation link. Bots can only create a server if they're under 10 servers, which means we can't distribute it. So you have to create your application and download our code, but we'll try to make it as easy as possible.
+
+Go to https://discord.com/developers/applications, there you should be able to create your application. Once you do that, go to the application and open the bot section. You can then add your bot, and afterwards you may reveal your token, copy it, and add it in the token.txt file provided in the release (https://github.com/Persian-Eagle/Discord-Deception-Games/releases). You can then double click run.bat, and you should be good!
+
+**Note: Make sure Java is installed on your machine, otherwise the program will not work.**
 
 ## Getting in contact
 If you have suggestions for roles that could make an interesting game, or any questions, you can reach me at amrojjeh@outlook.com
