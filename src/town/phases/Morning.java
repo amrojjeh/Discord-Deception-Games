@@ -17,7 +17,7 @@ public class Morning extends Phase
 		if (getGame().peekDeathForMorning() == null)
 			return;
 		Person person = getGame().getDeathForMorning();
-		getGame().sendMessageToTextChannel("daytime_discussion", person.getCauseOfDeath());
+		getGame().sendMessageToTextChannel("daytime_discussion", person.getCauseOfDeath() + "\nTheir role was: " + person.getType().getName());
 		if (getGame().peekDeathForMorning() != null)
 			nextPhase = new Morning(phaseManager);
 	}

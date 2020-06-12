@@ -24,6 +24,7 @@ public class LastWords extends Phase
 	public void end()
 	{
 		defendant.die(String.format("<@%d> was lynched in the open.", defendant.getID()));
+		getGame().sendMessageToTextChannel("daytime_discussion", "Their role was: " + defendant.getType().getName());
 		getGame().restoreTalking("Daytime");
 		getGame().restoreRead(defendant, "daytime_discussion");
 		getGame().getPlayers().forEach(person -> checkVictory(person));
