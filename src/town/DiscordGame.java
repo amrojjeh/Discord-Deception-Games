@@ -803,7 +803,7 @@ public class DiscordGame
 		for (int x = 1; x < members.size(); ++x)
 		{
 			final int y = x;
-			action.flatMap(kickAction -> members.get(y).getGuild().kickVoiceMember(members.get(y)));
+			action = action.flatMap(kickAction -> members.get(y).getGuild().kickVoiceMember(members.get(y)));
 		}
 		action.queue();
 	}
@@ -832,6 +832,7 @@ public class DiscordGame
 
 	public void setChannelVisibility(Person p, String channelName, boolean read, boolean write)
 	{
+		if (p.isDisconnected()) return;
 		Member member = getMemberFromGame(p);
 		if (member == null) throw new IllegalArgumentException("Invalid person.");
 		setChannelVisibility(member, channelName, read, write, null);
@@ -908,7 +909,8 @@ public class DiscordGame
 		for (int x = 1; x < members.size(); ++x)
 		{
 			final int y = x;
-			action.flatMap(muteAction -> members.get(y).mute(false));
+			if (getPerson(members.get(y)).isAlive())
+				action = action.flatMap(muteAction -> members.get(y).mute(false));
 		}
 		action.queue();
 	}
