@@ -30,7 +30,7 @@ public class Accusation extends Phase
 	public void start()
 	{
 		getGame().sendMessageToTextChannel("daytime_discussion", "The Accusation phase has started. There are "
-				+ numTrials + " left in the day.");
+				+ numTrials + " left in the day. Vote up a person with `!vote [num|@mention]`.");
 		sendInitialMessage();
 		phaseManager.setWarningInSeconds(5);
 	}
