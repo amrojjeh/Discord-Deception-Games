@@ -47,6 +47,6 @@ public class Day extends Phase
 	@Override
 	public int getDurationInSeconds()
 	{
-		return 60;
+		return 80;
 	}
 }

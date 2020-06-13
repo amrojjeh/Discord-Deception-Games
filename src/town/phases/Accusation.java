@@ -53,7 +53,7 @@ public class Accusation extends Phase
 	@Override
 	public int getDurationInSeconds()
 	{
-		return 30;
+		return 50;
 	}
 
 	public void putPlayerOnTrial(Person p)
