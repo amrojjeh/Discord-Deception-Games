@@ -53,7 +53,8 @@ public class MurderTownEvent implements TownEvent
 
 	public void attackVictim()
 	{
-		murderer.sendMessage("You attacked <@" + murderer.getID() + ">");
+		murderer.sendMessage("You attacked <@" + victim.getID() + ">");
+		victim.sendMessage("You were attacked");
 		if(murderer.getAttack() > victim.getDefense())
 			victim.die(String.format("<@%d> (%d) was murdered by a serial killer.", victim.getID(), victim.getNum()));
 	}
