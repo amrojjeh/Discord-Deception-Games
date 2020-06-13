@@ -45,6 +45,8 @@ public class Doctor extends Person {
 	@Override
 	public String ability(List<Person> references)
 	{
+		String msg = "";
+
 		if (references.isEmpty())
 			return "There's no one to heal. `!ability 1` to watch the first person shown in `!party`.";
 		if (references.size() > 1)
@@ -55,9 +57,10 @@ public class Doctor extends Person {
 		if (references.get(0) == this && selfHeal <= 0)
 			return "You already used your self-heal!";
 		else if(references.get(0) == this)
-			return "Remember, you only get one self-heal.";
+		{
+			msg += "Remember, you only get one self-heal.";
+		}
 
-		String msg = "";
 
 		if (event != null)
 		{
