@@ -14,16 +14,13 @@ public class Day extends Phase
 	@Override
 	public void start()
 	{
-		getGame().sendMessageToTextChannel("daytime_discussion", "Day " + getGame().getDayNum() + " started");
-		showDayChannels();
+		getGame().sendMessageToTextChannel("daytime_discussion", "Day " + getGame().getDayNum() + " started")
+		.flatMap(msg -> getGame().setChannelVisibility("daytime_discussion", true, true))
+		.flatMap(perm -> getGame().setChannelVisibility("Daytime", true, true))
+		.queue();
+
 		getGame().getPlayers().forEach((person) -> checkVictory(person));
 		phaseManager.setWarningInSeconds(5);
-	}
-
-	private void showDayChannels()
-	{
-		getGame().setChannelVisibility("daytime_discussion", true, true);
-		getGame().setChannelVisibility("Daytime", true, true);
 	}
 
 	public void checkVictory(Person person)
@@ -39,7 +36,7 @@ public class Day extends Phase
 		return new Accusation(phaseManager, 3);
 		else
 		{
-			getGame().sendMessageToTextChannel("daytime_discussion", "Accusation was skipped because there were only two people.");
+			getGame().sendMessageToTextChannel("daytime_discussion", "Accusation was skipped because there were only two people.").queue();
 			return new Night(phaseManager);
 		}
 	}

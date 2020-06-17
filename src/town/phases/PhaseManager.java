@@ -113,7 +113,7 @@ class Warning extends TimerTask
 	{
 		if (!ALL_FLAG)
 		{
-			pm.getGame().sendMessageToTextChannel("daytime_discussion", "5 seconds before the phase ends!");
+			pm.getGame().sendMessageToTextChannel("daytime_discussion", "5 seconds before the phase ends!").queue();
 			pm.cancelWarning();
 		}
 		else

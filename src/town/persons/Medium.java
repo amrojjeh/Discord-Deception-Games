@@ -32,7 +32,8 @@ public class Medium extends Person{
 	public void win()
 	{
 		getGame().winTownFaction(getType().getFaction());
-		getGame().sendMessageToTextChannel("daytime_discussion", "**Town has won!**", (msg) -> getGame().endGame());
+		getGame().sendMessageToTextChannel("daytime_discussion", "**Town has won!**")
+		.queue((msg) -> getGame().endGame());
 	}
 
 	@Override
@@ -45,9 +46,9 @@ public class Medium extends Person{
 	public void onPhaseChange(Phase phase)
 	{
 		super.onPhaseChange(phase);
-		if (phase instanceof Night)
-			getGame().setChannelVisibility(this, "the_afterlife", true, true);
-		else if (phase instanceof Morning)
-			getGame().setChannelVisibility(this, "the_afterlife", false, false);
+		if (phase instanceof Night && isAlive())
+			getGame().setChannelVisibility(this, "the_afterlife", true, true).queue();
+		else if (phase instanceof Morning && isAlive())
+			getGame().setChannelVisibility(this, "the_afterlife", false, false).queue();
 	}
 }

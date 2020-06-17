@@ -76,7 +76,7 @@ public class TalkingGraves
 		assigner.addRole(new LookoutAssigner(game, 1));
 		assigner.addRole(new MediumAssigner(game, 1));
 		int civAmount = totalPlayers > 3 ? totalPlayers - 3 : 1;
-		assigner.addRole(new CivilianAssigner(game, civAmount));
+//		assigner.addRole(new CivilianAssigner(game, civAmount));
 		return assigner;
 	}
 }

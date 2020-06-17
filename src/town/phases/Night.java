@@ -1,5 +1,7 @@
 package town.phases;
 
+import net.dv8tion.jda.api.requests.RestAction;
+
 public class Night extends Phase
 {
 	public Night(PhaseManager pm)
@@ -10,9 +12,13 @@ public class Night extends Phase
 	@Override
 	public void start()
 	{
-		getGame().setChannelVisibility("daytime_discussion", true, false);
-		getGame().setChannelVisibility("Daytime", false, false);
-		getGame().discconectEveryoneFromVC("Daytime");
+		getGame().setChannelVisibility("daytime_discussion", true, false)
+		.flatMap(perm -> getGame().setChannelVisibility("Daytime", false, false))
+		.queue();
+
+		RestAction<?> disconnect = getGame().discconectEveryoneFromVC("Daytime");
+		if (disconnect != null) disconnect.queue();
+
 		getGame().getPlayers().forEach(person -> person.sendMessage("Night " + getGame().getDayNum() + " started"));
 		phaseManager.setWarningToAll(5);
 	}

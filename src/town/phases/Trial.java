@@ -1,5 +1,6 @@
 package town.phases;
 
+import net.dv8tion.jda.api.requests.RestAction;
 import town.persons.Person;
 
 //Trial occurs when the Town agrees to put someone under suspicion. They are given this phase, a small window,
@@ -24,19 +25,27 @@ public class Trial extends Phase
 	@Override
 	public void start()
 	{
-		getGame().sendMessageToTextChannel("daytime_discussion", "<@" + defendant.getID() + ">, your trial has begun. All "
-				+ "other players are muted. What is your defense? You have 30 seconds.");
 		//mute all but the defendant in text / voice daytime channel
-		getGame().muteExcept("Daytime", defendant);
-		getGame().removeReadExcept(defendant, "daytime_discussion");
+		getGame().sendMessageToTextChannel("daytime_discussion", "<@" + defendant.getID() + ">, your trial has begun. All "
+				+ "other players are muted. What is your defense? You have 30 seconds.")
+		.flatMap(message -> getGame().muteExcept("Daytime", defendant))
+		.flatMap(nothing -> getGame().removeReadExcept(defendant, "daytime_discussion"))
+		.queue();
+
 		phaseManager.setWarningInSeconds(5);
 	}
 
 	@Override
 	public void end()
 	{
-		getGame().restoreTalking("Daytime");
-		getGame().restoreRead(defendant, "daytime_discussion");
+		getGame().restoreTalking("Daytime", false)
+		.queue();
+
+		RestAction<?> action1 = getGame().resetPermissions(defendant, "daytime_discussion");
+		if (action1 != null) action1.queue();
+		action1 = getGame().setChannelVisibility("daytime_discussion", true, true);
+		if (action1 != null) action1.queue();
+
 	}
 
 	@Override
