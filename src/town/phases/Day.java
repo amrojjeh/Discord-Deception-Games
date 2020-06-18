@@ -15,8 +15,8 @@ public class Day extends Phase
 	public void start()
 	{
 		getGame().sendMessageToTextChannel("daytime_discussion", "Day " + getGame().getDayNum() + " started")
-		.flatMap(msg -> getGame().setChannelVisibility("daytime_discussion", true, true))
-		.flatMap(perm -> getGame().setChannelVisibility("Daytime", true, true))
+		.flatMap(msg -> getGame().setChannelVisibility("player", "daytime_discussion", true, true))
+		.flatMap(perm -> getGame().setChannelVisibility("player", "Daytime", true, true))
 		.queue();
 
 		getGame().getPlayers().forEach((person) -> checkVictory(person));
@@ -44,6 +44,6 @@ public class Day extends Phase
 	@Override
 	public int getDurationInSeconds()
 	{
-		return 80;
+		return 10; // 80;
 	}
 }

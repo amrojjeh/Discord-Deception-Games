@@ -45,7 +45,10 @@ public class Judgment extends Phase
 		if (guilty > innocent)
 			return new LastWords(phaseManager, defendant);
 		else if(numTrials > 0)
+		{
+			getGame().getGameGuild().removeRoleFromMember(defendant.getID(), getGame().getRole("defendant")).queue();
 			return new Accusation(phaseManager, numTrials);
+		}
 		else
 			return new Night(phaseManager);
 	}

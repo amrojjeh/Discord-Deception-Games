@@ -19,7 +19,6 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.PermissionOverride;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
@@ -60,6 +59,7 @@ public class DiscordGame
 
 	private long playerRoleID;
 	private long deadRoleID;
+	private long defendantRoleID;
 
 	boolean started = false;
 	boolean ended = false;
@@ -407,14 +407,16 @@ public class DiscordGame
 		g.newRole().setName("Bot").addPermissions(Permission.ADMINISTRATOR).setColor(Color.YELLOW);
 		RoleData playerRoleData = g.newRole().setName("Player").setColor(Color.CYAN);
 		RoleData deadPlayerRoleData = g.newRole().setName("Dead").setColor(Color.GRAY);
+		RoleData defendantRoleData = g.newRole().setName("Defendant").setColor(Color.GREEN);
 
 		// FIXME: WARNING: Unable to load JDK7 types (java.nio.file.Path): no Java7 type support added
 		// Is being caued by the addPermissionOverride method.
 		g.newChannel(ChannelType.VOICE, "Daytime").setPosition(0);
 
-		//		players discussing during the day
+		// players discussing during the day
 		g.newChannel(ChannelType.TEXT, "daytime_discussion")
 		.addPermissionOverride(deadPlayerRoleData, QP.readPermissions(), QP.writePermissions())
+		.addPermissionOverride(defendantRoleData, QP.readPermissions() | QP.writePermissions(), 0)
 		.setPosition(0);
 
 		for (Person p : getPlayers())
@@ -465,8 +467,8 @@ public class DiscordGame
 		getGameGuild().addRoleToMember(jda.getSelfUser().getIdLong(), guild.getRolesByName("Bot", false).get(0)).queue();
 
 		playerRoleID = guild.getRolesByName("Player", false).get(0).getIdLong();
-		guild.getRolesByName("Bot", false).get(0).getIdLong();
 		deadRoleID = guild.getRolesByName("Dead", false).get(0).getIdLong();
+		defendantRoleID = guild.getRolesByName("Defendant", false).get(0).getIdLong();
 
 		for (Person p : getPlayers())
 		{
@@ -716,6 +718,27 @@ public class DiscordGame
 		return getGameGuild().getRoleById(roleID);
 	}
 
+	public Role getRole(String roleName)
+	{
+		return getRole(getRoleID(roleName));
+	}
+
+	private long getRoleID(String roleName)
+	{
+		if (!started) throw new IllegalStateException("Game has not started, can't get roles");
+		switch (roleName.toLowerCase())
+		{
+		case "player":
+			return playerRoleID;
+		case "dead":
+			return deadRoleID;
+		case "defendant":
+			return defendantRoleID;
+		default:
+			throw new IllegalArgumentException("Role name not found");
+		}
+	}
+
 	private RestAction<Message> sendDMTo(Person person, String msg)
 	{
 		return jda.getUserById(person.getID()).openPrivateChannel()
@@ -785,27 +808,9 @@ public class DiscordGame
 		return action;
 	}
 
-	public RestAction<PermissionOverride> removeReadExcept(Person p, String channelName)
+	public PermissionOverrideAction setChannelVisibility(String roleName, String channelName, boolean read, boolean write)
 	{
-		Member member = getMemberFromGame(p);
-		if (member == null) throw new IllegalArgumentException("Invalid person.");
-		return setChannelVisibility(channelName, true, false)
-		.flatMap(perm -> getGuildChannel(channelName).putPermissionOverride(member).setAllow(QP.readPermissions() | QP.writePermissions()));
-	}
-
-	public PermissionOverrideAction resetPermissions(Person p, String channelName)
-	{
-		Member member = getMemberFromGame(p);
-		if (member == null) throw new IllegalArgumentException("Invalid person.");
-		GuildChannel channel = getGuildChannel(channelName);
-		if (channel == null) throw new IllegalArgumentException("Channel " + channelName + " doesn't exist");
-		return channel.putPermissionOverride(member).reset();
-	}
-
-	public PermissionOverrideAction setChannelVisibility(String channelName, boolean read, boolean write)
-	{
-		Role playerRole = getRole(playerRoleID);
-		return setChannelVisibility(playerRole, channelName, read, write);
+		return setChannelVisibility(getRole(getRoleID(roleName)), channelName, read, write);
 	}
 
 	public PermissionOverrideAction setChannelVisibility(Person p, String channelName, boolean read, boolean write)
@@ -914,8 +919,7 @@ public class DiscordGame
 	{
 		if (!person.isDisconnected())
 			getGameGuild()
-			.addRoleToMember(person.getID(), getRole(deadRoleID))
-			.flatMap((rest) -> getGameGuild().removeRoleFromMember(person.getID(), getRole(playerRoleID)))
+			.modifyMemberRoles(getMemberFromGame(person), getRole("dead"))
 			.queue();
 
 		if (saveForMorning)

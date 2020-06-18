@@ -58,8 +58,8 @@ public class Accusation extends Phase
 
 	public void putPlayerOnTrial(Person p)
 	{
-		//ADDITION: "Start over" the phase cycle, from a trial phase.
 		phaseManager.end();
+		getGame().getGameGuild().addRoleToMember(p.getID(), getGame().getRole("defendant")).queue();
 		phaseManager.start(new Trial(phaseManager, p, numTrials - 1));
 	}
 

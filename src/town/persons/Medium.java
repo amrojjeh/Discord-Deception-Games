@@ -49,6 +49,6 @@ public class Medium extends Person{
 		if (phase instanceof Night && isAlive())
 			getGame().setChannelVisibility(this, "the_afterlife", true, true).queue();
 		else if (phase instanceof Morning && isAlive())
-			getGame().setChannelVisibility(this, "the_afterlife", false, false).queue();
+			getGame().getTextChannel("the_afterlife").getPermissionOverride(getGame().getMemberFromGame(this)).delete().queue();
 	}
 }
