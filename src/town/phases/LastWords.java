@@ -1,5 +1,6 @@
 package town.phases;
 
+import town.RestHelper;
 import town.persons.Person;
 
 public class LastWords extends Phase
@@ -15,18 +16,24 @@ public class LastWords extends Phase
 	@Override
 	public void start()
 	{
-		getGame().sendMessageToTextChannel("daytime_discussion", String.format("What are your last words? <@%d>", defendant.getID()));
-		getGame().muteExcept("Daytime", defendant);
-		getGame().removeReadExcept(defendant, "daytime_discussion");
+		RestHelper.queueAll
+		(
+			getGame().sendMessageToTextChannel("daytime_discussion", String.format("What are your last words? <@%d>", defendant.getID())),
+			getGame().muteExcept("Daytime", defendant),
+			getGame().setChannelVisibility("player", "daytime_discussion", true, false)
+		);
 	}
 
 	@Override
 	public void end()
 	{
 		defendant.die(String.format("<@%d> was lynched in the open.", defendant.getID()));
-		getGame().sendMessageToTextChannel("daytime_discussion", "Their role was: " + defendant.getType().getName());
-		getGame().restoreTalking("Daytime");
-		getGame().restoreRead(defendant, "daytime_discussion");
+		getGame().sendMessageToTextChannel("daytime_discussion", "Their role was: " + defendant.getType().getName())
+		.queue();
+
+		getGame().setChannelVisibility("player", "daytime_discussion", true, true);
+		RestHelper.queueAll(getGame().restoreTalking("Daytime", false));
+
 		getGame().getPlayers().forEach(person -> checkVictory(person));
 	}
 

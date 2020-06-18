@@ -7,8 +7,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
-import java.util.function.Consumer;
-import java.util.function.Function;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
@@ -21,7 +19,6 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.PermissionOverride;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
@@ -29,6 +26,7 @@ import net.dv8tion.jda.api.entities.VoiceChannel;
 import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.requests.restaction.GuildAction;
 import net.dv8tion.jda.api.requests.restaction.GuildAction.RoleData;
+import net.dv8tion.jda.api.requests.restaction.MessageAction;
 import net.dv8tion.jda.api.requests.restaction.PermissionOverrideAction;
 import town.events.TownEvent;
 import town.games.PartyGame;
@@ -39,7 +37,6 @@ import town.phases.End;
 import town.phases.Judgment;
 import town.phases.Phase;
 import town.phases.PhaseManager;
-import town.phases.Trial;
 
 public class DiscordGame
 {
@@ -62,6 +59,7 @@ public class DiscordGame
 
 	private long playerRoleID;
 	private long deadRoleID;
+	private long defendantRoleID;
 
 	boolean started = false;
 	boolean ended = false;
@@ -346,7 +344,7 @@ public class DiscordGame
 			return;
 		}
 		Accusation acc = (Accusation)phase;
-		sendMessageToTextChannel("daytime_discussion", acc.vote(accuser, accused));
+		sendMessageToTextChannel("daytime_discussion", acc.vote(accuser, accused)).queue();
 	}
 
 	private void displayParty(MessageChannel channelUsed)
@@ -409,14 +407,16 @@ public class DiscordGame
 		g.newRole().setName("Bot").addPermissions(Permission.ADMINISTRATOR).setColor(Color.YELLOW);
 		RoleData playerRoleData = g.newRole().setName("Player").setColor(Color.CYAN);
 		RoleData deadPlayerRoleData = g.newRole().setName("Dead").setColor(Color.GRAY);
+		RoleData defendantRoleData = g.newRole().setName("Defendant").setColor(Color.GREEN);
 
 		// FIXME: WARNING: Unable to load JDK7 types (java.nio.file.Path): no Java7 type support added
 		// Is being caued by the addPermissionOverride method.
 		g.newChannel(ChannelType.VOICE, "Daytime").setPosition(0);
 
-		//		players discussing during the day
+		// players discussing during the day
 		g.newChannel(ChannelType.TEXT, "daytime_discussion")
 		.addPermissionOverride(deadPlayerRoleData, QP.readPermissions(), QP.writePermissions())
+		.addPermissionOverride(defendantRoleData, QP.readPermissions() | QP.writePermissions(), 0)
 		.setPosition(0);
 
 		for (Person p : getPlayers())
@@ -461,14 +461,14 @@ public class DiscordGame
 
 	public void getNewGuild(Guild guild)
 	{
-		guild.getChannels().get(0).createInvite().queue((invite) -> persons.forEach((person) -> sendDMTo(person, invite.getUrl())));
+		guild.getChannels().get(0).createInvite().queue((invite) -> persons.forEach((person) -> sendDMTo(person, invite.getUrl()).queue()));
 		gameGuildID = guild.getIdLong();
 		guild.getChannels(true).forEach((channel) -> assignChannel(channel));
 		getGameGuild().addRoleToMember(jda.getSelfUser().getIdLong(), guild.getRolesByName("Bot", false).get(0)).queue();
 
 		playerRoleID = guild.getRolesByName("Player", false).get(0).getIdLong();
-		guild.getRolesByName("Bot", false).get(0).getIdLong();
 		deadRoleID = guild.getRolesByName("Dead", false).get(0).getIdLong();
+		defendantRoleID = guild.getRolesByName("Defendant", false).get(0).getIdLong();
 
 		for (Person p : getPlayers())
 		{
@@ -476,7 +476,7 @@ public class DiscordGame
 			p.sendMessage(p.getHelp());
 		}
 
-		sendMessageToTextChannel("daytime_discussion", "Waiting for players...");
+		sendMessageToTextChannel("daytime_discussion", "Waiting for players...").queue();
 	}
 
 	public Member getMemberFromGame(Person person)
@@ -718,56 +718,56 @@ public class DiscordGame
 		return getGameGuild().getRoleById(roleID);
 	}
 
-	private void sendDMTo(Person person, String msg)
+	public Role getRole(String roleName)
 	{
-		jda.getUserById(person.getID()).openPrivateChannel()
-		.flatMap((channel) -> channel.sendMessage(msg))
-		.queue();
+		return getRole(getRoleID(roleName));
 	}
 
-	public void sendMessageToTextChannel(String channelName, String msg, Consumer<Message> consumer)
+	private long getRoleID(String roleName)
 	{
-		getTextChannel(channelName).sendMessage(msg).queue(consumer);
+		if (!started) throw new IllegalStateException("Game has not started, can't get roles");
+		switch (roleName.toLowerCase())
+		{
+		case "player":
+			return playerRoleID;
+		case "dead":
+			return deadRoleID;
+		case "defendant":
+			return defendantRoleID;
+		default:
+			throw new IllegalArgumentException("Role name not found");
+		}
 	}
 
-	public void sendMessageToTextChannel(Long channelID, String msg, Consumer<Message> consumer)
+	private RestAction<Message> sendDMTo(Person person, String msg)
 	{
-		getTextChannel(channelID).sendMessage(msg).queue(consumer);
+		return jda.getUserById(person.getID()).openPrivateChannel()
+		.flatMap((channel) -> channel.sendMessage(msg));
 	}
 
-	public void sendMessageToTextChannel(String channelName, MessageEmbed embed, Consumer<Message> consumer)
+	public MessageAction sendMessageToTextChannel(String channelName, String msg)
 	{
-		getTextChannel(channelName).sendMessage(embed).queue(consumer);
+		return getTextChannel(channelName).sendMessage(msg);
 	}
 
-	public void sendMessageToTextChannel(Long channelID, MessageEmbed embed, Consumer<Message> consumer)
+	public MessageAction sendMessageToTextChannel(Long channelID, String msg)
 	{
-		getTextChannel(channelID).sendMessage(embed).queue(consumer);
+		return getTextChannel(channelID).sendMessage(msg);
 	}
 
-	public void sendMessageToTextChannel(String channelName, String msg)
+	public MessageAction sendMessageToTextChannel(String channelName, MessageEmbed embed)
 	{
-		getTextChannel(channelName).sendMessage(msg).queue();
+		return getTextChannel(channelName).sendMessage(embed);
 	}
 
-	public void sendMessageToTextChannel(Long channelID, String msg)
+	public MessageAction sendMessageToTextChannel(Long channelID, MessageEmbed embed)
 	{
-		getTextChannel(channelID).sendMessage(msg).queue();
+		return getTextChannel(channelID).sendMessage(embed);
 	}
 
-	public void sendMessageToTextChannel(String channelName, MessageEmbed embed)
+	public RestAction<Message> getMessage(String channelName, long messageID)
 	{
-		getTextChannel(channelName).sendMessage(embed).queue();
-	}
-
-	public void sendMessageToTextChannel(Long channelID, MessageEmbed embed)
-	{
-		getTextChannel(channelID).sendMessage(embed).queue();
-	}
-
-	public void getMessage(String channelName, long messageID, Consumer<Message> consumer)
-	{
-		getTextChannel(channelName).retrieveMessageById(messageID).queue(consumer);
+		return getTextChannel(channelName).retrieveMessageById(messageID);
 	}
 
 	public void gameGuildJoin(Member member)
@@ -790,64 +790,38 @@ public class DiscordGame
 			member.kick("He was not part of the lobby").queue();
 	}
 
-	public void discconectEveryoneFromVC(String vcName)
+	public RestAction<Void> discconectEveryoneFromVC(String vcName)
 	{
-		discconectEveryoneFromVC(getVoiceChannel(vcName));
+		return discconectEveryoneFromVC(getVoiceChannel(vcName));
 	}
 
-	public void discconectEveryoneFromVC(VoiceChannel channel)
+	public RestAction<Void> discconectEveryoneFromVC(VoiceChannel channel)
 	{
 		List<Member> members = channel.getMembers();
-		if (members.isEmpty()) return;
-		RestAction<?> action = members.get(0).getGuild().kickVoiceMember(members.get(0));
+		if (members.isEmpty()) return null;
+		RestAction<Void> action = members.get(0).getGuild().kickVoiceMember(members.get(0));
 		for (int x = 1; x < members.size(); ++x)
 		{
 			final int y = x;
 			action = action.flatMap(kickAction -> members.get(y).getGuild().kickVoiceMember(members.get(y)));
 		}
-		action.queue();
+		return action;
 	}
 
-	// Write doesn't matter if we're setting a voice channel
-	public void setChannelVisibility(String channelName, boolean read, boolean write,
-			Function<PermissionOverride, RestAction<PermissionOverride>> func)
+	public PermissionOverrideAction setChannelVisibility(String roleName, String channelName, boolean read, boolean write)
 	{
-		Role playerRole = getRole(playerRoleID);
-		setChannelVisibility(playerRole, channelName, read, write, func);
+		return setChannelVisibility(getRole(getRoleID(roleName)), channelName, read, write);
 	}
 
-	public void setChannelVisibility(String channelName, boolean read, boolean write)
+	public PermissionOverrideAction setChannelVisibility(Person p, String channelName, boolean read, boolean write)
 	{
-		Role playerRole = getRole(playerRoleID);
-		setChannelVisibility(playerRole, channelName, read, write, null);
-	}
-
-	public void removeReadExcept(Person p, String channelName)
-	{
+		if (p.isDisconnected()) return null;
 		Member member = getMemberFromGame(p);
 		if (member == null) throw new IllegalArgumentException("Invalid person.");
-		setChannelVisibility(channelName, true, false,
-				perm -> getGuildChannel(channelName).putPermissionOverride(member).setAllow(QP.readPermissions() | QP.writePermissions()));
+		return setChannelVisibility(member, channelName, read, write);
 	}
 
-	public void setChannelVisibility(Person p, String channelName, boolean read, boolean write)
-	{
-		if (p.isDisconnected()) return;
-		Member member = getMemberFromGame(p);
-		if (member == null) throw new IllegalArgumentException("Invalid person.");
-		setChannelVisibility(member, channelName, read, write, null);
-	}
-
-	public void restoreRead(Person p, String channelName)
-	{
-		Member member = getMemberFromGame(p);
-		if (member == null) throw new IllegalArgumentException("Invalid person.");
-		setChannelVisibility(channelName, true, true,
-				perm -> getGuildChannel(channelName).putPermissionOverride(member).reset());
-	}
-
-	private void setChannelVisibility(IPermissionHolder holder, String channelName, boolean read, boolean write,
-			Function<PermissionOverride, RestAction<PermissionOverride>> func)
+	private PermissionOverrideAction setChannelVisibility(IPermissionHolder holder, String channelName, boolean read, boolean write)
 	{
 		GuildChannel channel = getGuildChannel(channelName);
 		if (channel == null) throw new IllegalArgumentException("Channel name doesn't exist");
@@ -868,10 +842,8 @@ public class DiscordGame
 			else
 				action = channel.putPermissionOverride(holder).reset().setDeny(QP.readPermissions() | QP.writePermissions());
 		}
-		if (action != null && func != null)
-			action.flatMap(func).queue();
-		else if (action != null)
-			action.queue();
+
+		return action;
 	}
 
 	public ArrayList<Person> findAllWithRole(TownRole role) {
@@ -884,35 +856,44 @@ public class DiscordGame
 		return peeps;
 	}
 
-	public void muteExcept(String channelName, Person p)
+	public RestAction<Void> muteExcept(String channelName, Person speaker)
 	{
+		getPlayers().forEach(player -> player.mute(player != speaker));
+
 		VoiceChannel channel = getVoiceChannel(channelName);
 		if (channel == null) throw new IllegalArgumentException("Can't pass a non-voice channel to muteExcept");
 		List<Member> members = channel.getMembers();
-		if (members.isEmpty()) return;
-		RestAction<Void> action = members.get(0).getIdLong() != p.getID() ? members.get(0).mute(true) : members.get(0).mute(false);
+		if (members.isEmpty()) return null;
+
+
+		RestAction<Void> action = members.get(0).mute(members.get(0).getIdLong() != speaker.getID());
 		for (int x = 1; x < members.size(); ++x)
 		{
 			final int y = x; // Finals are needed for lambdas
-			action = action.flatMap(perm -> members.get(y).getIdLong() != p.getID() ? members.get(y).mute(true) : members.get(y).mute(false));
+			action = action.flatMap(perm -> members.get(y).mute(members.get(y).getIdLong() != speaker.getID()));
 		}
-		action.queue();
+		return action;
 	}
 
-	public void restoreTalking(String channelName)
+	public RestAction<Void> restoreTalking(String channelName, boolean canDeadTalk)
 	{
+		getPlayers().forEach(player -> player.mute(canDeadTalk || player.isAlive()));
+
 		VoiceChannel channel = getVoiceChannel(channelName);
 		if (channel == null) throw new IllegalArgumentException("Can't pass a non-voice channel to restoreTalking");
 		List<Member> members = channel.getMembers();
-		if (members.isEmpty()) return;
-		RestAction<?> action = members.get(0).mute(false);
+		if (members.isEmpty()) return null;
+
+		RestAction<Void> action = members.get(0).mute(false);
 		for (int x = 1; x < members.size(); ++x)
 		{
 			final int y = x;
-			if (getPerson(members.get(y)).isAlive())
+			Person person = getPerson(members.get(y));
+			person.mute(false);
+			if (canDeadTalk || getPerson(members.get(y)).isAlive())
 				action = action.flatMap(muteAction -> members.get(y).mute(false));
 		}
-		action.queue();
+		return action;
 	}
 
 	public void gameGuildVoiceJoin(Member m, VoiceChannel channel)
@@ -920,24 +901,8 @@ public class DiscordGame
 		if (!started) return;
 		if (channel.getGuild().getIdLong() != getGameID()) return;
 
-		Phase phase = getCurrentPhase();
-		if (phase instanceof Trial)
-		{
-			Trial trial = (Trial)phase;
-			if (m.getIdLong() != trial.getDefendant().getID())
-				m.mute(true).queue();
-		}
-
-		else if (!getPerson(m).isAlive())
-		{
-			if (channel.getIdLong() == getVoiceChannel("Daytime").getIdLong())
-				m.mute(true).queue();
-			else
-				m.mute(false).queue();
-		}
-
-		else
-			m.mute(false).queue();
+		Person person = getPerson(m);
+		m.mute(person.isMuted()).queue();
 	}
 
 	public void winTownFaction(TownFaction faction)
@@ -954,8 +919,7 @@ public class DiscordGame
 	{
 		if (!person.isDisconnected())
 			getGameGuild()
-			.addRoleToMember(person.getID(), getRole(deadRoleID))
-			.flatMap((rest) -> getGameGuild().removeRoleFromMember(person.getID(), getRole(playerRoleID)))
+			.modifyMemberRoles(getMemberFromGame(person), getRole("dead"))
 			.queue();
 
 		if (saveForMorning)

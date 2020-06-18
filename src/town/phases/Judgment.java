@@ -29,7 +29,7 @@ public class Judgment extends Phase
 	public void start()
 	{
 		loadPlayers();
-		getGame().sendMessageToTextChannel("daytime_discussion", "Vote `!guilty` or `!innocent` in #private");
+		getGame().sendMessageToTextChannel("daytime_discussion", "Vote `!guilty` or `!innocent` in #private").queue();
 	}
 
 	@Override
@@ -45,8 +45,11 @@ public class Judgment extends Phase
 		if (guilty > innocent)
 			return new LastWords(phaseManager, defendant);
 		else if(numTrials > 0)
+		{
+			getGame().getGameGuild().removeRoleFromMember(defendant.getID(), getGame().getRole("defendant")).queue();
 			return new Accusation(phaseManager, numTrials);
-		else 
+		}
+		else
 			return new Night(phaseManager);
 	}
 
@@ -114,7 +117,7 @@ public class Judgment extends Phase
 		});
 
 		MessageEmbed embed = new EmbedBuilder().setColor(Color.YELLOW).setDescription(builder.toString()).build();
-		getGame().sendMessageToTextChannel("daytime_discussion", embed);
+		getGame().sendMessageToTextChannel("daytime_discussion", embed).queue();
 	}
 
 	public enum voteType

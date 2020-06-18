@@ -20,6 +20,7 @@ public abstract class Person
 	private int refNum; // This is how players can refer to other players without mentioning them
 	private int tempDefense = -1;
 	private int tempAttack = -1;
+	private boolean muted = false;
 
 	protected TownRole type;
 	protected boolean disconnected = false;
@@ -43,6 +44,16 @@ public abstract class Person
 		this.refNum = refNum;
 		this.type = type;
 		realName = game.getUser(this).getName();
+	}
+
+	public boolean isMuted()
+	{
+		return muted;
+	}
+
+	public void mute(boolean val)
+	{
+		muted = val;
 	}
 
 	public long getID()
@@ -88,7 +99,7 @@ public abstract class Person
 	public void sendMessage(String msg)
 	{
 		if (privateChannelID != 0)
-			game.sendMessageToTextChannel(privateChannelID, msg);
+			game.sendMessageToTextChannel(privateChannelID, msg).queue();
 		else
 			System.out.println("Could not send to private channel");
 	}
@@ -96,7 +107,7 @@ public abstract class Person
 	public void sendMessage(MessageEmbed msg)
 	{
 		if (privateChannelID != 0)
-			game.sendMessageToTextChannel(privateChannelID, msg);
+			game.sendMessageToTextChannel(privateChannelID, msg).queue();
 		else
 			System.out.println("Could not send to private channel");
 	}
@@ -121,6 +132,7 @@ public abstract class Person
 
 	public void die(String reason, boolean saveForMorning)
 	{
+		muted = true;
 		if (!alive) return;
 		if (!reason.isEmpty()) causeOfDeath = reason;
 		getGame().personDied(this, saveForMorning);

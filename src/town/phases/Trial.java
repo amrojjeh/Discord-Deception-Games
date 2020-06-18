@@ -1,5 +1,6 @@
 package town.phases;
 
+import town.RestHelper;
 import town.persons.Person;
 
 //Trial occurs when the Town agrees to put someone under suspicion. They are given this phase, a small window,
@@ -24,19 +25,25 @@ public class Trial extends Phase
 	@Override
 	public void start()
 	{
-		getGame().sendMessageToTextChannel("daytime_discussion", "<@" + defendant.getID() + ">, your trial has begun. All "
-				+ "other players are muted. What is your defense? You have 30 seconds.");
-		//mute all but the defendant in text / voice daytime channel
-		getGame().muteExcept("Daytime", defendant);
-		getGame().removeReadExcept(defendant, "daytime_discussion");
+		RestHelper.queueAll
+		(
+			getGame().sendMessageToTextChannel("daytime_discussion", "<@" + defendant.getID() + ">, your trial has begun. All "
+					+ "other players are muted. What is your defense? You have 30 seconds."),
+			getGame().muteExcept("Daytime", defendant),
+			getGame().setChannelVisibility("player", "daytime_discussion", true, false)
+		);
+
 		phaseManager.setWarningInSeconds(5);
 	}
 
 	@Override
 	public void end()
 	{
-		getGame().restoreTalking("Daytime");
-		getGame().restoreRead(defendant, "daytime_discussion");
+		RestHelper.queueAll
+		(
+			getGame().restoreTalking("Daytime", false),
+			getGame().setChannelVisibility("player", "daytime_discussion", true, true)
+		);
 	}
 
 	@Override

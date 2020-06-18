@@ -22,7 +22,9 @@ public class End extends Phase
 	@Override
 	public void start()
 	{
-		getGame().sendMessageToTextChannel("daytime_discussion", "The game has ended! You can either `!delete` the server or `!transfer` the server. In 60 seconds if no choice is made, the server will delete itself. (To transfer, the party leader must be in the server)");
+		getGame().getPlayers().forEach(player -> player.mute(false));
+		getGame().sendMessageToTextChannel("daytime_discussion", "The game has ended! You can either `!delete` the server or `!transfer` the server. In 60 seconds if no choice is made, the server will delete itself. (To transfer, the party leader must be in the server)")
+		.queue();
 	}
 
 	@Override
@@ -40,6 +42,6 @@ public class End extends Phase
 	public void delete()
 	{
 		phaseManager.end();
-		getGame().sendMessageToTextChannel("daytime_discussion", "!delete");
+		getGame().sendMessageToTextChannel("daytime_discussion", "!delete").queue();
 	}
 }

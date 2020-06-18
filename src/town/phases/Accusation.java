@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.util.HashMap;
 
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import town.persons.Person;
 
@@ -30,8 +29,9 @@ public class Accusation extends Phase
 	public void start()
 	{
 		getGame().sendMessageToTextChannel("daytime_discussion", "The Accusation phase has started. There are "
-				+ numTrials + " left in the day. Vote up a person with `!vote [num|@mention]`.");
-		sendInitialMessage();
+				+ numTrials + " left in the day. Vote up a person with `!vote [num|@mention]`.")
+		.flatMap(msg -> getGame().sendMessageToTextChannel("daytime_discussion", generateList()))
+		.queue(message -> msgID = message.getIdLong());
 		phaseManager.setWarningInSeconds(5);
 	}
 
@@ -58,8 +58,8 @@ public class Accusation extends Phase
 
 	public void putPlayerOnTrial(Person p)
 	{
-		//ADDITION: "Start over" the phase cycle, from a trial phase.
 		phaseManager.end();
+		getGame().getGameGuild().addRoleToMember(p.getID(), getGame().getRole("defendant")).queue();
 		phaseManager.start(new Trial(phaseManager, p, numTrials - 1));
 	}
 
@@ -79,19 +79,11 @@ public class Accusation extends Phase
 		return new EmbedBuilder().setTitle("Players Alive").setColor(Color.YELLOW).setDescription(description).build();
 	}
 
-	public void sendInitialMessage()
-	{
-		getGame().sendMessageToTextChannel("daytime_discussion", generateList(), message -> msgID = message.getIdLong());
-	}
-
 	public void updateMessage()
 	{
-		getGame().getMessage("daytime_discussion", msgID, (msg) -> updateMessage(msg));
-	}
-
-	public void updateMessage(Message msg)
-	{
-		msg.editMessage(generateList()).queue();
+		getGame().getMessage("daytime_discussion", msgID)
+		.flatMap(msg -> msg.editMessage(generateList()))
+		.queue();
 	}
 
 	public String vote(Person accuser, Person accused)
