@@ -56,6 +56,7 @@ public class DiscordGame
 	private PriorityQueue<TownEvent> events = new PriorityQueue<>();
 	private PhaseManager phaseManager = new PhaseManager(this);
 	private boolean noMinimumPlayers = false;
+	private boolean randomMode = false;
 	private int dayNum = 1;
 
 	private long playerRoleID;
@@ -71,14 +72,6 @@ public class DiscordGame
 		guildID = guildId;
 		partyLeaderID = partyLeaderId;
 		gameMode = PartyGame.TALKING_GRAVES;
-	}
-
-	public DiscordGame(JDA jda, Long guildId, long partyLeaderId, PartyGame type)
-	{
-		this.jda = jda;
-		guildID = guildId;
-		partyLeaderID = partyLeaderId;
-		gameMode = type;
 	}
 
 	public void processMessage(Message message)
@@ -104,6 +97,8 @@ public class DiscordGame
 			noMinCommand(message);
 		else if (!isMessageFromGameGuild(message) && lowerCaseMessage.startsWith(prefix + "setgame"))
 			setGameTypeCommand(message);
+		else if (!isMessageFromGameGuild(message) && lowerCaseMessage.startsWith(prefix + "setrand"))
+			setRandomCommand(message);
 		else if (started && isMessageFromGameGuild(message) && (lowerCaseMessage.startsWith(prefix + "ability") || lowerCaseMessage.startsWith(prefix + "a")))
 			activateAbilityCommand(message);
 		else if (started && isMessageFromGameGuild(message) && lowerCaseMessage.startsWith(prefix + "cancel"))
@@ -190,6 +185,12 @@ public class DiscordGame
 
 	private void setGameTypeCommand(Message message)
 	{
+		if (message.getMember().getIdLong() != partyLeaderID)
+		{
+			message.getChannel().sendMessage(String.format("Only party leader (<@%d>) can configure the game!", partyLeaderID)).queue();
+			return;
+		}
+
 		String words[] = message.getContentRaw().split(" ", 2);
 
 		if (words.length != 2)
@@ -198,14 +199,57 @@ public class DiscordGame
 			return;
 		}
 
-		PartyGame gameToChangeTo = PartyGame.getGame(words[1]);
+		message.getChannel().sendMessage(setGameType(words[1])).queue();
+	}
+
+	public String setGameType(String game)
+	{
+		PartyGame gameToChangeTo = PartyGame.getGame(game);
 		if (gameToChangeTo == null)
-			message.getChannel().sendMessage("Game " + words[1] + " was not found.").queue();
-		else
+			return "FAILED: Game **" + game + "** was not found.";
+
+		gameMode = gameToChangeTo;
+		String extra = "";
+		if (!gameMode.hasRandom() && randomMode)
+			extra = setRandomMode(false) + "\n";
+		return extra + "Game mode was set to **" + gameMode.getName() + "**.";
+	}
+
+	private void setRandomCommand(Message message)
+	{
+		if (message.getMember().getIdLong() != partyLeaderID)
 		{
-			message.getChannel().sendMessage("Game mode was set to " + gameToChangeTo.getName() + ".").queue();
-			gameMode = gameToChangeTo;
+			message.getChannel().sendMessage(String.format("Only party leader (<@%d>) can configure the game!", partyLeaderID)).queue();
+			return;
 		}
+
+		String words[] = message.getContentRaw().split(" ");
+		if (words.length != 2)
+		{
+			message.getChannel().sendMessage("Syntax is: `" + prefix + "setRand [0|1]`");
+			return;
+		}
+
+		Integer activator = JavaHelper.parseInt(words[1]);
+		if (activator == null)
+		{
+			message.getChannel().sendMessage("Syntax is: `" + prefix + "setRand [0|1]`");
+			return;
+		}
+
+		setRandomMode(activator == 1);
+		message.getChannel().sendMessage(setRandomMode(activator == 1)).queue();
+	}
+
+	public String setRandomMode(boolean randomVal)
+	{
+		if (!getGameType().hasRandom() && randomVal)
+			return "FAILED: Game mode doesn't support random";
+
+		randomMode = randomVal;
+		if (randomMode)
+			return "Random mode was activated";
+		return "Random mode was disabled";
 	}
 
 	private void getPossibleTargetsCommand(Message message)
@@ -235,7 +279,7 @@ public class DiscordGame
 			return;
 		}
 
-		String syntax = "Syntax is: " + prefix + "nomin [1|0]";
+		String syntax = "Syntax is: " + prefix + "nomin [0|1]";
 		String words[] = message.getContentRaw().split(" ");
 		int activator = 0;
 		if (words.length != 2) message.getChannel().sendMessage(syntax).queue();
@@ -401,7 +445,8 @@ public class DiscordGame
 	{
 		// this channel used for general game updates
 		g.newRole().setName("Bot").addPermissions(Permission.ADMINISTRATOR).setColor(Color.YELLOW);
-		RoleData playerRoleData = g.newRole().setName("Player").setColor(Color.CYAN)
+
+		g.newRole().setName("Player").setColor(Color.CYAN)
 				.setPermissionsRaw(QP.readPermissions() | QP.writePermissions() | QP.speakPermissions());
 
 		RoleData deadPlayerRoleData = g.newRole().setName("Dead").setColor(Color.GRAY)
@@ -451,7 +496,7 @@ public class DiscordGame
 		started = true;
 
 		// TODO: Add an icon to the server
-		gameMode.build(this);
+		gameMode.build(this, randomMode);
 
 		GuildAction ga = jda.createGuild(gameMode.getName());
 		createNewChannels(ga);

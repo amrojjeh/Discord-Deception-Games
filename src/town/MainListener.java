@@ -217,7 +217,10 @@ public class MainListener extends ListenerAdapter
 	{
 		EmbedBuilder builder = new EmbedBuilder().setTitle("Party Games").setColor(Color.GREEN);
 		for (PartyGame g : PartyGame.values())
-			builder.addField(g.getReference() + ". " + g.getName(), g.getDescription(), false);
+			if (g.hasRandom())
+				builder.addField(g.getReference() + ". " + g.getName() + " (Rand)", g.getDescription(), false);
+			else
+				builder.addField(g.getReference() + ". " + g.getName(), g.getDescription(), false);
 		return builder.build();
 	}
 
@@ -257,21 +260,29 @@ public class MainListener extends ListenerAdapter
 			channelUsed.sendMessage("Can't start a party in a discord game!").queue();
 		else
 		{
-			DiscordGame game;
+			DiscordGame game = new DiscordGame(jda, guildID, partyLeader.getIdLong());
 			String[] words = message.split(" ", 2);
+			String messageToSend = "Party started\n";
+
+			// words[0] = pg.startparty
+			// words[1] = Talking Graves Rand
 			if (words.length == 2)
 			{
-				PartyGame mode = PartyGame.getGame(words[1]);
-				if (mode == null)
+				String lastWord = words[1].substring(words[1].lastIndexOf(" ") + 1).toLowerCase();
+				boolean isRandom = lastWord.contentEquals("rand") || lastWord.contentEquals("random");
+				if (isRandom)
 				{
-					channelUsed.sendMessage("Game mode not found").queue();
-					return;
+					messageToSend += game.setGameType(words[1].substring(0, words[1].toLowerCase().lastIndexOf(" rand"))) + "\n";
+					messageToSend += game.setRandomMode(isRandom)+ "\n";
 				}
-				else game = new DiscordGame(jda, guildID, partyLeader.getIdLong(), mode);
+				else
+					messageToSend += game.setGameType(words[1]);
 			}
 			else
-				game = new DiscordGame(jda, guildID, partyLeader.getIdLong());
-			channelUsed.sendMessage("Party started with game mode **" + game.getGameType().getName() + "**").queue();
+				messageToSend += "Game started with default settings, **Talking Graves** (no random).";
+			channelUsed.sendMessage(messageToSend).queue();
+			if (messageToSend.contains("FAILED")) return;
+
 			game.joinGame(partyLeader.getIdLong(), channelUsed);
 			parties.put(guildID, game);
 		}
