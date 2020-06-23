@@ -36,6 +36,6 @@ public class Night extends Phase
 	@Override
 	public int getDurationInSeconds()
 	{
-		return 10; // 40;
+		return 40;
 	}
 }
