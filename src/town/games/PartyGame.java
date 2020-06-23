@@ -6,20 +6,27 @@ import town.DiscordGame;
 
 public enum PartyGame
 {
-	TALKING_GRAVES("Talking Graves", "Figure out who the killer is by talking to the dead!", 1, 4, TalkingGraves::build),
-	MASHUP("Mashup", "Play with all the roles!", 2, 4, Mashup::build);
+	TALKING_GRAVES("Talking Graves", "Figure out who the killer is by talking to the dead!", 1, 4, TalkingGraves::build, TalkingGraves::buildRand),
+	MEDIC("Medic!", "Like talking graves, but instead of a medium, there's a doctor.", 2, 4, Medic::build, Medic::buildRand),
+	MASHUP("Mashup", "Play with all the roles!", 3, 4, Mashup::build);
 
 	private final String name, description;
 	private final int reference, minimum;
-	private final Consumer<DiscordGame> gameBuild;
+	private final Consumer<DiscordGame> gameBuild, randBuild;
 
 	PartyGame(String name, String descr, int ref, int minimum, Consumer<DiscordGame> gameBuild)
+	{
+		this(name, descr, ref, minimum, gameBuild, null);
+	}
+
+	PartyGame(String name, String descr, int ref, int minimum, Consumer<DiscordGame> gameBuild, Consumer<DiscordGame> random)
 	{
 		this.name = name;
 		this.minimum = minimum;
 		this.gameBuild = gameBuild;
 		description = descr;
 		reference = ref;
+		randBuild = random;
 	}
 
 	public String getName()
@@ -42,9 +49,15 @@ public enum PartyGame
 		return description;
 	}
 
-	public void build(DiscordGame game)
+	public boolean hasRandom()
 	{
-		gameBuild.accept(game);
+		return randBuild != null;
+	}
+
+	public void build(DiscordGame game, boolean buildRandom)
+	{
+		if (buildRandom && hasRandom()) randBuild.accept(game);
+		else gameBuild.accept(game);
 	}
 
 	public static PartyGame getGameFromName(String name)

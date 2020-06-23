@@ -3,11 +3,11 @@ package town.games;
 import town.DiscordGame;
 import town.persons.assigner.Assigner;
 import town.persons.assigner.CivilianAssigner;
+import town.persons.assigner.DoctorAssigner;
 import town.persons.assigner.LookoutAssigner;
-import town.persons.assigner.MediumAssigner;
 import town.persons.assigner.SerialKillerAssigner;
 
-public class TalkingGraves
+public class Medic
 {
 	public static void build(DiscordGame game)
 	{
@@ -28,7 +28,7 @@ public class TalkingGraves
 	private static Assigner random(DiscordGame game)
 	{
 		//    +---------------+----------------+----------+---------+-----------+
-		//    | Total Players | Serial Killers | Lookouts | Mediums | Civilians |
+		//    | Total Players | Serial Killers | Lookouts |  Doctor | Civilians |
 		//    +---------------+----------------+----------+---------+-----------+
 		//    |      X        |      RAND      |   RAND   |   RAND  |    RAND   |
 		//    +---------------+----------------+----------+---------+-----------+
@@ -37,7 +37,7 @@ public class TalkingGraves
 
 		assigner.addRole(new SerialKillerAssigner(game));
 		assigner.addRole(new LookoutAssigner(game));
-		assigner.addRole(new MediumAssigner(game));
+		assigner.addRole(new DoctorAssigner(game));
 		assigner.addRole(new CivilianAssigner(game));
 
 		return assigner;
@@ -46,7 +46,7 @@ public class TalkingGraves
 	private static Assigner medAmount(DiscordGame game, int totalPlayers)
 	{
 		//    +---------------+----------------+----------+---------+-----------+
-		//    | Total Players | Serial Killers | Lookouts | Mediums | Civilians |
+		//    | Total Players | Serial Killers | Lookouts |  Doctor | Civilians |
 		//    +---------------+----------------+----------+---------+-----------+
 		//    |     10        |       2        |     2    |    1    |     5     |
 		//    |      9        |       2        |     2    |    1    |     4     |
@@ -57,7 +57,7 @@ public class TalkingGraves
 
 		assigner.addRole(new SerialKillerAssigner(game, 2));
 		assigner.addRole(new LookoutAssigner(game, 2));
-		assigner.addRole(new MediumAssigner(game, 1));
+		assigner.addRole(new DoctorAssigner(game, 1));
 		int civAmount = totalPlayers > 7 ? totalPlayers - 5 : 1;
 		assigner.addRole(new CivilianAssigner(game, civAmount));
 
@@ -67,7 +67,7 @@ public class TalkingGraves
 	private static Assigner lowAmount(DiscordGame game, int totalPlayers)
 	{
 		//    +---------------+----------------+----------+---------+-----------+
-		//    | Total Players | Serial Killers | Lookouts | Mediums | Civilians |
+		//    | Total Players | Serial Killers | Lookouts |  Doctor | Civilians |
 		//    +---------------+----------------+----------+---------+-----------+
 		//    |      7        |       1        |     1    |    1    |     4     |
 		//    |      6        |       1        |     1    |    1    |     3     |
@@ -79,7 +79,7 @@ public class TalkingGraves
 		Assigner assigner = new Assigner();
 		assigner.addRole(new SerialKillerAssigner(game, 1));
 		assigner.addRole(new LookoutAssigner(game, 1));
-		assigner.addRole(new MediumAssigner(game, 1));
+		assigner.addRole(new DoctorAssigner(game, 1));
 		int civAmount = totalPlayers > 3 ? totalPlayers - 3 : 1;
 		assigner.addRole(new CivilianAssigner(game, civAmount));
 		return assigner;
