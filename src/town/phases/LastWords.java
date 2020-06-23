@@ -19,7 +19,8 @@ public class LastWords extends Phase
 		RestHelper.queueAll
 		(
 			getGame().sendMessageToTextChannel("daytime_discussion", String.format("What are your last words? <@%d>", defendant.getID())),
-			getGame().muteExcept("Daytime", defendant),
+			getGame().muteAllInRole("player", true),
+			getGame().muteAllInRole("defendant", false),
 			getGame().setChannelVisibility("player", "daytime_discussion", true, false)
 		);
 	}
@@ -32,7 +33,7 @@ public class LastWords extends Phase
 		.queue();
 
 		getGame().setChannelVisibility("player", "daytime_discussion", true, true);
-		RestHelper.queueAll(getGame().restoreTalking("Daytime", false));
+		RestHelper.queueAll(getGame().muteAllInRole("player", false));
 
 		getGame().getPlayers().forEach(person -> checkVictory(person));
 	}

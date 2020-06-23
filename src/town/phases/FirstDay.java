@@ -10,6 +10,16 @@ public class FirstDay extends Day
 	}
 
 	@Override
+	public void start()
+	{
+		getGame().sendMessageToTextChannel("daytime_discussion", "Day " + getGame().getDayNum() + " started")
+		.flatMap(msg -> getGame().setChannelVisibility("player", "daytime_discussion", true, true))
+		.queue();
+		getGame().getPlayers().forEach((person) -> checkVictory(person));
+		phaseManager.setWarningInSeconds(5);
+	}
+
+	@Override
 	public Phase getNextPhase()
 	{
 		return new Night(phaseManager);

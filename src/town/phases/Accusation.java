@@ -59,7 +59,8 @@ public class Accusation extends Phase
 	public void putPlayerOnTrial(Person p)
 	{
 		phaseManager.end();
-		getGame().getGameGuild().addRoleToMember(p.getID(), getGame().getRole("defendant")).queue();
+		getGame().getGameGuild().modifyMemberRoles(getGame().getMemberFromGame(p), getGame().getRole("defendant"))
+		.queue();
 		phaseManager.start(new Trial(phaseManager, p, numTrials - 1));
 	}
 
@@ -93,6 +94,9 @@ public class Accusation extends Phase
 
 		if (!accused.isAlive())
 			return String.format("Can't accuse a dead person <@%d>", accuser.getID());
+
+		if (!accuser.isAlive())
+			return String.format("A dead person can't vote <@%d>", accuser.getID());
 
 		if (accused == accuser)
 			return String.format("Can't vote against yourself <@%d>", accuser.getID());

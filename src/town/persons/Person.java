@@ -132,7 +132,7 @@ public abstract class Person
 
 	public void die(String reason, boolean saveForMorning)
 	{
-		muted = true;
+		mute(true);
 		if (!alive) return;
 		if (!reason.isEmpty()) causeOfDeath = reason;
 		getGame().personDied(this, saveForMorning);

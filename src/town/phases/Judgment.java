@@ -30,6 +30,7 @@ public class Judgment extends Phase
 	{
 		loadPlayers();
 		getGame().sendMessageToTextChannel("daytime_discussion", "Vote `!guilty` or `!innocent` in #private").queue();
+		phaseManager.setWarningInSeconds(5);
 	}
 
 	@Override
@@ -46,7 +47,8 @@ public class Judgment extends Phase
 			return new LastWords(phaseManager, defendant);
 		else if(numTrials > 0)
 		{
-			getGame().getGameGuild().removeRoleFromMember(defendant.getID(), getGame().getRole("defendant")).queue();
+			if (!defendant.isDisconnected())
+				getGame().getGameGuild().modifyMemberRoles(getGame().getMemberFromGame(defendant), getGame().getRole("player")).queue();
 			return new Accusation(phaseManager, numTrials);
 		}
 		else
@@ -57,13 +59,15 @@ public class Judgment extends Phase
 	@Override
 	public int getDurationInSeconds()
 	{
-		return 20;
+		return 40;
 	}
 
 	public String guilty(Person person)
 	{
 		if (person == defendant)
 			return defendantVoting();
+		if (!person.isAlive())
+			return deadVoting();
 		voteType previous = votes.put(person, voteType.GUILTY);
 		if (previous == voteType.INNOCENT) innocent -= 1;
 		guilty += 1;
@@ -74,6 +78,8 @@ public class Judgment extends Phase
 	{
 		if (person == defendant)
 			return defendantVoting();
+		if (!person.isAlive())
+			return deadVoting();
 		voteType previous = votes.put(person, voteType.INNOCENT);
 		if (previous == voteType.GUILTY) guilty -= 1;
 		innocent += 1;
@@ -84,6 +90,8 @@ public class Judgment extends Phase
 	{
 		if (person == defendant)
 			return defendantVoting();
+		if (!person.isAlive())
+			return deadVoting();
 		voteType previous = votes.put(person, voteType.ABSTAINED);
 		if (previous == voteType.GUILTY) guilty -= 1;
 		else if (previous == voteType.INNOCENT) innocent -= 1;
@@ -93,6 +101,11 @@ public class Judgment extends Phase
 	private String defendantVoting()
 	{
 		return String.format("<@%d> can't vote guilty or innocent", defendant.getID());
+	}
+
+	private String deadVoting()
+	{
+		return String.format("<@%d> dead can't vote", defendant.getID());
 	}
 
 	private void loadPlayers()

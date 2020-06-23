@@ -1,5 +1,6 @@
 package town.phases;
 
+import town.RestHelper;
 import town.persons.Person;
 
 //Daytime is the phase where players can discuss what is happening. There are no features other than
@@ -16,10 +17,12 @@ public class Day extends Phase
 	{
 		getGame().sendMessageToTextChannel("daytime_discussion", "Day " + getGame().getDayNum() + " started")
 		.flatMap(msg -> getGame().setChannelVisibility("player", "daytime_discussion", true, true))
-		.flatMap(perm -> getGame().setChannelVisibility("player", "Daytime", true, true))
 		.queue();
 
+		getGame().toggleVC("Daytime", true).queue();
+
 		getGame().getPlayers().forEach((person) -> checkVictory(person));
+		RestHelper.queueAll(getGame().muteAllInRole("dead", true));
 		phaseManager.setWarningInSeconds(5);
 	}
 
@@ -44,6 +47,6 @@ public class Day extends Phase
 	@Override
 	public int getDurationInSeconds()
 	{
-		return 10; // 80;
+		return 60;
 	}
 }

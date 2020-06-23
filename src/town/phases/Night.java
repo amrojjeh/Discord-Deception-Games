@@ -12,11 +12,9 @@ public class Night extends Phase
 	@Override
 	public void start()
 	{
-		getGame().setChannelVisibility("player", "daytime_discussion", true, false)
-		.flatMap(perm -> getGame().setChannelVisibility("player", "Daytime", false, false))
-		.queue();
+		getGame().setChannelVisibility("player", "daytime_discussion", true, false).queue();
 
-		RestHelper.queueAll(getGame().discconectEveryoneFromVC("Daytime"));
+		RestHelper.queueAll(getGame().toggleVC("Daytime", false), getGame().muteAllInRole("defendant", false));
 
 		getGame().getPlayers().forEach(person -> person.sendMessage("Night " + getGame().getDayNum() + " started"));
 		phaseManager.setWarningToAll(5);
@@ -38,6 +36,6 @@ public class Night extends Phase
 	@Override
 	public int getDurationInSeconds()
 	{
-		return 30;
+		return 10; // 40;
 	}
 }

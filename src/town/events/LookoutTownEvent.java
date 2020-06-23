@@ -46,7 +46,7 @@ public class LookoutTownEvent implements TownEvent
 	@Override
 	public void postDispatch()
 	{
-		if (visitors.isEmpty()) lookout.sendMessage(String.format("No one visited <@%d>", target.getID()));
+		if (visitors.size() == 1) lookout.sendMessage(String.format("No one visited <@%d>", target.getID()));
 		else
 		{
 			StringBuilder message = new StringBuilder()

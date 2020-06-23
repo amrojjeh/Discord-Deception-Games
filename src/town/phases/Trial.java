@@ -29,8 +29,8 @@ public class Trial extends Phase
 		(
 			getGame().sendMessageToTextChannel("daytime_discussion", "<@" + defendant.getID() + ">, your trial has begun. All "
 					+ "other players are muted. What is your defense? You have 30 seconds."),
-			getGame().muteExcept("Daytime", defendant),
-			getGame().setChannelVisibility("player", "daytime_discussion", true, false)
+			getGame().setChannelVisibility("player", "daytime_discussion", true, false),
+			getGame().muteAllInRoleExcept("player", true, defendant)
 		);
 
 		phaseManager.setWarningInSeconds(5);
@@ -41,7 +41,7 @@ public class Trial extends Phase
 	{
 		RestHelper.queueAll
 		(
-			getGame().restoreTalking("Daytime", false),
+			getGame().muteAllInRole("player", false),
 			getGame().setChannelVisibility("player", "daytime_discussion", true, true)
 		);
 	}
@@ -55,6 +55,6 @@ public class Trial extends Phase
 	@Override
 	public int getDurationInSeconds()
 	{
-		return 20;
+		return 30;
 	}
 }

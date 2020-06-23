@@ -23,6 +23,7 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.VoiceChannel;
+import net.dv8tion.jda.api.managers.RoleManager;
 import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.requests.restaction.GuildAction;
 import net.dv8tion.jda.api.requests.restaction.GuildAction.RoleData;
@@ -338,11 +339,6 @@ public class DiscordGame
 		Person accuser = getPerson(message.getMember());;
 		Person accused = referenced.get(0);
 
-		if (!accuser.isAlive())
-		{
-			message.getChannel().sendMessage(String.format("Dead men can't vote <@%d>", accuser.getID())).queue();
-			return;
-		}
 		Accusation acc = (Accusation)phase;
 		sendMessageToTextChannel("daytime_discussion", acc.vote(accuser, accused)).queue();
 	}
@@ -405,9 +401,14 @@ public class DiscordGame
 	{
 		// this channel used for general game updates
 		g.newRole().setName("Bot").addPermissions(Permission.ADMINISTRATOR).setColor(Color.YELLOW);
-		RoleData playerRoleData = g.newRole().setName("Player").setColor(Color.CYAN);
-		RoleData deadPlayerRoleData = g.newRole().setName("Dead").setColor(Color.GRAY);
-		RoleData defendantRoleData = g.newRole().setName("Defendant").setColor(Color.GREEN);
+		RoleData playerRoleData = g.newRole().setName("Player").setColor(Color.CYAN)
+				.setPermissionsRaw(QP.readPermissions() | QP.writePermissions() | QP.speakPermissions());
+
+		RoleData deadPlayerRoleData = g.newRole().setName("Dead").setColor(Color.GRAY)
+				.setPermissionsRaw(QP.readPermissions());
+
+		RoleData defendantRoleData = g.newRole().setName("Defendant").setColor(Color.GREEN)
+				.setPermissionsRaw(QP.speakPermissions() | QP.writePermissions() | QP.readPermissions());
 
 		// FIXME: WARNING: Unable to load JDK7 types (java.nio.file.Path): no Java7 type support added
 		// Is being caued by the addPermissionOverride method.
@@ -415,23 +416,22 @@ public class DiscordGame
 
 		// players discussing during the day
 		g.newChannel(ChannelType.TEXT, "daytime_discussion")
-		.addPermissionOverride(deadPlayerRoleData, QP.readPermissions(), QP.writePermissions())
-		.addPermissionOverride(defendantRoleData, QP.readPermissions() | QP.writePermissions(), 0)
-		.setPosition(0);
+		.setPosition(0)
+		.addPermissionOverride(g.getPublicRole(), QP.readPermissions(), QP.writePermissions())
+		.addPermissionOverride(defendantRoleData, QP.readPermissions() | QP.writePermissions(), 0);
 
 		for (Person p : getPlayers())
 		{
 			g.newChannel(ChannelType.TEXT, "private")
 			.setPosition(1)
-			.addPermissionOverride(playerRoleData, 0, QP.readPermissions() | QP.writePermissions())
-			.addPermissionOverride(deadPlayerRoleData, 0, QP.readPermissions() | QP.writePermissions())
+			.addPermissionOverride(g.getPublicRole(), 0, QP.readPermissions() | QP.writePermissions())
 			.setTopic(p.getRealName()); // This will be used as an identifier
 		}
 
 		//for dead players
 		g.newChannel(ChannelType.TEXT, "the_afterlife")
 		.setPosition(2)
-		.addPermissionOverride(playerRoleData, 0, QP.readPermissions() | QP.writePermissions())
+		.addPermissionOverride(g.getPublicRole(), 0, QP.readPermissions() | QP.writePermissions())
 		.addPermissionOverride(deadPlayerRoleData, QP.readPermissions() | QP.writePermissions(), 0);
 	}
 
@@ -476,6 +476,7 @@ public class DiscordGame
 			p.sendMessage(p.getHelp());
 		}
 
+		guild.getPublicRole().getManager().reset().queue();
 		sendMessageToTextChannel("daytime_discussion", "Waiting for players...").queue();
 	}
 
@@ -661,15 +662,7 @@ public class DiscordGame
 
 	public VoiceChannel getVoiceChannel(String channelName)
 	{
-		Long channelID = channels.get(channelName);
-		return getVoiceChannel(channelID);
-	}
-
-	public VoiceChannel getVoiceChannel(Long channelID)
-	{
-		if (channelID != null)
-			return getGameGuild().getVoiceChannelById(channelID);
-		return null;
+		return getGameGuild().getVoiceChannelsByName(channelName, false).get(0);
 	}
 
 	public void dispatchEvents()
@@ -790,22 +783,12 @@ public class DiscordGame
 			member.kick("He was not part of the lobby").queue();
 	}
 
-	public RestAction<Void> discconectEveryoneFromVC(String vcName)
+	public RestAction<?> toggleVC(String channelName, boolean show)
 	{
-		return discconectEveryoneFromVC(getVoiceChannel(vcName));
-	}
-
-	public RestAction<Void> discconectEveryoneFromVC(VoiceChannel channel)
-	{
-		List<Member> members = channel.getMembers();
-		if (members.isEmpty()) return null;
-		RestAction<Void> action = members.get(0).getGuild().kickVoiceMember(members.get(0));
-		for (int x = 1; x < members.size(); ++x)
-		{
-			final int y = x;
-			action = action.flatMap(kickAction -> members.get(y).getGuild().kickVoiceMember(members.get(y)));
-		}
-		return action;
+		if (!show)
+			return getVoiceChannel(channelName).delete();
+		else
+			return getGameGuild().createVoiceChannel("Daytime");
 	}
 
 	public PermissionOverrideAction setChannelVisibility(String roleName, String channelName, boolean read, boolean write)
@@ -826,14 +809,7 @@ public class DiscordGame
 		GuildChannel channel = getGuildChannel(channelName);
 		if (channel == null) throw new IllegalArgumentException("Channel name doesn't exist");
 		PermissionOverrideAction action = null;
-		if (channel.getType().equals(ChannelType.VOICE))
-		{
-			if (read)
-				action = channel.putPermissionOverride(holder).reset().setAllow(QP.connectPermissions());
-			else
-				action = channel.putPermissionOverride(holder).reset().setDeny(QP.connectPermissions());
-		}
-		else if (channel.getType().equals(ChannelType.TEXT))
+		if (channel.getType().equals(ChannelType.TEXT))
 		{
 			if (read && !write)
 				action = channel.putPermissionOverride(holder).reset().setPermissions(QP.readPermissions(), QP.writePermissions());
@@ -846,7 +822,7 @@ public class DiscordGame
 		return action;
 	}
 
-	public ArrayList<Person> findAllWithRole(TownRole role) {
+	public ArrayList<Person> findAllWithTownRole(TownRole role) {
 		ArrayList<Person> peeps = new ArrayList<>();
 		for(Person p : persons) {
 			if(p.getType().equals(role)) {
@@ -856,44 +832,34 @@ public class DiscordGame
 		return peeps;
 	}
 
-	public RestAction<Void> muteExcept(String channelName, Person speaker)
+	public RoleManager muteAllInRole(String roleName, boolean shouldMute)
 	{
-		getPlayers().forEach(player -> player.mute(player != speaker));
-
-		VoiceChannel channel = getVoiceChannel(channelName);
-		if (channel == null) throw new IllegalArgumentException("Can't pass a non-voice channel to muteExcept");
-		List<Member> members = channel.getMembers();
-		if (members.isEmpty()) return null;
-
-
-		RestAction<Void> action = members.get(0).mute(members.get(0).getIdLong() != speaker.getID());
-		for (int x = 1; x < members.size(); ++x)
+		Role role = getRole(roleName);
+		List<Member> members = getGameGuild().getMembersWithRoles(role);
+		for (Member member : members)
 		{
-			final int y = x; // Finals are needed for lambdas
-			action = action.flatMap(perm -> members.get(y).mute(members.get(y).getIdLong() != speaker.getID()));
+			getPerson(member).mute(shouldMute);
+			if (member.getVoiceState().inVoiceChannel()) member.mute(shouldMute).queue(v -> {}, v -> {});
 		}
-		return action;
+		if (shouldMute)
+			return role.getManager().revokePermissions(Permission.VOICE_SPEAK);
+		return role.getManager().setPermissions(Permission.VOICE_SPEAK);
 	}
 
-	public RestAction<Void> restoreTalking(String channelName, boolean canDeadTalk)
+	public RoleManager muteAllInRoleExcept(String roleName, boolean shouldMute, Person p)
 	{
-		getPlayers().forEach(player -> player.mute(canDeadTalk || player.isAlive()));
-
-		VoiceChannel channel = getVoiceChannel(channelName);
-		if (channel == null) throw new IllegalArgumentException("Can't pass a non-voice channel to restoreTalking");
-		List<Member> members = channel.getMembers();
-		if (members.isEmpty()) return null;
-
-		RestAction<Void> action = members.get(0).mute(false);
-		for (int x = 1; x < members.size(); ++x)
+		Role role = getRole(roleName);
+		List<Member> members = getGameGuild().getMembersWithRoles(role);
+		for (Member member : members)
 		{
-			final int y = x;
-			Person person = getPerson(members.get(y));
-			person.mute(false);
-			if (canDeadTalk || getPerson(members.get(y)).isAlive())
-				action = action.flatMap(muteAction -> members.get(y).mute(false));
+			Person person = getPerson(member);
+			if (person != p)
+				person.mute(shouldMute);
+			if (member.getVoiceState().inVoiceChannel()) member.mute(person.isMuted()).queue(v -> {}, v -> {});
 		}
-		return action;
+		if (shouldMute)
+			return role.getManager().revokePermissions(Permission.VOICE_SPEAK);
+		return role.getManager().setPermissions(Permission.VOICE_SPEAK);
 	}
 
 	public void gameGuildVoiceJoin(Member m, VoiceChannel channel)
@@ -973,9 +939,9 @@ public class DiscordGame
 			return Permission.getRaw(Permission.MESSAGE_WRITE, Permission.MESSAGE_ADD_REACTION);
 		}
 
-		public static long connectPermissions()
+		public static long speakPermissions()
 		{
-			return Permission.getRaw(Permission.VOICE_CONNECT, Permission.VIEW_CHANNEL);
+			return Permission.getRaw(Permission.VOICE_SPEAK, Permission.PRIORITY_SPEAKER);
 		}
 	}
 }
