@@ -483,7 +483,6 @@ public class DiscordGame
 	public void addEvent(TownEvent event)
 	{
 		events.add(event);
-		events.forEach(e -> System.out.println(e.toString()));
 	}
 
 	public void removeEvent(TownEvent event)
