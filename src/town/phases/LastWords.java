@@ -32,7 +32,6 @@ public class LastWords extends Phase
 		getGame().sendMessageToTextChannel("daytime_discussion", "Their role was: " + defendant.getType().getName())
 		.queue();
 
-		getGame().setChannelVisibility("player", "daytime_discussion", true, true);
 		RestHelper.queueAll(getGame().muteAllInRole("player", false));
 
 		getGame().getPlayers().forEach(person -> checkVictory(person));
