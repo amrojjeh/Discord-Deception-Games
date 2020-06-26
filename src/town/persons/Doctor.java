@@ -49,11 +49,13 @@ public class Doctor extends Person {
 		String msg = "";
 
 		if (references.isEmpty())
-			return "There's no one to heal. `!ability 1` to watch the first person shown in `!party`.";
+			return "There's no one to heal. `!ability 1` to protect the first person shown in `!party`.";
 		if (references.size() > 1)
 			return "Cannot heal more than one person at once. `!ability 1` to watch the first person show in `!party`.";
 		if (!(getGame().getCurrentPhase() instanceof Night))
 			return "You can only use your ability at night.";
+		if (!isAlive())
+			return "Doctors can't heal when dead";
 
 		if (references.get(0) == this && selfHeal <= 0)
 			return "You already used your self-heal!";
