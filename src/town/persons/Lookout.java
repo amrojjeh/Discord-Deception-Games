@@ -49,7 +49,9 @@ public class Lookout extends Person
 			return "Lookouts can only watch visitors during the night.";
 		if (!references.get(0).isAlive())
 			return "Lookouts can't watch dead people.";
-		// You can't kill yourself
+		if (!isAlive())
+			return "Can't watch people if you're dead.";
+
 		// In the real game, you can't track yourself
 		//		if (references.get(0) == this)
 		//			return "You can't track yourself.";
