@@ -3,6 +3,7 @@ package town.persons;
 import java.util.List;
 
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.TextChannel;
 import town.DiscordGame;
 import town.TownRole;
 import town.events.TownEvent;
@@ -120,6 +121,11 @@ public abstract class Person
 	public Long getChannelID()
 	{
 		return privateChannelID;
+	}
+
+	public TextChannel getChannel()
+	{
+		return getGame().getTextChannel(getChannelID());
 	}
 
 	public void die(String reason)
