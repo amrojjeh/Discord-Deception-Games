@@ -24,36 +24,26 @@ public class Accusation extends Phase
 		numVotesNeeded = getGame().getAlivePlayers().size() / 2 + 1;
 	}
 
-	//begins Accusation. Players can now use the command to accuse other players. One accusation at a time!!
 	@Override
 	public void start()
 	{
-		getGame().sendMessageToTextChannel("daytime_discussion", "The Accusation phase has started. There are "
-				+ numTrials + " left in the day. Vote up a person with `!vote [num|@mention]`.")
+		getGame().sendMessageToTextChannel("daytime_discussion", "The Accusation phase has started. **There are "
+				+ numTrials + " left in the day**. Vote up a person with `!vote [num|@mention]`.")
 		.flatMap(msg -> getGame().sendMessageToTextChannel("daytime_discussion", generateList()))
-		.queue(message -> msgID = message.getIdLong());
+		.queue(message -> {msgID = message.getIdLong(); message.pin().queue();});
 		phaseManager.setWarningInSeconds(5);
 	}
 
-	//ends the Accusation phase. HOWEVER, the phase may be resumed later, depending on if a trial has begun.
-	@Override
-	public void end()
-	{
-
-	}
-
-	//gets the next phase in line: could be Defense (if a player has enough votes) or Night
 	@Override
 	public Phase getNextPhase()
 	{
 		return new Night(phaseManager);
 	}
 
-	//Duration: 30 seconds
 	@Override
 	public int getDurationInSeconds()
 	{
-		return 50;
+		return 120;
 	}
 
 	public void putPlayerOnTrial(Person p)
@@ -71,11 +61,8 @@ public class Accusation extends Phase
 		{
 			Integer vote = numOfVotes.get(p);
 			if (vote == null) vote = 0;
-			if (vote < 10)
-				description += vote;
-			else
-				description += vote + " ";
-			description += ": " + p.getNum() + ". <@" + p.getID() + ">\n";
+			description += "(votes " + vote + ") ";
+			description += p.getNum() + ". <@" + p.getID() + ">\n";
 		}
 		return new EmbedBuilder().setTitle("Players Alive").setColor(Color.YELLOW).setDescription(description).build();
 	}
