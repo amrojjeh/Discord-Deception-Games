@@ -19,4 +19,9 @@ public interface TownEvent extends Comparable<TownEvent>
 	{
 		return getPriority() - e.getPriority();
 	}
+
+	default boolean isVisitor(Person person)
+	{
+		return person.getEvent() != null && person.getEvent().getTarget() == getTarget();
+	}
 }
