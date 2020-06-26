@@ -39,8 +39,8 @@ public class LookoutTownEvent implements TownEvent
 	@Override
 	public void standard(Person person)
 	{
-		if (person.getEvent() != null && person.getEvent().getTarget() == target)
-			addVisitor(person);
+		if (isVisitor(person))
+			visitors.add(person);
 	}
 
 	@Override
@@ -49,8 +49,7 @@ public class LookoutTownEvent implements TownEvent
 		if (visitors.size() == 1) lookout.sendMessage(String.format("No one visited <@%d>", target.getID()));
 		else
 		{
-			StringBuilder message = new StringBuilder()
-					.append(String.format("You watched <@%d> over night, here are the visitors\n", target.getID()));
+			StringBuilder message = new StringBuilder(String.format("You watched <@%d> over night, here are the visitors\n", target.getID()));
 			visitors.forEach(person -> {if (person != lookout) message.append(String.format("- <@%d>\n", person.getID()));});
 			lookout.sendMessage(message.toString());
 		}
@@ -60,10 +59,5 @@ public class LookoutTownEvent implements TownEvent
 	public int getPriority()
 	{
 		return lookout.getType().getPriority();
-	}
-
-	public void addVisitor(Person person)
-	{
-		visitors.add(person);
 	}
 }
