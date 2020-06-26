@@ -13,7 +13,7 @@ public class Medic
 	{
 		int totalPlayers = game.getPlayers().size();
 		Assigner assigner;
-		if (totalPlayers <= 5) assigner = lowAmount(game, totalPlayers);
+		if (totalPlayers <= 8) assigner = lowAmount(game, totalPlayers);
 		else assigner = medAmount(game, totalPlayers);
 
 		game.getPlayersCache().replaceAll(person -> assigner.generatePerson(person.getNum(), person.getID()));
@@ -28,7 +28,7 @@ public class Medic
 	private static Assigner random(DiscordGame game)
 	{
 		//    +---------------+----------------+----------+---------+-----------+
-		//    | Total Players | Serial Killers | Lookouts |  Doctor | Civilians |
+		//    | Total Players | Serial Killers | Lookouts | Doctors | Civilians |
 		//    +---------------+----------------+----------+---------+-----------+
 		//    |      X        |      RAND      |   RAND   |   RAND  |    RAND   |
 		//    +---------------+----------------+----------+---------+-----------+
@@ -46,7 +46,7 @@ public class Medic
 	private static Assigner medAmount(DiscordGame game, int totalPlayers)
 	{
 		//    +---------------+----------------+----------+---------+-----------+
-		//    | Total Players | Serial Killers | Lookouts |  Doctor | Civilians |
+		//    | Total Players | Serial Killers | Lookouts | Doctors | Civilians |
 		//    +---------------+----------------+----------+---------+-----------+
 		//    |     10        |       2        |     2    |    1    |     5     |
 		//    |      9        |       2        |     2    |    1    |     4     |
@@ -67,7 +67,7 @@ public class Medic
 	private static Assigner lowAmount(DiscordGame game, int totalPlayers)
 	{
 		//    +---------------+----------------+----------+---------+-----------+
-		//    | Total Players | Serial Killers | Lookouts |  Doctor | Civilians |
+		//    | Total Players | Serial Killers | Lookouts | Doctors | Civilians |
 		//    +---------------+----------------+----------+---------+-----------+
 		//    |      7        |       1        |     1    |    1    |     4     |
 		//    |      6        |       1        |     1    |    1    |     3     |
