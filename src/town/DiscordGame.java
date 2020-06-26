@@ -81,38 +81,47 @@ public class DiscordGame
 
 	public void processMessage(String prefix, Message message)
 	{
-		String lowerCaseMessage = message.getContentRaw().toLowerCase();
+		String rawMsg = message.getContentRaw().toLowerCase();
 
-		if (!isMessageFromGameGuild(message) && lowerCaseMessage.contentEquals(prefix + "startgame"))
+		if (!isMessageFromGameGuild(message) && commandCheck(false, rawMsg, prefix, "startgame"))
 			startGameCommand(message);
 
-		// TODO: Block people if they occupy a certain role
-		else if (message.getContentRaw().contentEquals(prefix + "party"))
+		else if (commandCheck(false, rawMsg, prefix, "party"))
 			displayParty(message.getChannel());
-		else if (!isMessageFromGameGuild(message) && lowerCaseMessage.contentEquals(prefix + "join"))
+		else if (!isMessageFromGameGuild(message) && commandCheck(false, rawMsg, prefix, "join"))
 			joinGame(message.getMember().getIdLong(), message.getChannel());
-		else if (!isMessageFromGameGuild(message) && lowerCaseMessage.contentEquals(prefix + "leave"))
+		else if (!isMessageFromGameGuild(message) && commandCheck(false, rawMsg, prefix, "leave"))
 			leaveGameCommand(message.getMember().getIdLong(), message.getChannel());
-		else if (!isMessageFromGameGuild(message) && lowerCaseMessage.startsWith(prefix + "nomin"))
+		else if (!isMessageFromGameGuild(message) && commandCheck(true, rawMsg, prefix, "nomin"))
 			noMinCommand(message);
-		else if (!isMessageFromGameGuild(message) && lowerCaseMessage.startsWith(prefix + "setgame"))
+		else if (!isMessageFromGameGuild(message) && commandCheck(true, rawMsg, prefix, "setgame"))
 			setGameTypeCommand(message);
-		else if (!isMessageFromGameGuild(message) && lowerCaseMessage.startsWith(prefix + "setrand"))
+		else if (!isMessageFromGameGuild(message) && commandCheck(true, rawMsg, prefix, "setrand"))
 			setRandomCommand(message);
-		else if (started && isMessageFromGameGuild(message) && (lowerCaseMessage.startsWith(prefix + "ability") || lowerCaseMessage.startsWith(prefix + "a")))
+
+		else if (started && isMessageFromGameGuild(message) && commandCheck(true, rawMsg, prefix, "ability", "a"))
 			activateAbilityCommand(message);
-		else if (started && isMessageFromGameGuild(message) && lowerCaseMessage.startsWith(prefix + "cancel"))
+		else if (started && isMessageFromGameGuild(message) && commandCheck(false, rawMsg, prefix, "cancel", "c"))
 			cancelCommand(message);
-		else if (started && isMessageFromGameGuild(message) && lowerCaseMessage.contentEquals(prefix + "rolehelp"))
+		else if (started && isMessageFromGameGuild(message) && commandCheck(false, rawMsg, prefix, "rolehelp", "rh"))
 			roleHelpCommand(message);
-		else if (started && isMessageFromGameGuild(message) && lowerCaseMessage.startsWith(prefix + "vote"))
+		else if (started && isMessageFromGameGuild(message) && commandCheck(true, rawMsg, prefix, "vote", "v"))
 			voteCommand(message);
-		else if (started && isMessageFromGameGuild(message) && lowerCaseMessage.contentEquals(prefix + "guilty"))
+		else if (started && isMessageFromGameGuild(message) && commandCheck(false, rawMsg, prefix, "guilty", "g"))
 			guiltyCommand(message);
-		else if (started && isMessageFromGameGuild(message) && lowerCaseMessage.contentEquals(prefix + "innocent"))
+		else if (started && isMessageFromGameGuild(message) && commandCheck(false, rawMsg, prefix, "innocent", "inno", "i"))
 			innocentCommand(message);
-		else if (started && isMessageFromGameGuild(message) && lowerCaseMessage.contentEquals(prefix + "targets"))
+		else if (started && isMessageFromGameGuild(message) && commandCheck(false, rawMsg, prefix, "targets", "t"))
 			getPossibleTargetsCommand(message);
+	}
+
+	// Assumes msg is lowercase
+	private boolean commandCheck(boolean startsWith, String msg, String prefix, String... commands)
+	{
+		for (String command : commands)
+			if (startsWith && msg.startsWith(prefix + command)) return true;
+			else if (msg.equals(prefix + command)) return true;
+		return false;
 	}
 
 	private boolean isMessageFromGameGuild(Message message)
@@ -309,7 +318,8 @@ public class DiscordGame
 		else if (message.getMember().getIdLong() != partyLeaderID)
 			message.getChannel().sendMessage(String.format("Only party leader (<@%d>) can start the game!", partyLeaderID)).queue();
 		else if (!noMinimumPlayers && getPlayers().size() < gameMode.getMinimum())
-			message.getChannel().sendMessage("Not enough players to play " + gameMode.getName() + "!").queue();
+			message.getChannel().sendMessage("Not enough players to play " + gameMode.getName() + "! (" +
+		(gameMode.getMinimum() - getPlayersCache().size()) + " left to play)").queue();
 		else
 		{
 			message.getChannel().sendMessage("Game has started! Creating server...").queue();
@@ -840,6 +850,11 @@ public class DiscordGame
 		return setChannelVisibility(getRole(getRoleID(roleName)), channelName, read, write);
 	}
 
+	public void openPrivateChannels()
+	{
+		getPlayersCache().forEach(p -> setChannelVisibility(getGameGuild().getPublicRole(), p.getChannel(), true, false).queue());
+	}
+
 	public PermissionOverrideAction setChannelVisibility(Person p, String channelName, boolean read, boolean write)
 	{
 		if (p.isDisconnected()) return null;
@@ -850,7 +865,16 @@ public class DiscordGame
 
 	private PermissionOverrideAction setChannelVisibility(IPermissionHolder holder, String channelName, boolean read, boolean write)
 	{
-		GuildChannel channel = getGuildChannel(channelName);
+		return setChannelVisibility(holder, getTextChannel(channelName), read, write);
+	}
+
+	private PermissionOverrideAction setChannelVisibility(IPermissionHolder holder, long channelId, boolean read, boolean write)
+	{
+		return setChannelVisibility(holder, getTextChannel(channelId), read, write);
+	}
+
+	private PermissionOverrideAction setChannelVisibility(IPermissionHolder holder, TextChannel channel, boolean read, boolean write)
+	{
 		if (channel == null) throw new IllegalArgumentException("Channel name doesn't exist");
 		PermissionOverrideAction action = null;
 		if (channel.getType().equals(ChannelType.TEXT))
