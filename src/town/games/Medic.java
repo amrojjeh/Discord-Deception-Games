@@ -13,7 +13,7 @@ public class Medic
 	{
 		int totalPlayers = game.getPlayers().size();
 		Assigner assigner;
-		if (totalPlayers <= 8) assigner = lowAmount(game, totalPlayers);
+		if (totalPlayers < 8) assigner = lowAmount(game, totalPlayers);
 		else assigner = medAmount(game, totalPlayers);
 
 		game.getPlayersCache().replaceAll(person -> assigner.generatePerson(person.getNum(), person.getID()));
