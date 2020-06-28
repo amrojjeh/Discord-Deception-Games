@@ -141,7 +141,10 @@ public abstract class Person
 		mute(true);
 		if (!alive) return;
 		if (!reason.isEmpty()) causeOfDeath = reason;
-		getGame().personDied(this, saveForMorning);
+		if (!isDisconnected())
+			getGame().modifyMemberRoles(this, "dead", getType().getName()).queue();
+		if (saveForMorning)
+			getGame().saveForMorning(this);
 		alive = false;
 	}
 

@@ -49,6 +49,7 @@ public class DiscordGame
 
 	// Important channels (Name : id)
 	private HashMap<String, Long> channels = new HashMap<>();
+	private HashMap<String, Long> roles = new HashMap<>();
 	private String prefix = "pg.";
 	private HashSet<TownFaction> wonTownRoles = new HashSet<TownFaction>();
 	private ArrayList<Person> persons = new ArrayList<>();
@@ -58,10 +59,6 @@ public class DiscordGame
 	private boolean noMinimumPlayers = false;
 	private boolean randomMode = false;
 	private int dayNum = 1;
-
-	private long playerRoleID;
-	private long deadRoleID;
-	private long defendantRoleID;
 
 	boolean initiated = false;
 	boolean ended = false;
@@ -498,16 +495,6 @@ public class DiscordGame
 		.addPermissionOverride(deadPlayerRoleData, QP.readPermissions() | QP.writePermissions(), 0);
 	}
 
-	public void addEvent(TownEvent event)
-	{
-		events.add(event);
-	}
-
-	public void removeEvent(TownEvent event)
-	{
-		events.remove(event);
-	}
-
 	public void startGame()
 	{
 		initiated = true;
@@ -528,9 +515,16 @@ public class DiscordGame
 		guild.getChannels(true).forEach((channel) -> assignChannel(channel));
 		getGameGuild().addRoleToMember(jda.getSelfUser().getIdLong(), guild.getRolesByName("Bot", false).get(0)).queue();
 
-		playerRoleID = guild.getRolesByName("Player", false).get(0).getIdLong();
-		deadRoleID = guild.getRolesByName("Dead", false).get(0).getIdLong();
-		defendantRoleID = guild.getRolesByName("Defendant", false).get(0).getIdLong();
+		List<Role> guildRoles = getGameGuild().getRoles();
+		for (int x = 0; x < getGameType().getTownRoles().length; ++x)
+		{
+			Role townRole = guildRoles.get(guildRoles.size() - x - 2);
+			roles.put(townRole.getName().toLowerCase(), townRole.getIdLong());
+		}
+
+		roles.put("player", guild.getRolesByName("Player", false).get(0).getIdLong());
+		roles.put("dead", guild.getRolesByName("Dead", false).get(0).getIdLong());
+		roles.put("defendant", guild.getRolesByName("Defendant", false).get(0).getIdLong());
 
 		for (Person p : getPlayers())
 		{
@@ -727,6 +721,16 @@ public class DiscordGame
 		return getGameGuild().getVoiceChannelsByName(channelName, false).get(0);
 	}
 
+	public void addEvent(TownEvent event)
+	{
+		events.add(event);
+	}
+
+	public void removeEvent(TownEvent event)
+	{
+		events.remove(event);
+	}
+
 	public void dispatchEvents()
 	{
 		if (events.size() == 0) return;
@@ -768,30 +772,18 @@ public class DiscordGame
 		return jda.getGuildById(getGameID());
 	}
 
-	public Role getRole(long roleID)
-	{
-		return getGameGuild().getRoleById(roleID);
-	}
-
 	public Role getRole(String roleName)
 	{
-		return getRole(getRoleID(roleName));
+		return getGameGuild().getRoleById(getRoleID(roleName));
 	}
 
 	private long getRoleID(String roleName)
 	{
 		if (!initiated) throw new IllegalStateException("Game has not started, can't get roles");
-		switch (roleName.toLowerCase())
-		{
-		case "player":
-			return playerRoleID;
-		case "dead":
-			return deadRoleID;
-		case "defendant":
-			return defendantRoleID;
-		default:
-			throw new IllegalArgumentException("Role name not found");
-		}
+		Long id = roles.get(roleName.toLowerCase());
+		if (id == null)
+			throw new IllegalArgumentException("Role " + roleName + " not found");
+		return id;
 	}
 
 	private RestAction<Message> sendDMTo(Person person, String msg)
@@ -832,7 +824,7 @@ public class DiscordGame
 		for (Person p : getPlayers())
 			if (p.getID() == member.getUser().getIdLong())
 			{
-				getGameGuild().addRoleToMember(member, getRole(playerRoleID)).queue();
+				getGameGuild().addRoleToMember(member, getRole("player")).queue();
 				TextChannel textChannel = getTextChannel(p.getChannelID());
 				textChannel.putPermissionOverride(getMemberFromGame(p)).setAllow(QP.readPermissions() | QP.writePermissions()).queue();
 				shouldKick = false;
@@ -855,7 +847,7 @@ public class DiscordGame
 
 	public PermissionOverrideAction setChannelVisibility(String roleName, String channelName, boolean read, boolean write)
 	{
-		return setChannelVisibility(getRole(getRoleID(roleName)), channelName, read, write);
+		return setChannelVisibility(getRole(roleName), channelName, read, write);
 	}
 
 	public void openPrivateChannels()
@@ -957,15 +949,9 @@ public class DiscordGame
 		return wonTownRoles.contains(faction);
 	}
 
-	public void personDied(Person person, boolean saveForMorning)
+	public void saveForMorning(Person p)
 	{
-		if (!person.isDisconnected())
-			getGameGuild()
-			.modifyMemberRoles(getMemberFromGame(person), getRole("dead"))
-			.queue();
-
-		if (saveForMorning)
-			savedForMorning.add(person);
+		savedForMorning.add(p);
 	}
 
 	public Person getDeathForMorning()
@@ -1000,6 +986,18 @@ public class DiscordGame
 	public PartyGame getGameType()
 	{
 		return gameMode;
+	}
+
+	public RestAction<Void> modifyMemberRoles(Person person, String... roleNames)
+	{
+		Role[] roles = new Role[roleNames.length];
+		for (int x = 0; x < roleNames.length; ++x)
+		{
+			Role role = getRole(roleNames[x]);
+			if (role == null) throw new IllegalArgumentException("Role name does not exist");
+			roles[x] = role;
+		}
+		return getGameGuild().modifyMemberRoles(getMemberFromGame(person), roles);
 	}
 
 	// Quick Permissions
