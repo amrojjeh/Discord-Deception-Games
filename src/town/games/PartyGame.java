@@ -3,27 +3,30 @@ package town.games;
 import java.util.function.Consumer;
 
 import town.DiscordGame;
+import town.TownRole;
 
 public enum PartyGame
 {
-	TALKING_GRAVES("Talking Graves", "Figure out who the killer is by talking to the dead!", 1, 4, TalkingGraves::build, TalkingGraves::buildRand),
-	MEDIC("Medic!", "Like talking graves, but instead of a medium, there's a doctor.", 2, 4, Medic::build, Medic::buildRand),
-	MASHUP("Mashup", "Play with all the roles!", 3, 4, Mashup::build);
+	TALKING_GRAVES("Talking Graves", "Figure out who the killer is by talking to the dead!", 1, 4, TalkingGraves.townRoles, TalkingGraves::build, TalkingGraves::buildRand),
+	MEDIC("Medic!", "Like talking graves, but instead of a medium, there's a doctor.", 2, 4, Medic.townRoles, Medic::build, Medic::buildRand),
+	MASHUP("Mashup", "Play with all the roles!", 3, 4, Mashup.townRoles, Mashup::build);
 
 	private final String name, description;
 	private final int reference, minimum;
 	private final Consumer<DiscordGame> gameBuild, randBuild;
+	private final TownRole[] townRoles;
 
-	PartyGame(String name, String descr, int ref, int minimum, Consumer<DiscordGame> gameBuild)
+	PartyGame(String name, String descr, int ref, int minimum, TownRole[] roles, Consumer<DiscordGame> gameBuild)
 	{
-		this(name, descr, ref, minimum, gameBuild, null);
+		this(name, descr, ref, minimum, roles, gameBuild, null);
 	}
 
-	PartyGame(String name, String descr, int ref, int minimum, Consumer<DiscordGame> gameBuild, Consumer<DiscordGame> random)
+	PartyGame(String name, String descr, int ref, int minimum, TownRole[] roles, Consumer<DiscordGame> gameBuild, Consumer<DiscordGame> random)
 	{
 		this.name = name;
 		this.minimum = minimum;
 		this.gameBuild = gameBuild;
+		this.townRoles = roles;
 		description = descr;
 		reference = ref;
 		randBuild = random;
@@ -52,6 +55,11 @@ public enum PartyGame
 	public boolean hasRandom()
 	{
 		return randBuild != null;
+	}
+
+	public TownRole[] getTownRoles()
+	{
+		return townRoles;
 	}
 
 	public void build(DiscordGame game, boolean buildRandom)

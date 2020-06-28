@@ -1,6 +1,7 @@
 package town.games;
 
 import town.DiscordGame;
+import town.TownRole;
 import town.persons.assigner.Assigner;
 import town.persons.assigner.CivilianAssigner;
 import town.persons.assigner.DoctorAssigner;
@@ -10,6 +11,8 @@ import town.persons.assigner.SerialKillerAssigner;
 
 public class Mashup
 {
+	public static final TownRole[] townRoles = TownRole.values();
+
 	public static void build(DiscordGame game)
 	{
 		Assigner assigner = getAssigner(game);

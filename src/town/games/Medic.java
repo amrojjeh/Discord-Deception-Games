@@ -1,6 +1,7 @@
 package town.games;
 
 import town.DiscordGame;
+import town.TownRole;
 import town.persons.assigner.Assigner;
 import town.persons.assigner.CivilianAssigner;
 import town.persons.assigner.DoctorAssigner;
@@ -9,6 +10,8 @@ import town.persons.assigner.SerialKillerAssigner;
 
 public class Medic
 {
+	public static final TownRole[] townRoles = {TownRole.CIVILIAN, TownRole.LOOKOUT, TownRole.DOCTOR, TownRole.SERIAL_KILLER};
+
 	public static void build(DiscordGame game)
 	{
 		int totalPlayers = game.getPlayers().size();

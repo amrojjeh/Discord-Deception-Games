@@ -63,7 +63,7 @@ public class DiscordGame
 	private long deadRoleID;
 	private long defendantRoleID;
 
-	boolean started = false;
+	boolean initiated = false;
 	boolean ended = false;
 
 	public DiscordGame(JDA jda, Long guildId, long partyLeaderId)
@@ -82,37 +82,42 @@ public class DiscordGame
 	public void processMessage(String prefix, Message message)
 	{
 		String rawMsg = message.getContentRaw().toLowerCase();
+		boolean fromGuild = isMessageFromGameGuild(message);
 
-		if (!isMessageFromGameGuild(message) && commandCheck(false, rawMsg, prefix, "startgame"))
-			startGameCommand(message);
-
-		else if (commandCheck(false, rawMsg, prefix, "party"))
+		if (commandCheck(false, rawMsg, prefix, "party"))
 			displayParty(message.getChannel());
-		else if (!isMessageFromGameGuild(message) && commandCheck(false, rawMsg, prefix, "join"))
-			joinGame(message.getMember().getIdLong(), message.getChannel());
-		else if (!isMessageFromGameGuild(message) && commandCheck(false, rawMsg, prefix, "leave"))
-			leaveGameCommand(message.getMember().getIdLong(), message.getChannel());
-		else if (!isMessageFromGameGuild(message) && commandCheck(true, rawMsg, prefix, "nomin"))
-			noMinCommand(message);
-		else if (!isMessageFromGameGuild(message) && commandCheck(true, rawMsg, prefix, "setgame"))
-			setGameTypeCommand(message);
-		else if (!isMessageFromGameGuild(message) && commandCheck(true, rawMsg, prefix, "setrand"))
-			setRandomCommand(message);
-
-		else if (started && isMessageFromGameGuild(message) && commandCheck(true, rawMsg, prefix, "ability", "a"))
-			activateAbilityCommand(message);
-		else if (started && isMessageFromGameGuild(message) && commandCheck(false, rawMsg, prefix, "cancel", "c"))
-			cancelCommand(message);
-		else if (started && isMessageFromGameGuild(message) && commandCheck(false, rawMsg, prefix, "rolehelp", "rh"))
-			roleHelpCommand(message);
-		else if (started && isMessageFromGameGuild(message) && commandCheck(true, rawMsg, prefix, "vote", "v"))
-			voteCommand(message);
-		else if (started && isMessageFromGameGuild(message) && commandCheck(false, rawMsg, prefix, "guilty", "g"))
-			guiltyCommand(message);
-		else if (started && isMessageFromGameGuild(message) && commandCheck(false, rawMsg, prefix, "innocent", "inno", "i"))
-			innocentCommand(message);
-		else if (started && isMessageFromGameGuild(message) && commandCheck(false, rawMsg, prefix, "targets", "t"))
-			getPossibleTargetsCommand(message);
+		else if (!fromGuild)
+		{
+			if (!fromGuild && commandCheck(false, rawMsg, prefix, "startgame"))
+				startGameCommand(message);
+			else if (!fromGuild && commandCheck(false, rawMsg, prefix, "join"))
+				joinGame(message.getMember().getIdLong(), message.getChannel());
+			else if (!fromGuild && commandCheck(false, rawMsg, prefix, "leave"))
+				leaveGameCommand(message.getMember().getIdLong(), message.getChannel());
+			else if (!fromGuild && commandCheck(true, rawMsg, prefix, "nomin"))
+				noMinCommand(message);
+			else if (!fromGuild && commandCheck(true, rawMsg, prefix, "setgame"))
+				setGameTypeCommand(message);
+			else if (!fromGuild && commandCheck(true, rawMsg, prefix, "setrand"))
+				setRandomCommand(message);
+		}
+		else if (fromGuild && initiated)
+		{
+			if (commandCheck(true, rawMsg, prefix, "ability", "a"))
+				activateAbilityCommand(message);
+			else if (commandCheck(false, rawMsg, prefix, "cancel", "c"))
+				cancelCommand(message);
+			else if (commandCheck(false, rawMsg, prefix, "rolehelp", "rh"))
+				roleHelpCommand(message);
+			else if (commandCheck(true, rawMsg, prefix, "vote", "v"))
+				voteCommand(message);
+			else if (commandCheck(false, rawMsg, prefix, "guilty", "g"))
+				guiltyCommand(message);
+			else if (commandCheck(false, rawMsg, prefix, "innocent", "inno", "i"))
+				innocentCommand(message);
+			else if (commandCheck(false, rawMsg, prefix, "targets", "t"))
+				getPossibleTargetsCommand(message);
+		}
 	}
 
 	// Assumes msg is lowercase
@@ -311,7 +316,7 @@ public class DiscordGame
 
 	private void startGameCommand(Message message)
 	{
-		if (started)
+		if (initiated)
 			message.getChannel().sendMessage("Game is already running!").queue();
 		else if (persons.isEmpty())
 			message.getChannel().sendMessage("Not enough players to start a server!").queue();
@@ -454,6 +459,9 @@ public class DiscordGame
 	public void createNewChannels(GuildAction g)
 	{
 		// this channel used for general game updates
+		for (TownRole role : getGameType().getTownRoles())
+			g.newRole().setName(role.getName()).setPermissionsRaw(0l);
+
 		g.newRole().setName("Bot").addPermissions(Permission.ADMINISTRATOR).setColor(Color.YELLOW);
 
 		g.newRole().setName("Player").setColor(Color.CYAN)
@@ -502,7 +510,7 @@ public class DiscordGame
 
 	public void startGame()
 	{
-		started = true;
+		initiated = true;
 
 		// TODO: Add an icon to the server
 		gameMode.build(this, randomMode);
@@ -593,7 +601,7 @@ public class DiscordGame
 
 	public void joinGame(long id, MessageChannel channelUsed)
 	{
-		if (started)
+		if (initiated)
 		{
 			String message = String.format("Can't join game until session is over <@%d>", id);
 			channelUsed.sendMessage(message).queue();
@@ -614,7 +622,7 @@ public class DiscordGame
 
 	private void leaveGameCommand(long id, MessageChannel channelUsed)
 	{
-		if (started)
+		if (initiated)
 		{
 			String message = String.format("Can't leave a game after it has started. Leave the server instead. <@%d>", id);
 			channelUsed.sendMessage(message).queue();
@@ -772,7 +780,7 @@ public class DiscordGame
 
 	private long getRoleID(String roleName)
 	{
-		if (!started) throw new IllegalStateException("Game has not started, can't get roles");
+		if (!initiated) throw new IllegalStateException("Game has not started, can't get roles");
 		switch (roleName.toLowerCase())
 		{
 		case "player":
@@ -932,7 +940,7 @@ public class DiscordGame
 
 	public void gameGuildVoiceJoin(Member m, VoiceChannel channel)
 	{
-		if (!started) return;
+		if (!initiated) return;
 		if (channel.getGuild().getIdLong() != getGameID()) return;
 
 		Person person = getPerson(m);
