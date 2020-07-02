@@ -8,7 +8,6 @@ import town.TownRole;
 import town.events.LookoutTownEvent;
 import town.phases.Night;
 
-// Civilian is NOT A REAL ROLE. This is a temporary useless town role to simulate games
 public class Lookout extends Person
 {
 	public Lookout(DiscordGame game, int num, Long id)

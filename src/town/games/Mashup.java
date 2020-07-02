@@ -3,11 +3,7 @@ package town.games;
 import town.DiscordGame;
 import town.TownRole;
 import town.persons.assigner.Assigner;
-import town.persons.assigner.CivilianAssigner;
-import town.persons.assigner.DoctorAssigner;
-import town.persons.assigner.LookoutAssigner;
-import town.persons.assigner.MediumAssigner;
-import town.persons.assigner.SerialKillerAssigner;
+import town.persons.assigner.GeneralAssigner;
 
 public class Mashup
 {
@@ -22,11 +18,8 @@ public class Mashup
 	public static Assigner getAssigner(DiscordGame game)
 	{
 		Assigner assigner = new Assigner();
-		assigner.addRole(new CivilianAssigner(game));
-		assigner.addRole(new SerialKillerAssigner(game));
-		assigner.addRole(new LookoutAssigner(game));
-		assigner.addRole(new MediumAssigner(game));
-		assigner.addRole(new DoctorAssigner(game));
+		for (TownRole role : townRoles)
+			assigner.addRole(new GeneralAssigner(game, role));
 		return assigner;
 	}
 }

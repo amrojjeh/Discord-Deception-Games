@@ -3,10 +3,7 @@ package town.games;
 import town.DiscordGame;
 import town.TownRole;
 import town.persons.assigner.Assigner;
-import town.persons.assigner.CivilianAssigner;
-import town.persons.assigner.LookoutAssigner;
-import town.persons.assigner.MediumAssigner;
-import town.persons.assigner.SerialKillerAssigner;
+import town.persons.assigner.GeneralAssigner;
 
 public class TalkingGraves
 {
@@ -38,10 +35,8 @@ public class TalkingGraves
 
 		Assigner assigner = new Assigner();
 
-		assigner.addRole(new SerialKillerAssigner(game));
-		assigner.addRole(new LookoutAssigner(game));
-		assigner.addRole(new MediumAssigner(game));
-		assigner.addRole(new CivilianAssigner(game));
+		for (TownRole role : townRoles)
+			assigner.addRole(new GeneralAssigner(game, role));
 
 		return assigner;
 	}
@@ -58,11 +53,11 @@ public class TalkingGraves
 
 		Assigner assigner = new Assigner();
 
-		assigner.addRole(new SerialKillerAssigner(game, 2));
-		assigner.addRole(new LookoutAssigner(game, 2));
-		assigner.addRole(new MediumAssigner(game, 1));
+		assigner.addRole(new GeneralAssigner(game, 2, TownRole.SERIAL_KILLER));
+		assigner.addRole(new GeneralAssigner(game, 2, TownRole.LOOKOUT));
+		assigner.addRole(new GeneralAssigner(game, 1, TownRole.MEDIUM));
 		int civAmount = totalPlayers > 7 ? totalPlayers - 5 : 1;
-		assigner.addRole(new CivilianAssigner(game, civAmount));
+		assigner.addRole(new GeneralAssigner(game, civAmount, TownRole.CIVILIAN));
 
 		return assigner;
 	}
@@ -80,11 +75,11 @@ public class TalkingGraves
 		//    +---------------+----------------+----------+---------+-----------+
 
 		Assigner assigner = new Assigner();
-		assigner.addRole(new SerialKillerAssigner(game, 1));
-		assigner.addRole(new LookoutAssigner(game, 1));
-		assigner.addRole(new MediumAssigner(game, 1));
+		assigner.addRole(new GeneralAssigner(game, 1, TownRole.SERIAL_KILLER));
+		assigner.addRole(new GeneralAssigner(game, 1, TownRole.LOOKOUT));
+		assigner.addRole(new GeneralAssigner(game, 1, TownRole.MEDIUM));
 		int civAmount = totalPlayers > 3 ? totalPlayers - 3 : 1;
-		assigner.addRole(new CivilianAssigner(game, civAmount));
+		assigner.addRole(new GeneralAssigner(game, civAmount, TownRole.CIVILIAN));
 		return assigner;
 	}
 }

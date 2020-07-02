@@ -30,7 +30,7 @@ public abstract class Person
 	protected TownEvent event;
 
 	// In case the role hasn't been yet figured out
-	Person(DiscordGame game, int refNum, long id)
+	protected Person(DiscordGame game, int refNum, long id)
 	{
 		this.game = game;
 		ID = id;
@@ -38,7 +38,8 @@ public abstract class Person
 		realName = game.getUser(this).getName();
 	}
 
-	Person(DiscordGame game, int refNum, long id, TownRole type)
+	// Used by children of this class
+	protected Person(DiscordGame game, int refNum, long id, TownRole type)
 	{
 		this.game = game;
 		ID = id;

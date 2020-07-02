@@ -10,9 +10,9 @@ import town.phases.Night;
 // A Serial Killer can kill a person each night.
 public class SerialKiller extends Person
 {
-	public SerialKiller(DiscordGame game, int num, Long id)
+	public SerialKiller(DiscordGame game, int refNum, long id)
 	{
-		super(game, num, id, TownRole.SERIAL_KILLER);
+		super(game, refNum, id, TownRole.SERIAL_KILLER);
 	}
 
 	@Override
