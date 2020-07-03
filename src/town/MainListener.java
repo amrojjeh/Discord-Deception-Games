@@ -217,9 +217,6 @@ public class MainListener extends ListenerAdapter
 	{
 		EmbedBuilder builder = new EmbedBuilder().setTitle("Party Games").setColor(Color.GREEN);
 		for (PartyGame g : PartyGame.values())
-			if (g.hasRandom())
-				builder.addField(g.getReference() + ". " + g.getName() + " (Rand)", g.getDescription(), false);
-			else
 				builder.addField(g.getReference() + ". " + g.getName(), g.getDescription(), false);
 		return builder.build();
 	}

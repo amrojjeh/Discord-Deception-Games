@@ -1,28 +1,33 @@
 package town.persons.assigner;
 
 import town.DiscordGame;
+import town.TownRole;
 import town.persons.Person;
 
 public abstract class RoleAssigner
 {
-	DiscordGame game;
 	int amount = 0;
 	int maxAmount = -1;
+	boolean isDefault = false;
 
-	RoleAssigner(DiscordGame g)
+	RoleAssigner()
 	{
-		game = g;
+
 	}
 
-	RoleAssigner(DiscordGame g, int maxAmount)
+	RoleAssigner(int maxAmount)
 	{
-		game = g;
 		this.maxAmount = maxAmount;
 	}
 
-	public boolean check()
+	public boolean check(int baseTotalOfPlayers, int totalPlayers)
 	{
-		if (maxAmount == -1) return true;
+		// Adjust maxAmount if default is set
+		int newMax = maxAmount;
+		if (isDefault)
+			newMax = totalPlayers - baseTotalOfPlayers + maxAmount;
+
+		if (newMax == -1) return true;
 		return amount < maxAmount;
 	}
 
@@ -31,5 +36,17 @@ public abstract class RoleAssigner
 		return amount;
 	}
 
-	public abstract Person getPerson(int ref, long id);
+	// Returns -1 if there is no max, there can still be a max even if default is set and the min has been assigned
+	public int getMax()
+	{
+		return maxAmount;
+	}
+
+	public void setDefault(boolean value)
+	{
+		isDefault = value;
+	}
+
+	public abstract Person getPerson(DiscordGame game, int ref, long id);
+	public abstract TownRole[] getTownRoles();
 }

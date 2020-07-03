@@ -1,36 +1,49 @@
 package town.games;
 
-import java.util.function.Consumer;
+import java.io.FileNotFoundException;
+import java.util.Set;
 
 import town.DiscordGame;
+import town.JavaHelper;
 import town.TownRole;
+import town.games.parser.GameParser;
 
 public enum PartyGame
 {
-	TALKING_GRAVES("Talking Graves", "Figure out who the killer is by talking to the dead!", 1, 4, TalkingGraves.townRoles, TalkingGraves::build, TalkingGraves::buildRand),
-	MEDIC("Medic!", "Like talking graves, but instead of a medium, there's a doctor.", 2, 4, Medic.townRoles, Medic::build, Medic::buildRand),
-	MASHUP("Mashup", "Play with all the roles!", 3, 4, Mashup.townRoles, Mashup::build);
+	TALKING_GRAVES("Talking Graves", "Figure out who the killer is by talking to the dead!", 1, "TalkingGraves.game"),
+	MEDIC("Medic!", "Like talking graves, but instead of a medium, there's a doctor.", 2, "Medic!.game"),
+	MASHUP("Mashup", "Play with all the roles!", 3, new Mashup());
 
 	private final String name, description;
-	private final int reference, minimum;
-	private final Consumer<DiscordGame> gameBuild, randBuild;
-	private final TownRole[] townRoles;
+	private final int reference;
+	private final GeneralGame game;
 
-	PartyGame(String name, String descr, int ref, int minimum, TownRole[] roles, Consumer<DiscordGame> gameBuild)
-	{
-		this(name, descr, ref, minimum, roles, gameBuild, null);
-	}
-
-	PartyGame(String name, String descr, int ref, int minimum, TownRole[] roles, Consumer<DiscordGame> gameBuild, Consumer<DiscordGame> random)
+	PartyGame(String name, String descr, int ref, GeneralGame game)
 	{
 		this.name = name;
-		this.minimum = minimum;
-		this.gameBuild = gameBuild;
-		this.townRoles = roles;
 		description = descr;
 		reference = ref;
-		randBuild = random;
+		this.game = game;
 	}
+	PartyGame(String name, String descr, int ref, String fileName)
+	{
+		this.name = name;
+		description = descr;
+		reference = ref;
+
+		String fileContents = "";
+		try
+		{
+			fileContents = JavaHelper.readFile(fileName);
+		}
+		catch(FileNotFoundException e)
+		{
+			e.printStackTrace();
+		}
+
+		this.game = GameParser.parseGeneralGame(fileContents);
+	}
+
 
 	public String getName()
 	{
@@ -39,7 +52,7 @@ public enum PartyGame
 
 	public int getMinimum()
 	{
-		return minimum;
+		return game.getMinimumTotalPlayers();
 	}
 
 	public int getReference()
@@ -52,20 +65,17 @@ public enum PartyGame
 		return description;
 	}
 
-	public boolean hasRandom()
+	public Set<TownRole> getTownRoles()
 	{
-		return randBuild != null;
+		return game.getRoles();
 	}
 
-	public TownRole[] getTownRoles()
+	public void build(DiscordGame discordGame, boolean buildRandom)
 	{
-		return townRoles;
-	}
-
-	public void build(DiscordGame game, boolean buildRandom)
-	{
-		if (buildRandom && hasRandom()) randBuild.accept(game);
-		else gameBuild.accept(game);
+		if (buildRandom)
+			game.buildRand(discordGame);
+		else
+			game.build(discordGame);
 	}
 
 	public static PartyGame getGameFromName(String name)

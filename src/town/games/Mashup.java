@@ -1,25 +1,15 @@
 package town.games;
 
-import town.DiscordGame;
 import town.TownRole;
-import town.persons.assigner.Assigner;
-import town.persons.assigner.GeneralAssigner;
+import town.games.parser.Rule;
 
-public class Mashup
+public class Mashup extends GeneralGame
 {
-	public static final TownRole[] townRoles = TownRole.values();
-
-	public static void build(DiscordGame game)
+	public Mashup()
 	{
-		Assigner assigner = getAssigner(game);
-		game.getPlayersCache().replaceAll(person -> assigner.generatePerson(person.getNum(), person.getID()));
-	}
-
-	public static Assigner getAssigner(DiscordGame game)
-	{
-		Assigner assigner = new Assigner();
-		for (TownRole role : townRoles)
-			assigner.addRole(new GeneralAssigner(game, role));
-		return assigner;
+		super("Mashup");
+		Rule rule = new Rule(0);
+		for (TownRole role : TownRole.values())
+			rule.addRole(role, -1, false);
 	}
 }

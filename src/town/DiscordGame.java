@@ -83,6 +83,9 @@ public class DiscordGame
 
 		if (commandCheck(false, rawMsg, prefix, "party"))
 			displayParty(message.getChannel());
+		// TODO: Display settings such as if random is set, the current game mode, and so on
+//		else if (commandCheck(false, rawMsg, prefix, "settings"))
+//			displaySettings(message.getChannel());
 		else if (!fromGuild)
 		{
 			if (!fromGuild && commandCheck(false, rawMsg, prefix, "startgame"))
@@ -220,10 +223,7 @@ public class DiscordGame
 			return "FAILED: Game **" + game + "** was not found.";
 
 		gameMode = gameToChangeTo;
-		String extra = "";
-		if (!gameMode.hasRandom() && randomMode)
-			extra = setRandomMode(false) + "\n";
-		return extra + "Game mode was set to **" + gameMode.getName() + "**.";
+		return "Game mode was set to **" + gameMode.getName() + "**.";
 	}
 
 	private void setRandomCommand(Message message)
@@ -254,9 +254,6 @@ public class DiscordGame
 
 	public String setRandomMode(boolean randomVal)
 	{
-		if (!getGameType().hasRandom() && randomVal)
-			return "FAILED: Game mode doesn't support random";
-
 		randomMode = randomVal;
 		if (randomMode)
 			return "Random mode was activated";
@@ -497,15 +494,20 @@ public class DiscordGame
 
 	public void startGame()
 	{
+		System.out.println("Not broken");
 		initiated = true;
 
 		// TODO: Add an icon to the server
 		gameMode.build(this, randomMode);
 
+		System.out.println("Not broken -- after building");
+
 		GuildAction ga = jda.createGuild(gameMode.getName());
 		createNewChannels(ga);
 		ga.newRole().setName("" + guildID);
 		ga.queue();
+
+		System.out.println("Not broken -- after creating server");
 	}
 
 	public void getNewGuild(Guild guild)
@@ -516,7 +518,7 @@ public class DiscordGame
 		getGameGuild().addRoleToMember(jda.getSelfUser().getIdLong(), guild.getRolesByName("Bot", false).get(0)).queue();
 
 		List<Role> guildRoles = getGameGuild().getRoles();
-		for (int x = 0; x < getGameType().getTownRoles().length; ++x)
+		for (int x = 0; x < getGameType().getTownRoles().size(); ++x)
 		{
 			Role townRole = guildRoles.get(guildRoles.size() - x - 2);
 			roles.put(townRole.getName().toLowerCase(), townRole.getIdLong());

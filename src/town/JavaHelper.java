@@ -1,8 +1,12 @@
 package town;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
+
 public class JavaHelper
 {
-	static Integer parseInt(String str)
+	public static Integer parseInt(String str)
 	{
 		Integer num;
 		try
@@ -14,5 +18,15 @@ public class JavaHelper
 			return null;
 		}
 		return num;
+	}
+
+	public static String readFile(String fileName) throws FileNotFoundException
+	{
+		Scanner scanner = new Scanner(new File(fileName));
+		String fileContents = "";
+		while (scanner.hasNextLine())
+			fileContents += scanner.nextLine() + "\n";
+		scanner.close();
+		return fileContents;
 	}
 }
