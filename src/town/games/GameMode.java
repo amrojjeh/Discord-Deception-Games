@@ -10,15 +10,27 @@ import town.games.parser.Rule;
 import town.persons.assigner.Assigner;
 import town.persons.assigner.GeneralAssigner;
 
-public class GeneralGame
+public class GameMode
 {
-	ArrayList<Rule> rules = new ArrayList<>();
-	final String name;
-	Set<TownRole> roles = new HashSet<>();
+	private ArrayList<Rule> rules = new ArrayList<>();
+	private final String name;
+	private final String description;
+	private Set<TownRole> roles = new HashSet<>();
 
-	public GeneralGame(String name)
+	public GameMode(String name, String description)
 	{
 		this.name = name;
+		this.description = description;
+	}
+
+	public String getName()
+	{
+		return name;
+	}
+
+	public String getDescription()
+	{
+		return description;
 	}
 
 	public void addRule(Rule rule)
@@ -28,14 +40,9 @@ public class GeneralGame
 		rules.sort((s, o) -> s.totalPlayers - o.totalPlayers);
 	}
 
-	public Set<TownRole> getRoles()
+	public Set<TownRole> getTownRoles()
 	{
 		return roles;
-	}
-
-	public String getName()
-	{
-		return name;
 	}
 
 	public int getMinimumTotalPlayers()
@@ -43,7 +50,13 @@ public class GeneralGame
 		return rules.get(0).totalPlayers;
 	}
 
-	public void build(DiscordGame game)
+	public void build(DiscordGame game, boolean rand)
+	{
+		if (rand) buildRand(game);
+		else buildDefault(game);
+	}
+
+	public void buildDefault(DiscordGame game)
 	{
 		int totalPlayers = game.getPlayersCache().size();
 		Assigner assigner;

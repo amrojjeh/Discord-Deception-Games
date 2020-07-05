@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Scanner;
 
 import javax.security.auth.login.LoginException;
@@ -27,22 +28,16 @@ import net.dv8tion.jda.api.events.guild.voice.GuildVoiceJoinEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceMoveEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import town.games.PartyGame;
+import town.games.GameMode;
+import town.games.GameModeLoader;
 
 
 public class MainListener extends ListenerAdapter
 {
-	String prefix;
+	String prefix = "pg.";
 
-	HashMap<Long, DiscordGame> parties;
-	HashMap<Long, DiscordGame> games;
-
-	public MainListener()
-	{
-		prefix = "pg.";
-		parties = new HashMap<>();
-		games = new HashMap<>();
-	}
+	HashMap<Long, DiscordGame> parties = new HashMap<>();
+	HashMap<Long, DiscordGame> games = new HashMap<>();
 
 	public static void main(String[] args)
 			throws InterruptedException
@@ -216,8 +211,12 @@ public class MainListener extends ListenerAdapter
 	private MessageEmbed displayGames()
 	{
 		EmbedBuilder builder = new EmbedBuilder().setTitle("Party Games").setColor(Color.GREEN);
-		for (PartyGame g : PartyGame.values())
-				builder.addField(g.getReference() + ". " + g.getName(), g.getDescription(), false);
+		List<GameMode> gameModes = GameModeLoader.getGames(true);
+		for (int x = 1; x <= gameModes.size(); ++x)
+		{
+			GameMode game = gameModes.get(x - 1);
+			builder.addField(x + ". " + game.getName(), game.getDescription(), false);
+		}
 		return builder.build();
 	}
 
@@ -260,23 +259,23 @@ public class MainListener extends ListenerAdapter
 			DiscordGame game = new DiscordGame(jda, guildID, partyLeader.getIdLong());
 			String[] words = message.split(" ", 2);
 			String messageToSend = "Party started\n";
+			boolean isRandom = game.isRandom();
+			String gameName = game.getGameMode().getName();
 
 			// words[0] = pg.startparty
 			// words[1] = Talking Graves Rand
 			if (words.length == 2)
 			{
 				String lastWord = words[1].substring(words[1].lastIndexOf(" ") + 1).toLowerCase();
-				boolean isRandom = lastWord.contentEquals("rand") || lastWord.contentEquals("random");
+				isRandom = lastWord.contentEquals("rand") || lastWord.contentEquals("random");
 				if (isRandom)
-				{
-					messageToSend += game.setGameType(words[1].substring(0, words[1].toLowerCase().lastIndexOf(" rand"))) + "\n";
-					messageToSend += game.setRandomMode(isRandom)+ "\n";
-				}
+					gameName = words[1].substring(0, words[1].toLowerCase().lastIndexOf(" rand"));
 				else
-					messageToSend += game.setGameType(words[1]);
+					gameName += words[1];
 			}
-			else
-				messageToSend += "Game started with default settings, **Talking Graves** (no random).";
+
+			messageToSend += game.setGameMode(gameName) + "\n";
+			messageToSend += game.setRandomMode(isRandom) + "\n";
 			channelUsed.sendMessage(messageToSend).queue();
 			if (messageToSend.contains("FAILED")) return;
 

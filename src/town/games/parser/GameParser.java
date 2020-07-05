@@ -5,15 +5,16 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import town.TownRole;
-import town.games.GeneralGame;
+import town.games.GameMode;
 
 public class GameParser
 {
-	public static GeneralGame parseGeneralGame(String str)
+	public static GameMode parseGeneralGame(String str)
 	{
 		if (str.isBlank())
 			throw new IllegalArgumentException("Could not parse string because it was empty.");
 		String name = "Custom Game";
+		String description = "";
 
 		int currentLine = 0;
 		String[] lines = str.split("\n");
@@ -21,9 +22,14 @@ public class GameParser
 			throw new IllegalArgumentException("Could not parse string, it has no rules: (\n" + str + ").");
 
 		if (isGameName(lines[currentLine]))
-			name = lines[currentLine++];
+		{
+			String[] first = lines[currentLine++].split(":", 2);
+			name = first[0];
+			if (first.length == 2)
+				description = first[1];
+		}
 
-		GeneralGame game = new GeneralGame(name);
+		GameMode game = new GameMode(name, description);
 		while (currentLine != lines.length)
 		{
 			Rule rule = parseRule(lines[currentLine++]);

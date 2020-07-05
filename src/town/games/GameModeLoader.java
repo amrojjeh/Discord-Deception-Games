@@ -1,0 +1,78 @@
+package town.games;
+
+import java.io.FileNotFoundException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Stream;
+
+import town.JavaHelper;
+import town.games.parser.GameParser;
+
+public class GameModeLoader
+{
+	public static List<GameMode> loadedGameModes = null;
+	public static List<GameMode> specialGameModes = new ArrayList<GameMode>();
+	public static String defaultPath = "Games";
+
+	public static List<GameMode> getGames(boolean forceReload)
+	{
+		loadedGameModes = new ArrayList<GameMode>();
+		if (forceReload || loadedGameModes == null)
+		{
+			loadedGameModes.addAll(loadGameModesFromFolder(defaultPath));
+			loadedGameModes.addAll(loadSpecialGameModes());
+
+		}
+		return loadedGameModes;
+	}
+
+	public static List<GameMode> loadGameModesFromFolder(String relativePath)
+	{
+		ArrayList<GameMode> games = new ArrayList<>();
+		try (Stream<Path> paths = Files.walk(Paths.get(relativePath)))
+		{
+			paths
+			.filter(Files::isRegularFile)
+			.filter(p -> p.toString().endsWith(".game"))
+			.forEach(p -> {
+				try {
+					games.add(loadGame(p.toString()));
+				} catch (FileNotFoundException e) {
+					e.printStackTrace();
+				}
+			});
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		return games;
+	}
+
+	public static GameMode loadGame(String path) throws FileNotFoundException
+	{
+		String str = JavaHelper.readFile(path.toString());
+		return GameParser.parseGeneralGame(str);
+	}
+
+	public static GameMode getGameModeByName(String name, boolean forceReload)
+	{
+		if (forceReload || loadedGameModes == null) getGames(true);
+		for (GameMode g : loadedGameModes)
+		{
+			if (g.getName().equals(name))
+				return g;
+		}
+
+		return null;
+	}
+
+	public static List<GameMode> loadSpecialGameModes()
+	{
+		specialGameModes.add(new Mashup());
+		return specialGameModes;
+	}
+}

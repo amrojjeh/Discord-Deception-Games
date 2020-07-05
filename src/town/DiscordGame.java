@@ -30,7 +30,8 @@ import net.dv8tion.jda.api.requests.restaction.GuildAction.RoleData;
 import net.dv8tion.jda.api.requests.restaction.MessageAction;
 import net.dv8tion.jda.api.requests.restaction.PermissionOverrideAction;
 import town.events.TownEvent;
-import town.games.PartyGame;
+import town.games.GameMode;
+import town.games.GameModeLoader;
 import town.persons.LobbyPerson;
 import town.persons.Person;
 import town.phases.Accusation;
@@ -45,7 +46,7 @@ public class DiscordGame
 	private long guildID;
 	private long gameGuildID;
 	private long partyLeaderID;
-	private PartyGame gameMode;
+	private GameMode gameMode;
 
 	// Important channels (Name : id)
 	private HashMap<String, Long> channels = new HashMap<>();
@@ -68,7 +69,7 @@ public class DiscordGame
 		this.jda = jda;
 		guildID = guildId;
 		partyLeaderID = partyLeaderId;
-		gameMode = PartyGame.TALKING_GRAVES;
+		gameMode = GameModeLoader.getGames(true).get(0);
 	}
 
 	public void processMessage(Message message)
@@ -97,7 +98,7 @@ public class DiscordGame
 			else if (!fromGuild && commandCheck(true, rawMsg, prefix, "nomin"))
 				noMinCommand(message);
 			else if (!fromGuild && commandCheck(true, rawMsg, prefix, "setgame"))
-				setGameTypeCommand(message);
+				setGameModeCommand(message);
 			else if (!fromGuild && commandCheck(true, rawMsg, prefix, "setrand"))
 				setRandomCommand(message);
 		}
@@ -197,7 +198,7 @@ public class DiscordGame
 		return references;
 	}
 
-	private void setGameTypeCommand(Message message)
+	private void setGameModeCommand(Message message)
 	{
 		if (message.getMember().getIdLong() != partyLeaderID)
 		{
@@ -213,12 +214,12 @@ public class DiscordGame
 			return;
 		}
 
-		message.getChannel().sendMessage(setGameType(words[1])).queue();
+		message.getChannel().sendMessage(setGameMode(words[1])).queue();
 	}
 
-	public String setGameType(String game)
+	public String setGameMode(String game)
 	{
-		PartyGame gameToChangeTo = PartyGame.getGame(game);
+		GameMode gameToChangeTo = GameModeLoader.getGameModeByName(game, false);
 		if (gameToChangeTo == null)
 			return "FAILED: Game **" + game + "** was not found.";
 
@@ -316,9 +317,9 @@ public class DiscordGame
 			message.getChannel().sendMessage("Not enough players to start a server!").queue();
 		else if (message.getMember().getIdLong() != partyLeaderID)
 			message.getChannel().sendMessage(String.format("Only party leader (<@%d>) can start the game!", partyLeaderID)).queue();
-		else if (!noMinimumPlayers && getPlayers().size() < gameMode.getMinimum())
+		else if (!noMinimumPlayers && getPlayers().size() < gameMode.getMinimumTotalPlayers())
 			message.getChannel().sendMessage("Not enough players to play " + gameMode.getName() + "! (" +
-		(gameMode.getMinimum() - getPlayersCache().size()) + " left to play)").queue();
+		(gameMode.getMinimumTotalPlayers() - getPlayersCache().size()) + " left to play)").queue();
 		else
 		{
 			message.getChannel().sendMessage("Game has started! Creating server...").queue();
@@ -453,7 +454,7 @@ public class DiscordGame
 	public void createNewChannels(GuildAction g)
 	{
 		// this channel used for general game updates
-		for (TownRole role : getGameType().getTownRoles())
+		for (TownRole role : getGameMode().getTownRoles())
 			g.newRole().setName(role.getName()).setPermissionsRaw(0l);
 
 		g.newRole().setName("Bot").addPermissions(Permission.ADMINISTRATOR).setColor(Color.YELLOW);
@@ -518,7 +519,7 @@ public class DiscordGame
 		getGameGuild().addRoleToMember(jda.getSelfUser().getIdLong(), guild.getRolesByName("Bot", false).get(0)).queue();
 
 		List<Role> guildRoles = getGameGuild().getRoles();
-		for (int x = 0; x < getGameType().getTownRoles().size(); ++x)
+		for (int x = 0; x < getGameMode().getTownRoles().size(); ++x)
 		{
 			Role townRole = guildRoles.get(guildRoles.size() - x - 2);
 			roles.put(townRole.getName().toLowerCase(), townRole.getIdLong());
@@ -985,9 +986,14 @@ public class DiscordGame
 		dayNum++;
 	}
 
-	public PartyGame getGameType()
+	public GameMode getGameMode()
 	{
 		return gameMode;
+	}
+
+	public boolean isRandom()
+	{
+		return randomMode;
 	}
 
 	public RestAction<Void> modifyMemberRoles(Person person, String... roleNames)
