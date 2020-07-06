@@ -39,6 +39,8 @@ public class SerialKiller extends Person
 	@Override
 	public String ability(List<Person> references)
 	{
+		if (!isAlive())
+			return "Can't kill if you're dead.";
 		if (references.isEmpty())
 			return "There's no person to kill. `!ability 1` to kill the first person shown in `!party`.";
 		if (references.size() > 1)

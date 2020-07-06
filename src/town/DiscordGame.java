@@ -219,7 +219,7 @@ public class DiscordGame
 
 	public String setGameMode(String game)
 	{
-		GameMode gameToChangeTo = GameModeLoader.getGameModeByName(game, false);
+		GameMode gameToChangeTo = GameModeLoader.getGameMode(game, false);
 		if (gameToChangeTo == null)
 			return "FAILED: Game **" + game + "** was not found.";
 
@@ -495,20 +495,15 @@ public class DiscordGame
 
 	public void startGame()
 	{
-		System.out.println("Not broken");
 		initiated = true;
 
 		// TODO: Add an icon to the server
 		gameMode.build(this, randomMode);
 
-		System.out.println("Not broken -- after building");
-
 		GuildAction ga = jda.createGuild(gameMode.getName());
 		createNewChannels(ga);
 		ga.newRole().setName("" + guildID);
 		ga.queue();
-
-		System.out.println("Not broken -- after creating server");
 	}
 
 	public void getNewGuild(Guild guild)

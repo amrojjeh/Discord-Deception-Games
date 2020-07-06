@@ -271,7 +271,7 @@ public class MainListener extends ListenerAdapter
 				if (isRandom)
 					gameName = words[1].substring(0, words[1].toLowerCase().lastIndexOf(" rand"));
 				else
-					gameName += words[1];
+					gameName = words[1];
 			}
 
 			messageToSend += game.setGameMode(gameName) + "\n";

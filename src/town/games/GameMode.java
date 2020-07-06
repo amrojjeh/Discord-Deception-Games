@@ -12,10 +12,10 @@ import town.persons.assigner.GeneralAssigner;
 
 public class GameMode
 {
-	private ArrayList<Rule> rules = new ArrayList<>();
+	protected ArrayList<Rule> rules = new ArrayList<>();
 	private final String name;
 	private final String description;
-	private Set<TownRole> roles = new HashSet<>();
+	protected Set<TownRole> roles = new HashSet<>();
 
 	public GameMode(String name, String description)
 	{

@@ -11,5 +11,6 @@ public class Mashup extends GameMode
 		Rule rule = new Rule(0);
 		for (TownRole role : TownRole.values())
 			rule.addRole(role, -1, false);
+		addRule(rule);
 	}
 }

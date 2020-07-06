@@ -40,6 +40,8 @@ public class Lookout extends Person
 	@Override
 	public String ability(List<Person> references)
 	{
+		if (!isAlive())
+			return "Can't watch people if you're dead.";
 		if (references.isEmpty())
 			return "There's no person to watch. `!ability 1` to watch the first person shown in `!party`.";
 		if (references.size() > 1)
@@ -48,9 +50,6 @@ public class Lookout extends Person
 			return "Lookouts can only watch visitors during the night.";
 		if (!references.get(0).isAlive())
 			return "Lookouts can't watch dead people.";
-		if (!isAlive())
-			return "Can't watch people if you're dead.";
-
 		// In the real game, you can't track yourself
 		//		if (references.get(0) == this)
 		//			return "You can't track yourself.";

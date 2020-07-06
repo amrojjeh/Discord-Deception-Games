@@ -22,13 +22,13 @@ public abstract class RoleAssigner
 
 	public boolean check(int baseTotalOfPlayers, int totalPlayers)
 	{
+		if (maxAmount == -1) return true;
 		// Adjust maxAmount if default is set
 		int newMax = maxAmount;
-		if (isDefault)
+		if (isDefault && totalPlayers >= baseTotalOfPlayers)
 			newMax = totalPlayers - baseTotalOfPlayers + maxAmount;
 
-		if (newMax == -1) return true;
-		return amount < maxAmount;
+		return amount < newMax;
 	}
 
 	public int getAmount()

@@ -70,9 +70,24 @@ public class GameModeLoader
 		return null;
 	}
 
+	public static GameMode getGameModeByRef(int ref, boolean forceReload)
+	{
+		if (forceReload || loadedGameModes == null) getGames(true);
+		if (ref > loadedGameModes.size()) return null;
+		return loadedGameModes.get(ref - 1);
+	}
+
 	public static List<GameMode> loadSpecialGameModes()
 	{
+		specialGameModes.clear();
 		specialGameModes.add(new Mashup());
 		return specialGameModes;
+	}
+
+	public static GameMode getGameMode(String name, boolean forceReload)
+	{
+		Integer ref = JavaHelper.parseInt(name);
+		if (ref == null) return getGameModeByName(name, forceReload);
+		return getGameModeByRef(ref, forceReload);
 	}
 }

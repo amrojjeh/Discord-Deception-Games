@@ -22,13 +22,11 @@ public class Assigner
 
 	public Person generatePerson(DiscordGame game, int baseNumberOfPlayers, int refNum, long id)
 	{
-		System.out.println("Generating person...");
 		Random random = new Random();
 		int randNum;
 		do
 		{
 			randNum = random.nextInt(roles.size());
-			System.out.println("Random number generated, roles.size() -> " + roles.size());
 		} while (!roles.get(randNum).check(baseNumberOfPlayers, refNum));
 		System.out.println("Person generated");
 		return roles.get(randNum).getPerson(game, refNum, id);

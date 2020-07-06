@@ -11,7 +11,7 @@ import town.persons.assigner.GeneralAssigner;
 public class Rule
 {
 	public int totalPlayers;
-	public ArrayList<SingleRole> roles = new ArrayList<>();
+	public ArrayList<Role> roles = new ArrayList<>();
 
 	public Rule(int totalPlayers)
 	{
@@ -20,11 +20,11 @@ public class Rule
 
 	public void addRole(TownRole role, int max, boolean isDefault)
 	{
-		SingleRole singleRole = new SingleRole(role, max, isDefault);
+		Role singleRole = new Role(role, max, isDefault);
 		roles.add(singleRole);
 	}
 
-	public void addRole(SingleRole role)
+	public void addRole(Role role)
 	{
 		roles.add(role);
 	}
@@ -32,7 +32,7 @@ public class Rule
 	public Set<TownRole> getRoles()
 	{
 		HashSet<TownRole> allRoles = new HashSet<>();
-		for (SingleRole sr : roles)
+		for (Role sr : roles)
 			allRoles.add(sr.role);
 	return allRoles;
 	}
@@ -40,7 +40,7 @@ public class Rule
 	public Assigner buildAssigner()
 	{
 		Assigner assigner = new Assigner();
-		for (SingleRole sr : roles)
+		for (Role sr : roles)
 		{
 			GeneralAssigner ga = new GeneralAssigner(sr.role, sr.max);
 			ga.setDefault(sr.isDefault);

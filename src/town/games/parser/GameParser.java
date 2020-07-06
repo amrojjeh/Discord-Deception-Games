@@ -62,20 +62,20 @@ public class GameParser
 		return rule;
 	}
 
-	public static SingleRole getRoleFromTuple(String tuple)
+	public static Role getRoleFromTuple(String tuple)
 	{
 		Pattern roleAndNum = Pattern.compile("\\((.+?),\\s*(\\d+)(\\+?)");
 		Matcher match = roleAndNum.matcher(tuple);
 		if (!match.find())
 			throw new IllegalArgumentException("Could not parse: " + tuple);
 		TownRole role = TownRole.getRoleFromName(match.group(1));
-		return new SingleRole(role, Integer.parseInt(match.group(2)), match.group(3).equals("+"));
+		return new Role(role, Integer.parseInt(match.group(2)), match.group(3).equals("+"));
 	}
 
-	public static int calculateImplicitTotalPlayers(ArrayList<SingleRole> singleRoles)
+	public static int calculateImplicitTotalPlayers(ArrayList<Role> singleRoles)
 	{
 		int sum = 0;
-		for (SingleRole sr : singleRoles)
+		for (Role sr : singleRoles)
 			sum += sr.max;
 		return sum;
 	}
