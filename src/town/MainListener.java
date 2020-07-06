@@ -215,7 +215,10 @@ public class MainListener extends ListenerAdapter
 		for (int x = 1; x <= gameModes.size(); ++x)
 		{
 			GameMode game = gameModes.get(x - 1);
-			builder.addField(x + ". " + game.getName(), game.getDescription(), false);
+			if (!game.isSpecial())
+				builder.addField(x + ". " + game.getName(), game.getDescription(), false);
+			else
+				builder.addField(x + ". " + game.getName() + " (Special)", game.getDescription(), false);
 		}
 		return builder.build();
 	}
