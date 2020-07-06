@@ -29,7 +29,7 @@ public class GameParser
 				description = first[1];
 		}
 
-		GameMode game = new GameMode(name, description);
+		GameMode game = new GameMode(name, description, false);
 		while (currentLine != lines.length)
 		{
 			Rule rule = parseRule(lines[currentLine++]);

@@ -15,12 +15,14 @@ public class GameMode
 	protected ArrayList<Rule> rules = new ArrayList<>();
 	private final String name;
 	private final String description;
+	private final boolean isSpecial;
 	protected Set<TownRole> roles = new HashSet<>();
 
-	public GameMode(String name, String description)
+	public GameMode(String name, String description, boolean special)
 	{
 		this.name = name;
 		this.description = description;
+		this.isSpecial = special;
 	}
 
 	public String getName()
@@ -31,6 +33,11 @@ public class GameMode
 	public String getDescription()
 	{
 		return description;
+	}
+
+	public boolean isSpecial()
+	{
+		return isSpecial;
 	}
 
 	public void addRule(Rule rule)
