@@ -63,7 +63,7 @@ public class GameModeLoader
 		if (forceReload || loadedGameModes == null) getGames(true);
 		for (GameMode g : loadedGameModes)
 		{
-			if (g.getName().equals(name))
+			if (g.getName().toLowerCase().strip().equals(name.toLowerCase().strip()))
 				return g;
 		}
 
