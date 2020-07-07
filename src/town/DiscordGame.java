@@ -563,6 +563,11 @@ public class DiscordGame
 		ended = true;
 	}
 
+	public boolean hasEnded()
+	{
+		return ended;
+	}
+
 	public void transferOrDelete()
 	{
 		if (!transfer()) deleteServer();
@@ -899,10 +904,8 @@ public class DiscordGame
 		Role role = getRole(roleName);
 		List<Member> members = getGameGuild().getMembersWithRoles(role);
 		for (Member member : members)
-		{
 			getPerson(member).mute(shouldMute);
-			if (member.getVoiceState().inVoiceChannel()) member.mute(shouldMute).queue(v -> {}, v -> {});
-		}
+
 		if (shouldMute)
 			return role.getManager().revokePermissions(Permission.VOICE_SPEAK);
 		return role.getManager().setPermissions(Permission.VOICE_SPEAK);
@@ -917,7 +920,6 @@ public class DiscordGame
 			Person person = getPerson(member);
 			if (person != p)
 				person.mute(shouldMute);
-			if (member.getVoiceState().inVoiceChannel()) member.mute(person.isMuted()).queue(v -> {}, v -> {});
 		}
 		if (shouldMute)
 			return role.getManager().revokePermissions(Permission.VOICE_SPEAK);

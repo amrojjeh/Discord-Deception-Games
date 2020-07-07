@@ -33,14 +33,6 @@ public class LastWords extends Phase
 		.queue();
 
 		RestHelper.queueAll(getGame().muteAllInRole("player", false));
-
-		getGame().getPlayers().forEach(person -> checkVictory(person));
-	}
-
-	public void checkVictory(Person person)
-	{
-		if (!person.hasWon() && person.canWin())
-			person.win();
 	}
 
 	@Override

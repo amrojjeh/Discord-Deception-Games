@@ -2,6 +2,7 @@ package town.persons;
 
 import java.util.List;
 
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.TextChannel;
 import town.DiscordGame;
@@ -56,6 +57,12 @@ public abstract class Person
 	public void mute(boolean val)
 	{
 		muted = val;
+		if (game != null)
+		{
+			Member member = game.getMemberFromGame(this);
+			if (member.getVoiceState().inVoiceChannel())
+				game.getGameGuild().mute(member, muted).queue(e -> {}, e -> {});
+		}
 	}
 
 	public long getID()
@@ -114,7 +121,7 @@ public abstract class Person
 			System.out.println("Could not send to private channel");
 	}
 
-	public void assignPrivateChannel(Long channelID)
+	public void assignPrivateChannel(long channelID)
 	{
 		privateChannelID = channelID;
 	}
