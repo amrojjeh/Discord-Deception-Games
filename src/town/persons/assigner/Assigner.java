@@ -28,7 +28,6 @@ public class Assigner
 		{
 			randNum = random.nextInt(roles.size());
 		} while (!roles.get(randNum).check(baseNumberOfPlayers, refNum));
-		System.out.println("Person generated");
 		return roles.get(randNum).getPerson(game, refNum, id);
 	}
 }

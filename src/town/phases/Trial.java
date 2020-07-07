@@ -1,7 +1,7 @@
 package town.phases;
 
-import town.RestHelper;
 import town.persons.Person;
+import town.util.RestHelper;
 
 //Trial occurs when the Town agrees to put someone under suspicion. They are given this phase, a small window,
 //to defend themselves without any outside noise. After this, their fate is judged by the town.

@@ -1,7 +1,7 @@
 package town.phases;
 
-import town.RestHelper;
 import town.persons.Person;
+import town.util.RestHelper;
 
 public class LastWords extends Phase
 {

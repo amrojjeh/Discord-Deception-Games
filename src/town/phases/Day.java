@@ -1,7 +1,7 @@
 package town.phases;
 
-import town.RestHelper;
 import town.persons.Person;
+import town.util.RestHelper;
 
 //Daytime is the phase where players can discuss what is happening. There are no features other than
 //a voice and text chat that all can use.

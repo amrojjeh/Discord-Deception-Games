@@ -18,8 +18,6 @@ public class GameParser
 
 		int currentLine = 0;
 		String[] lines = str.split("\n");
-		if (lines.length < 2)
-			throw new IllegalArgumentException("Could not parse string, it has no rules: (\n" + str + ").");
 
 		if (isGameName(lines[currentLine]))
 		{

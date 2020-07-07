@@ -30,8 +30,6 @@ import net.dv8tion.jda.api.requests.restaction.GuildAction.RoleData;
 import net.dv8tion.jda.api.requests.restaction.MessageAction;
 import net.dv8tion.jda.api.requests.restaction.PermissionOverrideAction;
 import town.events.TownEvent;
-import town.games.GameMode;
-import town.games.GameModeLoader;
 import town.persons.LobbyPerson;
 import town.persons.Person;
 import town.phases.Accusation;
@@ -39,42 +37,41 @@ import town.phases.End;
 import town.phases.Judgment;
 import town.phases.Phase;
 import town.phases.PhaseManager;
+import town.util.JavaHelper;
 
 public class DiscordGame
 {
-	private JDA jda;
-	private long guildID;
+	public final JDA jda;
+	public final long partyGuildID;
+	public final long partyLeaderID;
+	public DiscordGameConfig config = new DiscordGameConfig();
+
 	private long gameGuildID;
-	private long partyLeaderID;
-	private GameMode gameMode;
 
 	// Important channels (Name : id)
 	private HashMap<String, Long> channels = new HashMap<>();
 	private HashMap<String, Long> roles = new HashMap<>();
-	private String prefix = "pg.";
 	private HashSet<TownFaction> wonTownRoles = new HashSet<TownFaction>();
 	private ArrayList<Person> persons = new ArrayList<>();
 	private LinkedList<Person> savedForMorning = new LinkedList<>();
 	private PriorityQueue<TownEvent> events = new PriorityQueue<>();
 	private PhaseManager phaseManager = new PhaseManager(this);
-	private boolean noMinimumPlayers = false;
-	private boolean randomMode = false;
 	private int dayNum = 1;
 
 	boolean initiated = false;
 	boolean ended = false;
 
-	public DiscordGame(JDA jda, Long guildId, long partyLeaderId)
+	public DiscordGame(JDA jda, long guildId, long partyLeaderId)
 	{
 		this.jda = jda;
-		guildID = guildId;
+		partyGuildID = guildId;
 		partyLeaderID = partyLeaderId;
-		gameMode = GameModeLoader.getGames(true).get(0);
+		config.setGameMode("0");
 	}
 
 	public void processMessage(Message message)
 	{
-		processMessage(prefix, message);
+		processMessage(config.getPrefix(), message);
 	}
 
 	public void processMessage(String prefix, Message message)
@@ -84,22 +81,19 @@ public class DiscordGame
 
 		if (commandCheck(false, rawMsg, prefix, "party"))
 			displayParty(message.getChannel());
-		// TODO: Display settings such as if random is set, the current game mode, and so on
-//		else if (commandCheck(false, rawMsg, prefix, "settings"))
-//			displaySettings(message.getChannel());
 		else if (!fromGuild)
 		{
-			if (!fromGuild && commandCheck(false, rawMsg, prefix, "startgame"))
+			if (commandCheck(false, rawMsg, prefix, "startgame"))
 				startGameCommand(message);
-			else if (!fromGuild && commandCheck(false, rawMsg, prefix, "join"))
+			else if (commandCheck(false, rawMsg, prefix, "join"))
 				joinGame(message.getMember().getIdLong(), message.getChannel());
-			else if (!fromGuild && commandCheck(false, rawMsg, prefix, "leave"))
+			else if (commandCheck(false, rawMsg, prefix, "leave"))
 				leaveGameCommand(message.getMember().getIdLong(), message.getChannel());
-			else if (!fromGuild && commandCheck(true, rawMsg, prefix, "nomin"))
+			else if (commandCheck(true, rawMsg, prefix, "nomin"))
 				noMinCommand(message);
-			else if (!fromGuild && commandCheck(true, rawMsg, prefix, "setgame"))
+			else if (commandCheck(true, rawMsg, prefix, "setgame"))
 				setGameModeCommand(message);
-			else if (!fromGuild && commandCheck(true, rawMsg, prefix, "setrand"))
+			else if (commandCheck(true, rawMsg, prefix, "setrand"))
 				setRandomCommand(message);
 		}
 		else if (fromGuild && initiated)
@@ -210,21 +204,24 @@ public class DiscordGame
 
 		if (words.length != 2)
 		{
-			message.getChannel().sendMessage("Syntax is: `" + prefix + "setGame 2` OR `" + prefix + "setGame Mashup`").queue();
+			message.getChannel().sendMessage("Syntax is: `" + config.getPrefix() + "setGame 2` OR `" + config.getPrefix() + "setGame Mashup` OR\n```\nsetGame custom\n4 (Civilian, 3+), (Serial Killer, 1)```").queue();
 			return;
 		}
 
-		message.getChannel().sendMessage(setGameMode(words[1])).queue();
-	}
+		if (words[1].contains("custom"))
+		{
+			String[] lines = message.getContentRaw().split("\n", 2);
+			if (lines.length != 2)
+			{
+				message.getChannel().sendMessage("When passing a custom game, each line has to be seperated. Example:\n```\nsetGame custom\n4 (Civilian, 3+), (Serial Killer, 1)\6 (Civilian, 4+), (Serial Killer, 2)```").queue();
+				return;
+			}
 
-	public String setGameMode(String game)
-	{
-		GameMode gameToChangeTo = GameModeLoader.getGameMode(game, false);
-		if (gameToChangeTo == null)
-			return "FAILED: Game **" + game + "** was not found.";
-
-		gameMode = gameToChangeTo;
-		return "Game mode was set to **" + gameMode.getName() + "**.";
+			String rules = lines[1];
+			message.getChannel().sendMessage(config.setCustomGameMode(rules)).queue();
+		}
+		else
+			message.getChannel().sendMessage(config.setGameMode(words[1])).queue();
 	}
 
 	private void setRandomCommand(Message message)
@@ -238,14 +235,14 @@ public class DiscordGame
 		String words[] = message.getContentRaw().split(" ");
 		if (words.length != 2)
 		{
-			message.getChannel().sendMessage("Syntax is: `" + prefix + "setRand [0|1]`");
+			message.getChannel().sendMessage("Syntax is: `" + config.getPrefix() + "setRand [0|1]`");
 			return;
 		}
 
 		Integer activator = JavaHelper.parseInt(words[1]);
 		if (activator == null)
 		{
-			message.getChannel().sendMessage("Syntax is: `" + prefix + "setRand [0|1]`");
+			message.getChannel().sendMessage("Syntax is: `" + config.getPrefix() + "setRand [0|1]`");
 			return;
 		}
 
@@ -255,8 +252,8 @@ public class DiscordGame
 
 	public String setRandomMode(boolean randomVal)
 	{
-		randomMode = randomVal;
-		if (randomMode)
+		config.setRandom(randomVal);
+		if (config.isRandom())
 			return "Random mode was activated";
 		return "Random mode was disabled";
 	}
@@ -288,7 +285,7 @@ public class DiscordGame
 			return;
 		}
 
-		String syntax = "Syntax is: " + prefix + "nomin [0|1]";
+		String syntax = "Syntax is: " + config.getPrefix() + "nomin [0|1]";
 		String words[] = message.getContentRaw().split(" ");
 		int activator = 0;
 		if (words.length != 2) message.getChannel().sendMessage(syntax).queue();
@@ -303,8 +300,8 @@ public class DiscordGame
 				message.getChannel().sendMessage(syntax).queue();
 				return;
 			}
-			noMinimumPlayers = activator == 1;
-			if (noMinimumPlayers) message.getChannel().sendMessage("No minimum players requried anymore.").queue();
+			config.byPassMin(activator == 1);
+			if (config.getMin() == 0) message.getChannel().sendMessage("No minimum players requried anymore.").queue();
 			else message.getChannel().sendMessage("Default minimum players required.").queue();
 		}
 	}
@@ -317,9 +314,9 @@ public class DiscordGame
 			message.getChannel().sendMessage("Not enough players to start a server!").queue();
 		else if (message.getMember().getIdLong() != partyLeaderID)
 			message.getChannel().sendMessage(String.format("Only party leader (<@%d>) can start the game!", partyLeaderID)).queue();
-		else if (!noMinimumPlayers && getPlayers().size() < gameMode.getMinimumTotalPlayers())
-			message.getChannel().sendMessage("Not enough players to play " + gameMode.getName() + "! (" +
-		(gameMode.getMinimumTotalPlayers() - getPlayersCache().size()) + " left to play)").queue();
+		else if (getPlayers().size() < config.getMin())
+			message.getChannel().sendMessage("Not enough players to play " + config.getGame().getName() + "! (" +
+		(config.getMin() - getPlayersCache().size()) + " left to play)").queue();
 		else
 		{
 			message.getChannel().sendMessage("Game has started! Creating server...").queue();
@@ -380,13 +377,13 @@ public class DiscordGame
 
 		if (referenced.isEmpty())
 		{
-			message.getChannel().sendMessage("You have to vote one person! Ex: `" + prefix + "vote 2`").queue();
+			message.getChannel().sendMessage("You have to vote one person! Ex: `" + config.getPrefix() + "vote 2`").queue();
 			return;
 		}
 
 		if (referenced.size() > 1)
 		{
-			message.getChannel().sendMessage("You can only vote one person! Ex: `" + prefix + "vote 2`").queue();
+			message.getChannel().sendMessage("You can only vote one person! Ex: `" + config.getPrefix() + "vote 2`").queue();
 			return;
 		}
 
@@ -454,7 +451,7 @@ public class DiscordGame
 	public void createNewChannels(GuildAction g)
 	{
 		// this channel used for general game updates
-		for (TownRole role : getGameMode().getTownRoles())
+		for (TownRole role : config.getGame().getTownRoles())
 			g.newRole().setName(role.getName()).setPermissionsRaw(0l);
 
 		g.newRole().setName("Bot").addPermissions(Permission.ADMINISTRATOR).setColor(Color.YELLOW);
@@ -497,12 +494,11 @@ public class DiscordGame
 	{
 		initiated = true;
 
-		// TODO: Add an icon to the server
-		gameMode.build(this, randomMode);
+		config.getGame().build(this, config.isRandom());
 
-		GuildAction ga = jda.createGuild(gameMode.getName());
+		GuildAction ga = jda.createGuild(config.getGame().getName());
 		createNewChannels(ga);
-		ga.newRole().setName("" + guildID);
+		ga.newRole().setName("" + partyGuildID);
 		ga.queue();
 	}
 
@@ -514,7 +510,7 @@ public class DiscordGame
 		getGameGuild().addRoleToMember(jda.getSelfUser().getIdLong(), guild.getRolesByName("Bot", false).get(0)).queue();
 
 		List<Role> guildRoles = getGameGuild().getRoles();
-		for (int x = 0; x < getGameMode().getTownRoles().size(); ++x)
+		for (int x = 0; x < config.getGame().getTownRoles().size(); ++x)
 		{
 			Role townRole = guildRoles.get(guildRoles.size() - x - 2);
 			roles.put(townRole.getName().toLowerCase(), townRole.getIdLong());
@@ -602,7 +598,7 @@ public class DiscordGame
 
 		if (getPerson(id) != null)
 		{
-			String message = String.format("<@%d> already joined! Check party members with " + prefix + "party", id);
+			String message = String.format("<@%d> already joined! Check party members with " + config.getPrefix() + "party", id);
 			channelUsed.sendMessage(message).queue();
 			return;
 		}
@@ -630,7 +626,7 @@ public class DiscordGame
 
 		if (id == partyLeaderID)
 		{
-			String message = String.format("Party leader can't leave the party. `" + prefix + "endParty` instead <@%d>", id);
+			String message = String.format("Party leader can't leave the party. `" + config.getPrefix() + "endParty` instead <@%d>", id);
 			channelUsed.sendMessage(message).queue();
 			return;
 		}
@@ -752,7 +748,7 @@ public class DiscordGame
 
 	public long getPartyID()
 	{
-		return guildID;
+		return partyGuildID;
 	}
 
 	public long getGameID()
@@ -979,16 +975,6 @@ public class DiscordGame
 	public void nextDayStarted()
 	{
 		dayNum++;
-	}
-
-	public GameMode getGameMode()
-	{
-		return gameMode;
-	}
-
-	public boolean isRandom()
-	{
-		return randomMode;
 	}
 
 	public RestAction<Void> modifyMemberRoles(Person person, String... roleNames)

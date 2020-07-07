@@ -1,4 +1,4 @@
-package town;
+package town.util;
 
 import net.dv8tion.jda.api.requests.RestAction;
 

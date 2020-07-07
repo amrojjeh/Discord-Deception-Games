@@ -48,4 +48,13 @@ public class Rule
 		}
 		return assigner;
 	}
+
+	@Override
+	public String toString()
+	{
+		StringBuilder builder = new StringBuilder(totalPlayers + " ");
+		for (Role role : roles)
+			builder.append("(" + role.role.getName() + ", " + role.max + (role.isDefault ? "+" : "") + ") ");
+		return builder.toString();
+	}
 }

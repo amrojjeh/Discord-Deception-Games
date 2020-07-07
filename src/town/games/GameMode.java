@@ -40,6 +40,15 @@ public class GameMode
 		return isSpecial;
 	}
 
+	public String getConfig()
+	{
+		if (isSpecial()) return "Special";
+		String str = "";
+		for (Rule rule : rules)
+			str += rule.toString() + "\n";
+		return str;
+	}
+
 	public void addRule(Rule rule)
 	{
 		rules.add(rule);

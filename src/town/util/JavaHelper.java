@@ -1,4 +1,4 @@
-package town;
+package town.util;
 
 import java.io.File;
 import java.io.FileNotFoundException;

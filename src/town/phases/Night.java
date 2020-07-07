@@ -1,6 +1,6 @@
 package town.phases;
 
-import town.RestHelper;
+import town.util.RestHelper;
 
 public class Night extends Phase
 {

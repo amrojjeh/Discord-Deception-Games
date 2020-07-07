@@ -165,6 +165,8 @@ public class MainListener extends ListenerAdapter
 		}
 		else if (lowerCaseMessage.contentEquals(prefix + "games"))
 				e.getChannel().sendMessage(displayGames()).queue();
+		else if (lowerCaseMessage.startsWith(prefix + "config"))
+			displayConfig(e.getChannel(), lowerCaseMessage, e.getGuild().getIdLong());
 		else if (lowerCaseMessage.contentEquals(prefix + "delete") || lowerCaseMessage.contentEquals("!delete"))
 		{
 			DiscordGame game = games.get(message.getGuild().getIdLong());
@@ -223,6 +225,51 @@ public class MainListener extends ListenerAdapter
 		return builder.build();
 	}
 
+	private void displayConfig(MessageChannel channelUsed, String message, long guildID)
+	{
+		EmbedBuilder embed = new EmbedBuilder();
+		GameMode selectedGameMode;
+		String[] words = message.split(" ", 2);
+		if (words.length == 1)
+		{
+			if (!parties.containsKey(guildID) && !games.containsKey(guildID))
+			{
+				channelUsed.sendMessage("Syntax: pg.config [GAME_MODE]").queue();
+				return;
+			}
+
+			DiscordGame game;
+			if (parties.containsKey(guildID)) game = parties.get(guildID);
+			else game = games.get(guildID);
+
+			selectedGameMode = game.config.getGame();
+
+			boolean randomMode = game.config.isRandom();
+			boolean noMin = game.config.getMin() == 0;
+			long partyLeaderID = game.partyLeaderID;
+
+			embed
+			.addField("Random", (randomMode ? "Yes" : "No"), true)
+			.addField("Minimum Players", (noMin ? "0" : selectedGameMode.getMinimumTotalPlayers() + ""), true)
+			.addField("Party leader","<@" + partyLeaderID + ">", true);
+
+		}
+
+		else
+		{
+			selectedGameMode = GameModeLoader.getGameMode(words[1], true);
+			if (selectedGameMode == null)
+				channelUsed.sendMessage("FAILED: Game mode **" + words[1] + "** does not exist.").queue();
+		}
+
+			embed.setTitle(selectedGameMode.getName())
+				.setDescription(selectedGameMode.getDescription())
+				.setColor(Color.YELLOW)
+				.addField("Game Config", selectedGameMode.getConfig(), true);
+
+		channelUsed.sendMessage(embed.build()).queue();
+	}
+
 	private String helpTable()
 	{
 		String commands =
@@ -262,23 +309,32 @@ public class MainListener extends ListenerAdapter
 			DiscordGame game = new DiscordGame(jda, guildID, partyLeader.getIdLong());
 			String[] words = message.split(" ", 2);
 			String messageToSend = "Party started\n";
-			boolean isRandom = game.isRandom();
-			String gameName = game.getGameMode().getName();
+			String customRules = "";
+			String gameName = game.config.getGame().getName();
 
 			// words[0] = pg.startparty
 			// words[1] = Talking Graves Rand
 			if (words.length == 2)
 			{
-				String lastWord = words[1].substring(words[1].lastIndexOf(" ") + 1).toLowerCase();
-				isRandom = lastWord.contentEquals("rand") || lastWord.contentEquals("random");
-				if (isRandom)
-					gameName = words[1].substring(0, words[1].toLowerCase().lastIndexOf(" rand"));
+				if (words[1].contains("custom"))
+				{
+					String[] lines = message.split("\n", 2);
+					if (lines.length == 2)
+						customRules = lines[1];
+					else
+					{
+						channelUsed.sendMessage("When passing a custom game, each line has to be seperated. Example:\n```\nstartParty custom\n4 (Civilian, 3+), (Serial Killer, 1)\n6 (Civilian, 4+), (Serial Killer, 2)```").queue();
+						return;
+					}
+				}
 				else
 					gameName = words[1];
 			}
 
-			messageToSend += game.setGameMode(gameName) + "\n";
-			messageToSend += game.setRandomMode(isRandom) + "\n";
+			if (!customRules.isBlank())
+				messageToSend += game.config.setCustomGameMode(customRules) + "\n";
+			else
+				messageToSend += game.config.setGameMode(gameName) + "\n";
 			channelUsed.sendMessage(messageToSend).queue();
 			if (messageToSend.contains("FAILED")) return;
 

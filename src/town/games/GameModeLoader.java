@@ -8,8 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
-import town.JavaHelper;
 import town.games.parser.GameParser;
+import town.util.JavaHelper;
 
 public class GameModeLoader
 {
