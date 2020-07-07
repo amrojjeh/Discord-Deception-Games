@@ -1,11 +1,10 @@
 package town.games.parser;
 
 import java.util.ArrayList;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import town.TownRole;
 import town.games.GameMode;
+import town.util.JavaHelper;
 
 public class GameParser
 {
@@ -28,11 +27,13 @@ public class GameParser
 		}
 
 		GameMode game = new GameMode(name, description, false);
+		if (currentLine == lines.length)
+			throw new IllegalArgumentException("No valid rules parsed in **" + str + "**");
 		while (currentLine != lines.length)
 		{
 			Rule rule = parseRule(lines[currentLine++]);
 			if (rule.totalPlayers != calculateImplicitTotalPlayers(rule.roles))
-				throw new IllegalArgumentException("The total number of players does not equal the max number of players pass in the rule: " + str);
+				throw new IllegalArgumentException("The total number of players does not equal the max number of players pass in the rule: **" + str + "**");
 			game.addRule(rule);
 		}
 		return game;
@@ -50,24 +51,29 @@ public class GameParser
 
 	public static Rule parseRule(String str)
 	{
-		Pattern roleTuples = Pattern.compile("\\(.+?,\\s*\\d+\\+?\\s*\\)");
-
-		Matcher matcher = roleTuples.matcher(str);
 		Rule rule = new Rule(getExplicitTotalPlayers(str));
-		while (matcher.find())
-			rule.addRole(getRoleFromTuple(str.substring(matcher.start(), matcher.end())));
+		String[] tuples = str.replaceFirst(rule.totalPlayers + "", "").split(",");
+		if (tuples.length == 0)
+			throw new IllegalArgumentException("No roles passed");
+		for (String tuple : tuples)
+			rule.addRole(getRoleFromTuple(tuple.strip()));
 
 		return rule;
 	}
 
 	public static Role getRoleFromTuple(String tuple)
 	{
-		Pattern roleAndNum = Pattern.compile("\\((.+?),\\s*(\\d+)(\\+?)");
-		Matcher match = roleAndNum.matcher(tuple);
-		if (!match.find())
-			throw new IllegalArgumentException("Could not parse: " + tuple);
-		TownRole role = TownRole.getRoleFromName(match.group(1));
-		return new Role(role, Integer.parseInt(match.group(2)), match.group(3).equals("+"));
+		String[] splitTuple = tuple.split(" ");
+		Integer roleMax = JavaHelper.parseInt(splitTuple[splitTuple.length - 1].replace("+", ""));
+		if (roleMax == null)
+			throw new IllegalArgumentException("No role max was passed in the tuple: " + tuple);
+		splitTuple[splitTuple.length - 1] = "";
+		String roleName = String.join(" ", splitTuple);
+
+		TownRole role = TownRole.getRoleFromName(roleName.strip());
+		if (role == null)
+			throw new IllegalArgumentException("Role name (" + roleName.strip() + ") not found in: **" + tuple + "**");
+		return new Role(role, roleMax, tuple.charAt(tuple.length() - 1) == '+');
 	}
 
 	public static int calculateImplicitTotalPlayers(ArrayList<Role> singleRoles)
@@ -80,10 +86,9 @@ public class GameParser
 
 	public static int getExplicitTotalPlayers(String str)
 	{
-		Pattern totalNumberOfPlayers = Pattern.compile("(\\d+)");
-		Matcher matcher = totalNumberOfPlayers.matcher(str);
-		if (!matcher.find())
+		Integer total = JavaHelper.parseInt(str.split(" ", 2)[0]);
+		if (total == null)
 			throw new IllegalArgumentException("No total number of players passed in: " + str);
-		return Integer.parseInt(matcher.group(1));
+		return total;
 	}
 }

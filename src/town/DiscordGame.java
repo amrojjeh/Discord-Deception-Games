@@ -66,7 +66,7 @@ public class DiscordGame
 		this.jda = jda;
 		partyGuildID = guildId;
 		partyLeaderID = partyLeaderId;
-		config.setGameMode("0");
+		config.setGameMode("1");
 	}
 
 	public void processMessage(Message message)

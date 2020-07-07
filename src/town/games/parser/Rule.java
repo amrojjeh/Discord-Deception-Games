@@ -53,8 +53,13 @@ public class Rule
 	public String toString()
 	{
 		StringBuilder builder = new StringBuilder(totalPlayers + " ");
-		for (Role role : roles)
-			builder.append("(" + role.role.getName() + ", " + role.max + (role.isDefault ? "+" : "") + ") ");
+		for (int x = 0; x < roles.size(); ++x)
+		{
+			Role role = roles.get(x);
+			builder.append(role.role.getName() + " " + role.max + (role.isDefault ? "+" : ""));
+			if (x != roles.size() - 1)
+				builder.append(", ");
+		}
 		return builder.toString();
 	}
 }

@@ -65,6 +65,14 @@ public enum TownRole
 
 	public static TownRole getRoleFromName(String name)
 	{
-		return TownRole.valueOf(name.toUpperCase().replace(" ", "_"));
+		TownRole role;
+		try
+		{
+			role = TownRole.valueOf(name.toUpperCase().replace(" ", "_"));
+		} catch (IllegalArgumentException e)
+		{
+			return null;
+		}
+		return role;
 	}
 }
