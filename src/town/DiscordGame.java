@@ -611,7 +611,7 @@ public class DiscordGame
 
 		Rule rule = config.getGame().getClosestRule(getPlayersCache().size());
 
-		if (!rule.hasDefault() && rule.totalPlayers < getPlayersCache().size() + 1)
+		if (!rule.hasDefault() && !config.isRandom() && rule.totalPlayers < getPlayersCache().size() + 1)
 		{
 			String message = String.format("<@%d> cannot join, as the closest rule, *%s*, has no defaults and thus can't support more players", id, rule.toString());
 			channelUsed.sendMessage(message).queue();
