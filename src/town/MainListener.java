@@ -264,7 +264,7 @@ public class MainListener extends ListenerAdapter
 
 			embed.setTitle(selectedGameMode.getName())
 				.setDescription(selectedGameMode.getDescription())
-				.setColor(Color.YELLOW)
+				.setColor(Color.GREEN)
 				.addField("Game Config", selectedGameMode.getConfig(), true);
 
 		channelUsed.sendMessage(embed.build()).queue();

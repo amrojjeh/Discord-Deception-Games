@@ -274,7 +274,7 @@ public class DiscordGame
 		String format = "%d. <@%d> ";
 		for (Person p : targets)
 			description += String.format(format, p.getNum(), p.getID()) + (p.isDisconnected() ? "(d)\n" : "\n");
-		MessageEmbed embed = new EmbedBuilder().setColor(Color.YELLOW).setTitle("Possible targets").setDescription(description).build();
+		MessageEmbed embed = new EmbedBuilder().setColor(Color.GREEN).setTitle("Possible targets").setDescription(description).build();
 		user.sendMessage(embed);
 	}
 
@@ -409,7 +409,7 @@ public class DiscordGame
 		String format = "%d. <@%d> ";
 		for (Person p : persons)
 			description += String.format(format, p.getNum(), p.getID()) + (p.isDisconnected() ? "(d)\n" : "\n");
-		MessageEmbed embed = new EmbedBuilder().setColor(Color.YELLOW).setTitle("Party members").setDescription(description).build();
+		MessageEmbed embed = new EmbedBuilder().setColor(Color.GREEN).setTitle("Party members").setDescription(description).build();
 		channelUsed.sendMessage(embed).queue();
 	}
 

@@ -129,7 +129,7 @@ public class Judgment extends Phase
 				builder.append(String.format("<@%d> abstained\n", person.getID()));
 		});
 
-		MessageEmbed embed = new EmbedBuilder().setColor(Color.YELLOW).setDescription(builder.toString()).build();
+		MessageEmbed embed = new EmbedBuilder().setColor(Color.GREEN).setDescription(builder.toString()).build();
 		getGame().sendMessageToTextChannel("daytime_discussion", embed).queue();
 	}
 

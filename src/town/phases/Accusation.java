@@ -64,7 +64,7 @@ public class Accusation extends Phase
 			description += "(votes " + vote + ") ";
 			description += p.getNum() + ". <@" + p.getID() + ">\n";
 		}
-		return new EmbedBuilder().setTitle("Players Alive").setColor(Color.YELLOW).setDescription(description).build();
+		return new EmbedBuilder().setTitle("Players Alive").setColor(Color.GREEN).setDescription(description).build();
 	}
 
 	public void updateMessage()
