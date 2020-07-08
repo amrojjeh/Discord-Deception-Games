@@ -33,8 +33,8 @@ public class Lookout extends Person
 	public void win()
 	{
 		getGame().winTownFaction(getType().getFaction());
-		getGame().sendMessageToTextChannel("daytime_discussion", "**Town has won!**")
-		.queue((msg) -> getGame().endGame());
+		getGame().sendMessageToTextChannel("daytime_discussion", "**Town has won!**").queue();
+		getGame().endGame();
 	}
 
 	@Override

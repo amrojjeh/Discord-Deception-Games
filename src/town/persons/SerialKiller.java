@@ -32,8 +32,8 @@ public class SerialKiller extends Person
 	public void win()
 	{
 		getGame().winTownFaction(getType().getFaction());
-		getGame().sendMessageToTextChannel("daytime_discussion", "**Serial Killers have won!**")
-		.queue((msg) -> getGame().endGame());
+		getGame().sendMessageToTextChannel("daytime_discussion", "**Serial Killers have won!**").queue();
+		getGame().endGame();
 	}
 
 	@Override

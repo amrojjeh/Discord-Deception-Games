@@ -14,11 +14,15 @@ public class Night extends Phase
 	public void start()
 	{
 		getGame().getPlayers().forEach(person -> checkVictory(person));
+
 		if (getGame().hasEnded())
 			return;
-		getGame().setChannelVisibility("player", "daytime_discussion", true, false).queue();
 
-		RestHelper.queueAll(getGame().toggleVC("Daytime", false), getGame().muteAllInRole("defendant", false));
+		RestHelper.queueAll
+		(
+				getGame().toggleVC("Daytime", false),
+				getGame().setChannelVisibility("player", "daytime_discussion", true, false)
+		);
 
 		getGame().getPlayers().forEach(person -> person.sendMessage("Night " + getGame().getDayNum() + " started"));
 		phaseManager.setWarningToAll(5);

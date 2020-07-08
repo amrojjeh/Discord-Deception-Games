@@ -558,9 +558,9 @@ public class DiscordGame
 
 	public void endGame()
 	{
+		ended = true;
 		phaseManager.end();
 		phaseManager.start(new End(phaseManager));
-		ended = true;
 	}
 
 	public boolean hasEnded()

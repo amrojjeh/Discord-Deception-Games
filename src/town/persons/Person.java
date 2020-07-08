@@ -146,7 +146,7 @@ public abstract class Person
 
 	public void die(String reason, boolean saveForMorning)
 	{
-		mute(true);
+		muted = true;
 		if (!alive) return;
 		if (!reason.isEmpty()) causeOfDeath = reason;
 		if (!isDisconnected())
