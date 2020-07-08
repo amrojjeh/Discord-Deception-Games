@@ -31,7 +31,6 @@ import net.dv8tion.jda.api.requests.restaction.MessageAction;
 import net.dv8tion.jda.api.requests.restaction.PermissionOverrideAction;
 import town.commands.GlobalCommands;
 import town.commands.PartyCommands;
-import town.commands.TVMCommands;
 import town.events.TownEvent;
 import town.persons.Person;
 import town.phases.End;
@@ -81,7 +80,7 @@ public class DiscordGame
 			if (!fromGuild)
 				executeCommand(this, new PartyCommands(), prefix, message);
 			else if (initiated)
-				executeCommand(this, new TVMCommands(), prefix, message);
+				executeCommand(this, config.getGame().getCommands(), prefix, message);
 	}
 
 	private boolean isMessageFromGameGuild(Message message)
@@ -111,7 +110,6 @@ public class DiscordGame
 
 		// FIXME: WARNING: Unable to load JDK7 types (java.nio.file.Path): no Java7 type support added
 		// Is being caued by the addPermissionOverride method.
-		g.newChannel(ChannelType.VOICE, "Daytime").setPosition(0);
 
 		// players discussing during the day
 		g.newChannel(ChannelType.TEXT, "daytime_discussion")

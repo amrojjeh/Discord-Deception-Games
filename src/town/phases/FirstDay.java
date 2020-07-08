@@ -14,6 +14,7 @@ public class FirstDay extends Day
 	@Override
 	public void start()
 	{
+		getGame().toggleVC("Daytime", true).queue();
 		getGame().sendMessageToTextChannel("daytime_discussion", "Day " + getGame().getDayNum() + " started")
 		.flatMap(msg -> getGame().setChannelVisibility("player", "daytime_discussion", true, true))
 		.queue();
