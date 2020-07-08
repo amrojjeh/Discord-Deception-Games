@@ -160,9 +160,8 @@ public class MainListener extends ListenerAdapter
 			startLobby(e.getJDA(), e.getGuild().getIdLong(), e.getMessage().getContentRaw(), e.getChannel(), e.getMember());
 		else if (lowerCaseMessage.contentEquals(prefix + "endparty"))
 			endLobby(e.getGuild().getIdLong(), e.getChannel(), message.getMember());
-		else if (lowerCaseMessage.contentEquals(prefix + "help")) {
+		else if (lowerCaseMessage.startsWith(prefix + "help"))
 			e.getChannel().sendMessage(helpTable()).queue();
-		}
 		else if (lowerCaseMessage.contentEquals(prefix + "games"))
 				e.getChannel().sendMessage(displayGames()).queue();
 		else if (lowerCaseMessage.startsWith(prefix + "config"))
@@ -276,13 +275,18 @@ public class MainListener extends ListenerAdapter
 				"Lobby:\n" +
 				"  " + prefix + "startParty | starts a new party for players to join\n" +
 				"  " + prefix + "endParty   | cancels the current party\n" +
+				"  " + prefix + "setgame    | changes the game mode\n" +
 				"  " + prefix + "join       | join the current party\n" +
+				"  " + prefix + "leave      | leaves the current party\n" +
 				"  " + prefix + "party      | displays all members currently in the party\n" +
 				"  " + prefix + "startGame  | begins the game with current party members\n" +
-				"\nGame commands (can also use ! for prefix):\n" +
+				"\nIn-game(can also use ! for prefix):\n" +
 				"  " + prefix + "ability    | activates your role ability\n" +
+				"  " + prefix + "cancel     | cancels your role ability\n" +
 				"  " + prefix + "targets    | lists everyone you can use your ability on\n" +
-				"  " + prefix + "roleHelp   | displays the help message for your role.\n";
+				"\nAdvanced Lobby:\n" +
+				"  " + prefix + "setrand    | removes the max amount of roles in a game\n" +
+				"  " + prefix + "nomin      | sets the minimum players that can play to 0\n";
 
 		return "```\n" + commands + "```";
 	}
@@ -323,7 +327,7 @@ public class MainListener extends ListenerAdapter
 						customRules = lines[1];
 					else
 					{
-						channelUsed.sendMessage("When passing a custom game, each line has to be seperated. Example:\n```\nstartParty custom\n4 (Civilian, 3+), (Serial Killer, 1)\n6 (Civilian, 4+), (Serial Killer, 2)```").queue();
+						channelUsed.sendMessage("When passing a custom game, each line has to be seperated. Example:\n```\nstartParty custom\n4 Civilian 3+, Serial Killer 1\n6 Civilian 4+, Serial Killer 2```").queue();
 						return;
 					}
 				}
