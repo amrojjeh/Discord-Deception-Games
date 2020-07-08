@@ -1,5 +1,6 @@
 package town.phases;
 
+import town.DiscordGame;
 import town.persons.Person;
 import town.util.RestHelper;
 
@@ -7,9 +8,9 @@ public class LastWords extends Phase
 {
 	Person defendant;
 
-	public LastWords(PhaseManager pm, Person defendant)
+	public LastWords(DiscordGame game, PhaseManager pm, Person defendant)
 	{
-		super(pm);
+		super(game, pm);
 		this.defendant = defendant;
 	}
 
@@ -38,7 +39,7 @@ public class LastWords extends Phase
 	@Override
 	public Phase getNextPhase()
 	{
-		return new Night(phaseManager);
+		return new Night(getGame(), phaseManager);
 	}
 
 	@Override

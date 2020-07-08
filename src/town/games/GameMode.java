@@ -6,9 +6,13 @@ import java.util.Set;
 
 import town.DiscordGame;
 import town.TownRole;
+import town.commands.CommandSet;
+import town.commands.TVMCommands;
 import town.games.parser.Rule;
 import town.persons.assigner.Assigner;
 import town.persons.assigner.GeneralAssigner;
+import town.phases.FirstDay;
+import town.phases.PhaseManager;
 
 public class GameMode
 {
@@ -16,13 +20,20 @@ public class GameMode
 	private final String name;
 	private final String description;
 	private final boolean isSpecial;
+	private final CommandSet gameCommands;
 	protected Set<TownRole> roles = new HashSet<>();
 
 	public GameMode(String name, String description, boolean special)
 	{
+		this(name, description, special, new TVMCommands());
+	}
+
+	public GameMode(String name, String description, boolean special, CommandSet gameCommands)
+	{
 		this.name = name;
 		this.description = description;
 		this.isSpecial = special;
+		this.gameCommands = gameCommands;
 	}
 
 	public String getName()
@@ -38,6 +49,11 @@ public class GameMode
 	public boolean isSpecial()
 	{
 		return isSpecial;
+	}
+
+	public CommandSet getCommands()
+	{
+		return gameCommands;
 	}
 
 	public String getConfig()
@@ -72,17 +88,6 @@ public class GameMode
 		else buildDefault(game);
 	}
 
-	public Rule getClosestRule(int totalPlayers)
-	{
-		Rule ruleFloor = rules.get(0);
-		for (Rule rule : rules)
-			if (rule.totalPlayers > totalPlayers)
-				break;
-			else
-				ruleFloor = rule;
-		return ruleFloor;
-	}
-
 	public void buildDefault(DiscordGame game)
 	{
 		int totalPlayers = game.getPlayersCache().size();
@@ -99,5 +104,21 @@ public class GameMode
 		for (TownRole role : roles)
 			assigner.addRole(new GeneralAssigner(role));
 		game.getPlayersCache().replaceAll(person -> assigner.generatePerson(game, 0, person.getNum(), person.getID()));
+	}
+
+	public Rule getClosestRule(int totalPlayers)
+	{
+		Rule ruleFloor = rules.get(0);
+		for (Rule rule : rules)
+			if (rule.totalPlayers > totalPlayers)
+				break;
+			else
+				ruleFloor = rule;
+		return ruleFloor;
+	}
+
+	public void start(DiscordGame game, PhaseManager pm)
+	{
+		pm.start(game, new FirstDay(game, pm));
 	}
 }

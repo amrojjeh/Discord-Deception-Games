@@ -28,6 +28,7 @@ import net.dv8tion.jda.api.events.guild.voice.GuildVoiceJoinEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceMoveEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import town.commands.PartyCommands;
 import town.games.GameMode;
 import town.games.GameModeLoader;
 
@@ -144,7 +145,7 @@ public class MainListener extends ListenerAdapter
 	{
 		DiscordGame game = games.get(event.getGuild().getIdLong());
 		if (game == null) return;
-		game.gameGuildPersonLeave(event.getMember());
+		game.memberLeftGameGuild(event.getMember());
 	}
 
 	@Override
@@ -157,7 +158,7 @@ public class MainListener extends ListenerAdapter
 		String lowerCaseMessage = message.getContentRaw().toLowerCase();
 
 		if (lowerCaseMessage.startsWith(prefix + "startparty"))
-			startLobby(e.getJDA(), e.getGuild().getIdLong(), e.getMessage().getContentRaw(), e.getChannel(), e.getMember());
+			startLobby(e.getJDA(), e.getGuild().getIdLong(), e.getMessage().getContentRaw(), e.getChannel(), e.getMember(), message);
 		else if (lowerCaseMessage.contentEquals(prefix + "endparty"))
 			endLobby(e.getGuild().getIdLong(), e.getChannel(), message.getMember());
 		else if (lowerCaseMessage.startsWith(prefix + "help"))
@@ -302,7 +303,7 @@ public class MainListener extends ListenerAdapter
 		}
 	}
 
-	public void startLobby(JDA jda, Long guildID, String message, MessageChannel channelUsed, Member partyLeader)
+	public void startLobby(JDA jda, Long guildID, String message, MessageChannel channelUsed, Member partyLeader, Message usermessage)
 	{
 		if (parties.containsKey(guildID))
 			channelUsed.sendMessage("Party already started").queue();
@@ -342,7 +343,7 @@ public class MainListener extends ListenerAdapter
 			channelUsed.sendMessage(messageToSend).queue();
 			if (messageToSend.contains("FAILED")) return;
 
-			game.joinGame(partyLeader.getIdLong(), channelUsed);
+			PartyCommands.joinGame(game, usermessage);
 			parties.put(guildID, game);
 		}
 	}

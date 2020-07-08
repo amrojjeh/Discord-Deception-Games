@@ -1,5 +1,7 @@
 package town;
 
+import static town.commands.CommandSet.executeCommand;
+
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -8,7 +10,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
 
-import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.ChannelType;
@@ -17,7 +18,6 @@ import net.dv8tion.jda.api.entities.GuildChannel;
 import net.dv8tion.jda.api.entities.IPermissionHolder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -29,16 +29,14 @@ import net.dv8tion.jda.api.requests.restaction.GuildAction;
 import net.dv8tion.jda.api.requests.restaction.GuildAction.RoleData;
 import net.dv8tion.jda.api.requests.restaction.MessageAction;
 import net.dv8tion.jda.api.requests.restaction.PermissionOverrideAction;
+import town.commands.GlobalCommands;
+import town.commands.PartyCommands;
+import town.commands.TVMCommands;
 import town.events.TownEvent;
-import town.games.parser.Rule;
-import town.persons.LobbyPerson;
 import town.persons.Person;
-import town.phases.Accusation;
 import town.phases.End;
-import town.phases.Judgment;
 import town.phases.Phase;
 import town.phases.PhaseManager;
-import town.util.JavaHelper;
 
 public class DiscordGame
 {
@@ -56,7 +54,7 @@ public class DiscordGame
 	private ArrayList<Person> persons = new ArrayList<>();
 	private LinkedList<Person> savedForMorning = new LinkedList<>();
 	private PriorityQueue<TownEvent> events = new PriorityQueue<>();
-	private PhaseManager phaseManager = new PhaseManager(this);
+	private PhaseManager phaseManager = new PhaseManager();
 	private int dayNum = 1;
 
 	boolean initiated = false;
@@ -77,52 +75,13 @@ public class DiscordGame
 
 	public void processMessage(String prefix, Message message)
 	{
-		String rawMsg = message.getContentRaw().toLowerCase();
 		boolean fromGuild = isMessageFromGameGuild(message);
 
-		if (commandCheck(false, rawMsg, prefix, "party"))
-			displayParty(message.getChannel());
-		else if (!fromGuild)
-		{
-			if (commandCheck(false, rawMsg, prefix, "startgame"))
-				startGameCommand(message);
-			else if (commandCheck(false, rawMsg, prefix, "join"))
-				joinGame(message.getMember().getIdLong(), message.getChannel());
-			else if (commandCheck(false, rawMsg, prefix, "leave"))
-				leaveGameCommand(message.getMember().getIdLong(), message.getChannel());
-			else if (commandCheck(true, rawMsg, prefix, "nomin"))
-				noMinCommand(message);
-			else if (commandCheck(true, rawMsg, prefix, "setgame"))
-				setGameModeCommand(message);
-			else if (commandCheck(true, rawMsg, prefix, "setrand"))
-				setRandomCommand(message);
-		}
-		else if (fromGuild && initiated)
-		{
-			if (commandCheck(true, rawMsg, prefix, "ability", "a"))
-				activateAbilityCommand(message);
-			else if (commandCheck(false, rawMsg, prefix, "cancel", "c"))
-				cancelCommand(message);
-			else if (commandCheck(false, rawMsg, prefix, "rolehelp", "rh"))
-				roleHelpCommand(message);
-			else if (commandCheck(true, rawMsg, prefix, "vote", "v"))
-				voteCommand(message);
-			else if (commandCheck(false, rawMsg, prefix, "guilty", "g"))
-				guiltyCommand(message);
-			else if (commandCheck(false, rawMsg, prefix, "innocent", "inno", "i"))
-				innocentCommand(message);
-			else if (commandCheck(false, rawMsg, prefix, "targets", "t"))
-				getPossibleTargetsCommand(message);
-		}
-	}
-
-	// Assumes msg is lowercase
-	private boolean commandCheck(boolean startsWith, String msg, String prefix, String... commands)
-	{
-		for (String command : commands)
-			if (startsWith && msg.startsWith(prefix + command)) return true;
-			else if (msg.equals(prefix + command)) return true;
-		return false;
+		if (!executeCommand(this, new GlobalCommands(), prefix, message))
+			if (!fromGuild)
+				executeCommand(this, new PartyCommands(), prefix, message);
+			else if (initiated)
+				executeCommand(this, new TVMCommands(), prefix, message);
 	}
 
 	private boolean isMessageFromGameGuild(Message message)
@@ -131,322 +90,6 @@ public class DiscordGame
 			return message.getGuild().getIdLong() == getGameGuild().getIdLong();
 		else
 			return false;
-	}
-
-	private List<Person> getPersonsFromMessage(Message message)
-	{
-		List<Person> references = getPersonsFromMessageUsingNumReferences(message);
-		if (references != null)
-			return references;
-
-		return getPersonsFromMessageUsingMentions(message);
-	}
-
-	private List<Person> getPersonsFromMessageUsingMentions(Message message)
-	{
-		List<Member> members = message.getMentionedMembers();
-		ArrayList<Person> mentioned = new ArrayList<>();
-
-		if (members.size() == 0) return mentioned;
-
-		for (Member m : members)
-		{
-			Person p = getPerson(m);
-			if (p == null)
-			{
-				message.getChannel().sendMessage(String.format("Person <@%d> isn't a player", m.getIdLong())).queue();
-				return null;
-			}
-
-			mentioned.add(p);
-		}
-		return mentioned;
-	}
-
-	private List<Person> getPersonsFromMessageUsingNumReferences(Message message)
-	{
-		ArrayList<Person> references = new ArrayList<>();
-		String[] words = message.getContentStripped().split(" ");
-		if (words.length == 1) return references;
-		for (int x = 1; x < words.length; ++x)
-		{
-			// Check if parsable
-			int personNum = 0; // 0 can't exist as a ref
-			try
-			{
-				personNum = Integer.parseInt(words[x]);
-			}
-			catch (NumberFormatException e)
-			{
-				return null;
-			}
-
-			Person reference = getPerson(personNum);
-			if (reference == null)
-			{
-				message.getChannel().sendMessage(String.format("Person with number %d doesn't exist", personNum)).queue();
-				return null;
-			}
-			references.add(reference);
-		}
-
-		return references;
-	}
-
-	private void setGameModeCommand(Message message)
-	{
-		if (message.getMember().getIdLong() != partyLeaderID)
-		{
-			message.getChannel().sendMessage(String.format("Only party leader (<@%d>) can configure the game!", partyLeaderID)).queue();
-			return;
-		}
-
-		String words[] = message.getContentRaw().split(" ", 2);
-
-		if (words.length != 2)
-		{
-			message.getChannel().sendMessage("Syntax is: `" + config.getPrefix() + "setGame 2` OR `" + config.getPrefix() + "setGame Mashup` OR\n```\nsetGame custom\n4 (Civilian, 3+), (Serial Killer, 1)```").queue();
-			return;
-		}
-
-		if (words[1].contains("custom"))
-		{
-			String[] lines = message.getContentRaw().split("\n", 2);
-			if (lines.length != 2)
-			{
-				message.getChannel().sendMessage("When passing a custom game, each line has to be seperated. Example:\n```\nsetGame custom\n4 (Civilian, 3+), (Serial Killer, 1)\6 (Civilian, 4+), (Serial Killer, 2)```").queue();
-				return;
-			}
-
-			String rules = lines[1];
-			message.getChannel().sendMessage(config.setCustomGameMode(rules)).queue();
-		}
-		else
-			message.getChannel().sendMessage(config.setGameMode(words[1])).queue();
-	}
-
-	private void setRandomCommand(Message message)
-	{
-		if (message.getMember().getIdLong() != partyLeaderID)
-		{
-			message.getChannel().sendMessage(String.format("Only party leader (<@%d>) can configure the game!", partyLeaderID)).queue();
-			return;
-		}
-
-		String words[] = message.getContentRaw().split(" ");
-		if (words.length != 2)
-		{
-			message.getChannel().sendMessage("Syntax is: `" + config.getPrefix() + "setRand [0|1]`");
-			return;
-		}
-
-		Integer activator = JavaHelper.parseInt(words[1]);
-		if (activator == null)
-		{
-			message.getChannel().sendMessage("Syntax is: `" + config.getPrefix() + "setRand [0|1]`");
-			return;
-		}
-
-		setRandomMode(activator == 1);
-		message.getChannel().sendMessage(setRandomMode(activator == 1)).queue();
-	}
-
-	public String setRandomMode(boolean randomVal)
-	{
-		config.setRandom(randomVal);
-		if (config.isRandom())
-			return "Random mode was activated";
-		return "Random mode was disabled";
-	}
-
-	private void getPossibleTargetsCommand(Message message)
-	{
-		Person user = getPerson(message.getMember());
-		List<Person> targets = user.getPossibleTargets();
-
-		if (targets == null || targets.isEmpty())
-		{
-			user.sendMessage("No possible targets");
-			return;
-		}
-
-		String description = "";
-		String format = "%d. <@%d> ";
-		for (Person p : targets)
-			description += String.format(format, p.getNum(), p.getID()) + (p.isDisconnected() ? "(d)\n" : "\n");
-		MessageEmbed embed = new EmbedBuilder().setColor(Color.GREEN).setTitle("Possible targets").setDescription(description).build();
-		user.sendMessage(embed);
-	}
-
-	private void noMinCommand(Message message)
-	{
-		if (message.getMember().getIdLong() != partyLeaderID)
-		{
-			message.getChannel().sendMessage(String.format("Only party leader (<@%d>) can configure the game!", partyLeaderID)).queue();
-			return;
-		}
-
-		String syntax = "Syntax is: " + config.getPrefix() + "nomin [0|1]";
-		String words[] = message.getContentRaw().split(" ");
-		int activator = 0;
-		if (words.length != 2) message.getChannel().sendMessage(syntax).queue();
-		else
-		{
-			try
-			{
-				activator = Integer.parseInt(words[1]);
-			}
-			catch (NumberFormatException e)
-			{
-				message.getChannel().sendMessage(syntax).queue();
-				return;
-			}
-			config.byPassMin(activator == 1);
-			if (config.getMin() == 0) message.getChannel().sendMessage("No minimum players requried anymore.").queue();
-			else message.getChannel().sendMessage("Default minimum players required.").queue();
-		}
-	}
-
-	private void startGameCommand(Message message)
-	{
-		if (initiated)
-			message.getChannel().sendMessage("Game is already running!").queue();
-		else if (persons.isEmpty())
-			message.getChannel().sendMessage("Not enough players to start a server!").queue();
-		else if (message.getMember().getIdLong() != partyLeaderID)
-			message.getChannel().sendMessage(String.format("Only party leader (<@%d>) can start the game!", partyLeaderID)).queue();
-		else if (getPlayers().size() < config.getMin())
-			message.getChannel().sendMessage("Not enough players to play " + config.getGame().getName() + "! (" +
-		(config.getMin() - getPlayersCache().size()) + " left to play)").queue();
-		else
-		{
-			message.getChannel().sendMessage("Game has started! Creating server...").queue();
-			startGame();
-		}
-	}
-
-	private void activateAbilityCommand(Message message)
-	{
-		Person user = getPerson(message.getMember());
-		user.sendMessage(user.ability(getPersonsFromMessage(message)));
-	}
-
-	private void cancelCommand(Message message)
-	{
-		Person user = getPerson(message.getMember());
-		Phase currentPhase = getCurrentPhase();
-		if (currentPhase instanceof Accusation)
-		{
-			Accusation acc = (Accusation)currentPhase;
-			message.getChannel().sendMessage(acc.cancelVote(user)).queue();
-			return;
-		}
-
-		if (currentPhase instanceof Judgment)
-		{
-			if (!user.isAlive()) message.getChannel().sendMessage(String.format("Can't vote if you're dead <@%d>.", user.getID())).queue();
-
-			Judgment j = (Judgment)currentPhase;
-			message.getChannel().sendMessage(j.abstain(user)).queue();
-			return;
-		}
-
-		message.getChannel().sendMessage(user.cancel()).queue();
-	}
-
-	private void roleHelpCommand(Message message)
-	{
-		Person user = getPerson(message.getMember());
-		user.sendMessage(user.getHelp());
-	}
-
-	private void voteCommand(Message message)
-	{
-		Phase phase = getCurrentPhase();
-		if (!(phase instanceof Accusation))
-		{
-			message.getChannel().sendMessage("You can only vote for trial once the accusation phase starts!").queue();
-			return;
-		}
-
-		List<Person> referenced = getPersonsFromMessage(message);
-		if (referenced == null)
-		{
-			System.out.println("Thing was null mate");
-			return;
-		}
-
-		if (referenced.isEmpty())
-		{
-			message.getChannel().sendMessage("You have to vote one person! Ex: `" + config.getPrefix() + "vote 2`").queue();
-			return;
-		}
-
-		if (referenced.size() > 1)
-		{
-			message.getChannel().sendMessage("You can only vote one person! Ex: `" + config.getPrefix() + "vote 2`").queue();
-			return;
-		}
-
-		Person accuser = getPerson(message.getMember());;
-		Person accused = referenced.get(0);
-
-		Accusation acc = (Accusation)phase;
-		sendMessageToTextChannel("daytime_discussion", acc.vote(accuser, accused)).queue();
-	}
-
-	private void displayParty(MessageChannel channelUsed)
-	{
-		Phase currentPhase = getCurrentPhase();
-		if (currentPhase instanceof Accusation)
-		{
-			Accusation acc = (Accusation)currentPhase;
-			channelUsed.sendMessage(acc.generateList()).queue();
-			return;
-		}
-
-		String description = "";
-		String format = "%d. <@%d> ";
-		for (Person p : persons)
-			description += String.format(format, p.getNum(), p.getID()) + (p.isDisconnected() ? "(d)\n" : "\n");
-		MessageEmbed embed = new EmbedBuilder().setColor(Color.GREEN).setTitle("Party members").setDescription(description).build();
-		channelUsed.sendMessage(embed).queue();
-	}
-
-	private void guiltyCommand(Message message)
-	{
-		Person user = getPerson(message.getMember());
-		Phase currentPhase = getCurrentPhase();
-
-		if (!(currentPhase instanceof Judgment))
-		{
-			String msg = String.format("<@%d> can only vote guilty once someone's been accused.", user.getID());
-			message.getChannel().sendMessage(msg).queue();
-			return;
-		}
-
-		if (!user.isAlive()) message.getChannel().sendMessage(String.format("Can't vote if you're dead <@%d>.", user.getID())).queue();
-
-		Judgment j = (Judgment)currentPhase;
-		message.getChannel().sendMessage(j.guilty(user)).queue();
-	}
-
-	private void innocentCommand(Message message)
-	{
-		Person user = getPerson(message.getMember());
-		Phase currentPhase = getCurrentPhase();
-
-		if (!(currentPhase instanceof Judgment))
-		{
-			String msg = String.format("<@%d> can only vote innocent once someone's been accused.", user.getID());
-			message.getChannel().sendMessage(msg).queue();
-			return;
-		}
-
-		if (!user.isAlive()) message.getChannel().sendMessage(String.format("Can't vote if you're dead <@%d>.", user.getID())).queue();
-
-		Judgment j = (Judgment)currentPhase;
-		message.getChannel().sendMessage(j.innocent(user)).queue();
 	}
 
 	public void createNewChannels(GuildAction g)
@@ -491,7 +134,7 @@ public class DiscordGame
 		.addPermissionOverride(deadPlayerRoleData, QP.readPermissions() | QP.writePermissions(), 0);
 	}
 
-	public void startGame()
+	public void createServer()
 	{
 		initiated = true;
 
@@ -561,12 +204,17 @@ public class DiscordGame
 	{
 		ended = true;
 		phaseManager.end();
-		phaseManager.start(new End(phaseManager));
+		phaseManager.start(this, new End(this, phaseManager));
 	}
 
 	public boolean hasEnded()
 	{
 		return ended;
+	}
+
+	public boolean hasInitiated()
+	{
+		return initiated;
 	}
 
 	public void transferOrDelete()
@@ -591,68 +239,6 @@ public class DiscordGame
 			return true;
 		}
 		return false;
-	}
-
-	public void joinGame(long id, MessageChannel channelUsed)
-	{
-		if (initiated)
-		{
-			String message = String.format("Can't join game until session is over <@%d>", id);
-			channelUsed.sendMessage(message).queue();
-			return;
-		}
-
-		if (getPerson(id) != null)
-		{
-			String message = String.format("<@%d> already joined! Check party members with " + config.getPrefix() + "party", id);
-			channelUsed.sendMessage(message).queue();
-			return;
-		}
-
-		Rule rule = config.getGame().getClosestRule(getPlayersCache().size());
-
-		if (!rule.hasDefault() && !config.isRandom() && rule.totalPlayers < getPlayersCache().size() + 1)
-		{
-			String message = String.format("<@%d> cannot join, as the closest rule, *%s*, has no defaults and thus can't support more players", id, rule.toString());
-			channelUsed.sendMessage(message).queue();
-			return;
-		}
-
-
-		persons.add(new LobbyPerson(this, persons.size() + 1, id));
-		String message = String.format("<@%d> joined the lobby", id);
-		channelUsed.sendMessage(message).queue();
-	}
-
-	private void leaveGameCommand(long id, MessageChannel channelUsed)
-	{
-		if (initiated)
-		{
-			String message = String.format("Can't leave a game after it has started. Leave the server instead. <@%d>", id);
-			channelUsed.sendMessage(message).queue();
-			return;
-		}
-
-		if (getPerson(id) == null)
-		{
-			String message = String.format("Can't leave a game you're not in <@%d>", id);
-			channelUsed.sendMessage(message).queue();
-			return;
-		}
-
-		if (id == partyLeaderID)
-		{
-			String message = String.format("Party leader can't leave the party. `" + config.getPrefix() + "endParty` instead <@%d>", id);
-			channelUsed.sendMessage(message).queue();
-			return;
-		}
-
-		persons.remove(getPerson(id));
-		for (int x = 1; x <= persons.size(); ++x)
-			persons.get(x - 1).setNum(x);
-
-		String message = String.format("You've been removed from the party <@%d>", id);
-		channelUsed.sendMessage(message).queue();
 	}
 
 	public Person getPerson(Member member)
@@ -827,6 +413,12 @@ public class DiscordGame
 		return getTextChannel(channelName).retrieveMessageById(messageID);
 	}
 
+	public void startGame()
+	{
+		config.getGame().start(this, phaseManager);
+	}
+
+	// Where the game ACTUALLY starts
 	public void gameGuildJoin(Member member)
 	{
 		// Check if member was in the lobby
@@ -838,8 +430,8 @@ public class DiscordGame
 				TextChannel textChannel = getTextChannel(p.getChannelID());
 				textChannel.putPermissionOverride(getMemberFromGame(p)).setAllow(QP.readPermissions() | QP.writePermissions()).queue();
 				shouldKick = false;
-				if (getPlayers().size() == getGameGuild().getMemberCount() - 1)
-					phaseManager.start();
+				if (getPlayers().size() == getGameGuild().getMemberCount() - 1) // -1 since Bot counts as a member
+					startGame();
 				break;
 			}
 
@@ -973,11 +565,11 @@ public class DiscordGame
 		return savedForMorning.peek();
 	}
 
-	public void gameGuildPersonLeave(Member member)
+	public void memberLeftGameGuild(Member member)
 	{
 		Person person = getPerson(member);
-		person.disconnect();
-		person.die(String.format("<@%d> (%d) committed suicide.", person.getID(), person.getNum()), true);
+		if (person != null)
+			person.disconnect();
 	}
 
 	public int getDayNum()

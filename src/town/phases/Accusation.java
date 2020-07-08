@@ -5,6 +5,7 @@ import java.util.HashMap;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import town.DiscordGame;
 import town.persons.Person;
 
 //Accusation is the phase where players can vote to put another player on trial. If a player receives enough
@@ -17,9 +18,9 @@ public class Accusation extends Phase
 	int numVotesNeeded;
 	int numTrials;
 
-	public Accusation(PhaseManager pm, int numTrials)
+	public Accusation(DiscordGame game, PhaseManager pm, int numTrials)
 	{
-		super(pm);
+		super(game, pm);
 		this.numTrials = numTrials;
 		numVotesNeeded = getGame().getAlivePlayers().size() / 2 + 1;
 	}
@@ -37,7 +38,7 @@ public class Accusation extends Phase
 	@Override
 	public Phase getNextPhase()
 	{
-		return new Night(phaseManager);
+		return new Night(getGame(), phaseManager);
 	}
 
 	@Override
@@ -51,7 +52,7 @@ public class Accusation extends Phase
 		phaseManager.end();
 		getGame().getGameGuild().modifyMemberRoles(getGame().getMemberFromGame(p), getGame().getRole("defendant"))
 		.queue();
-		phaseManager.start(new Trial(phaseManager, p, numTrials - 1));
+		phaseManager.start(getGame(), new Trial(getGame(), phaseManager, p, numTrials - 1));
 	}
 
 	public MessageEmbed generateList()

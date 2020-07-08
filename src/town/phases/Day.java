@@ -1,5 +1,6 @@
 package town.phases;
 
+import town.DiscordGame;
 import town.persons.Person;
 import town.util.RestHelper;
 
@@ -7,9 +8,9 @@ import town.util.RestHelper;
 //a voice and text chat that all can use.
 public class Day extends Phase
 {
-	public Day(PhaseManager pm)
+	public Day(DiscordGame game, PhaseManager pm)
 	{
-		super(pm);
+		super(game, pm);
 	}
 
 	@Override
@@ -36,11 +37,11 @@ public class Day extends Phase
 	public Phase getNextPhase()
 	{
 		if (getGame().getAlivePlayers().size() > 2)
-		return new Accusation(phaseManager, 3);
+		return new Accusation(getGame(), phaseManager, 3);
 		else
 		{
 			getGame().sendMessageToTextChannel("daytime_discussion", "Accusation was skipped because there were only two people.").queue();
-			return new Night(phaseManager);
+			return new Night(getGame(), phaseManager);
 		}
 	}
 

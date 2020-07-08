@@ -6,6 +6,7 @@ import java.util.List;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import town.DiscordGame;
 import town.persons.Person;
 
 //Judgment is the moment of fate. All players still alive vote on the life of the defendant.
@@ -17,9 +18,9 @@ public class Judgment extends Phase
 	int innocent = 0;
 	int numTrials;
 
-	public Judgment(PhaseManager pm, Person p, int numTrials)
+	public Judgment(DiscordGame game, PhaseManager pm, Person p, int numTrials)
 	{
-		super(pm);
+		super(game, pm);
 		defendant = p;
 		this.numTrials = numTrials;
 	}
@@ -44,15 +45,15 @@ public class Judgment extends Phase
 	public Phase getNextPhase()
 	{
 		if (guilty > innocent)
-			return new LastWords(phaseManager, defendant);
+			return new LastWords(getGame(), phaseManager, defendant);
 		else if(numTrials > 0)
 		{
 			if (!defendant.isDisconnected())
 				getGame().getGameGuild().modifyMemberRoles(getGame().getMemberFromGame(defendant), getGame().getRole("player")).queue();
-			return new Accusation(phaseManager, numTrials);
+			return new Accusation(getGame(), phaseManager, numTrials);
 		}
 		else
-			return new Night(phaseManager);
+			return new Night(getGame(), phaseManager);
 	}
 
 	//Duration: 15-20 seconds

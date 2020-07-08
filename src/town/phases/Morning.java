@@ -1,14 +1,15 @@
 package town.phases;
 
+import town.DiscordGame;
 import town.persons.Person;
 
 public class Morning extends Phase
 {
-	Phase nextPhase = new Day(phaseManager);
+	Phase nextPhase = new Day(getGame(), phaseManager);
 
-	public Morning(PhaseManager pm)
+	public Morning(DiscordGame game, PhaseManager pm)
 	{
-		super(pm);
+		super(game, pm);
 	}
 
 	@Override
@@ -20,7 +21,7 @@ public class Morning extends Phase
 		getGame().sendMessageToTextChannel("daytime_discussion", person.getCauseOfDeath() + "\nTheir role was: " + person.getType().getName())
 		.queue();
 		if (getGame().peekDeathForMorning() != null)
-			nextPhase = new Morning(phaseManager);
+			nextPhase = new Morning(getGame(), phaseManager);
 	}
 
 	@Override

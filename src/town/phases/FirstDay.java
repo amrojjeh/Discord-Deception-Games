@@ -1,12 +1,14 @@
 package town.phases;
 
+import town.DiscordGame;
+
 //Daytime is the phase where players can discuss what is happening. There are no features other than
 //a voice and text chat that all can use.
 public class FirstDay extends Day
 {
-	public FirstDay(PhaseManager pm)
+	public FirstDay(DiscordGame game, PhaseManager pm)
 	{
-		super(pm);
+		super(game, pm);
 	}
 
 	@Override
@@ -22,7 +24,7 @@ public class FirstDay extends Day
 	@Override
 	public Phase getNextPhase()
 	{
-		return new Night(phaseManager);
+		return new Night(getGame(), phaseManager);
 	}
 
 	@Override

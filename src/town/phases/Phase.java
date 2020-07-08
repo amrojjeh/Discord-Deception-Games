@@ -8,16 +8,18 @@ public abstract class Phase extends TimerTask
 {
 	//Phase Manager that drives the phases
 	PhaseManager phaseManager;
+	private DiscordGame game;
 
-	public Phase(PhaseManager pm)
+	public Phase(DiscordGame game, PhaseManager pm)
 	{
 		phaseManager = pm;
-		getGame().getPlayers().forEach(person -> person.onPhaseChange(this));
+		this.game = game;
+		getGame().getPlayersCache().forEach(person -> person.onPhaseChange(this));
 	}
 
 	public DiscordGame getGame()
 	{
-		return phaseManager.getGame();
+		return game;
 	}
 
 	public void start() { }

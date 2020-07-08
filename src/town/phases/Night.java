@@ -1,13 +1,14 @@
 package town.phases;
 
+import town.DiscordGame;
 import town.persons.Person;
 import town.util.RestHelper;
 
 public class Night extends Phase
 {
-	public Night(PhaseManager pm)
+	public Night(DiscordGame game, PhaseManager pm)
 	{
-		super(pm);
+		super(game, pm);
 	}
 
 	@Override
@@ -44,7 +45,7 @@ public class Night extends Phase
 	@Override
 	public Phase getNextPhase()
 	{
-		return new Morning(phaseManager);
+		return new Morning(getGame(), phaseManager);
 	}
 
 	@Override

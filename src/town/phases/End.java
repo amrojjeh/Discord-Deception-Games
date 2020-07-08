@@ -1,18 +1,19 @@
 package town.phases;
 
+import town.DiscordGame;
 import town.util.RestHelper;
 
 public class End extends Phase
 {
-	public End(PhaseManager pm)
+	public End(DiscordGame game, PhaseManager pm)
 	{
-		super(pm);
+		super(game, pm);
 	}
 
 	@Override
 	public Phase getNextPhase()
 	{
-		return new End(phaseManager);
+		return new End(getGame(), phaseManager);
 	}
 
 	@Override

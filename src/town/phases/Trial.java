@@ -1,5 +1,6 @@
 package town.phases;
 
+import town.DiscordGame;
 import town.persons.Person;
 import town.util.RestHelper;
 
@@ -10,9 +11,9 @@ public class Trial extends Phase
 	Person defendant;
 	int numTrials;
 
-	public Trial(PhaseManager pm, Person p, int numTrials)
+	public Trial(DiscordGame game, PhaseManager pm, Person p, int numTrials)
 	{
-		super(pm);
+		super(game, pm);
 		defendant = p;
 		this.numTrials = numTrials;
 	}
@@ -49,7 +50,7 @@ public class Trial extends Phase
 	@Override
 	public Phase getNextPhase()
 	{
-		return new Judgment(phaseManager, defendant, numTrials);
+		return new Judgment(getGame(), phaseManager, defendant, numTrials);
 	}
 
 	@Override

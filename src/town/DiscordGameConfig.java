@@ -49,9 +49,12 @@ public class DiscordGameConfig
 		return isRand;
 	}
 
-	public void setRandom(boolean val)
+	public String setRandomMode(boolean randomVal)
 	{
-		isRand = val;
+		isRand = randomVal;
+		if (isRandom())
+			return "Random mode was activated";
+		return "Random mode was disabled";
 	}
 
 	public int getMin()
