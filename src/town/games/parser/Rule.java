@@ -18,6 +18,14 @@ public class Rule
 		this.totalPlayers = totalPlayers;
 	}
 
+	public boolean hasDefault()
+	{
+		for (Role role : roles)
+			if (role.isDefault)
+				return true;
+		return false;
+	}
+
 	public void addRole(TownRole role, int max, boolean isDefault)
 	{
 		Role singleRole = new Role(role, max, isDefault);

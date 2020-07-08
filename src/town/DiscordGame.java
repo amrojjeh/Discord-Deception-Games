@@ -30,6 +30,7 @@ import net.dv8tion.jda.api.requests.restaction.GuildAction.RoleData;
 import net.dv8tion.jda.api.requests.restaction.MessageAction;
 import net.dv8tion.jda.api.requests.restaction.PermissionOverrideAction;
 import town.events.TownEvent;
+import town.games.parser.Rule;
 import town.persons.LobbyPerson;
 import town.persons.Person;
 import town.phases.Accusation;
@@ -607,6 +608,16 @@ public class DiscordGame
 			channelUsed.sendMessage(message).queue();
 			return;
 		}
+
+		Rule rule = config.getGame().getClosestRule(getPlayersCache().size());
+
+		if (!rule.hasDefault() && rule.totalPlayers < getPlayersCache().size() + 1)
+		{
+			String message = String.format("<@%d> cannot join, as the closest rule, *%s*, has no defaults and thus can't support more players", id, rule.toString());
+			channelUsed.sendMessage(message).queue();
+			return;
+		}
+
 
 		persons.add(new LobbyPerson(this, persons.size() + 1, id));
 		String message = String.format("<@%d> joined the lobby", id);

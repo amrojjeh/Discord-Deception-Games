@@ -72,16 +72,22 @@ public class GameMode
 		else buildDefault(game);
 	}
 
-	public void buildDefault(DiscordGame game)
+	public Rule getClosestRule(int totalPlayers)
 	{
-		int totalPlayers = game.getPlayersCache().size();
-		Assigner assigner;
 		Rule ruleFloor = rules.get(0);
 		for (Rule rule : rules)
 			if (rule.totalPlayers > totalPlayers)
 				break;
 			else
 				ruleFloor = rule;
+		return ruleFloor;
+	}
+
+	public void buildDefault(DiscordGame game)
+	{
+		int totalPlayers = game.getPlayersCache().size();
+		Assigner assigner;
+		Rule ruleFloor = getClosestRule(totalPlayers);
 		assigner = ruleFloor.buildAssigner();
 		int basePlayers = ruleFloor.totalPlayers;
 		game.getPlayersCache().replaceAll(person -> assigner.generatePerson(game, basePlayers, person.getNum(), person.getID()));
