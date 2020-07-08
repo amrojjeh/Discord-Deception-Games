@@ -3,7 +3,7 @@ package town.persons;
 import java.util.List;
 
 import town.DiscordGame;
-import town.TownRole;
+import town.GameRole;
 import town.events.MurderTownEvent;
 import town.phases.Night;
 
@@ -12,7 +12,7 @@ public class SerialKiller extends Person
 {
 	public SerialKiller(DiscordGame game, int refNum, long id)
 	{
-		super(game, refNum, id, TownRole.SERIAL_KILLER);
+		super(game, refNum, id, GameRole.SERIAL_KILLER);
 	}
 
 	@Override

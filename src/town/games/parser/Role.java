@@ -1,14 +1,14 @@
 package town.games.parser;
 
-import town.TownRole;
+import town.GameRole;
 
 public  class Role
 {
-	public TownRole role;
+	public GameRole role;
 	public int max;
 	public boolean isDefault;
 
-	public Role(TownRole role, int max, boolean isDefault)
+	public Role(GameRole role, int max, boolean isDefault)
 	{
 		this.role = role;
 		this.max = max;

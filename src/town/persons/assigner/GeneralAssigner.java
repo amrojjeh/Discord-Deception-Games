@@ -1,20 +1,20 @@
 package town.persons.assigner;
 
 import town.DiscordGame;
-import town.TownRole;
+import town.GameRole;
 import town.persons.Person;
 
 public class GeneralAssigner extends RoleAssigner
 {
-	final TownRole role;
+	final GameRole role;
 
-	public GeneralAssigner(TownRole role)
+	public GeneralAssigner(GameRole role)
 	{
 		super();
 		this.role = role;
 	}
 
-	public GeneralAssigner(TownRole role, int max)
+	public GeneralAssigner(GameRole role, int max)
 	{
 		super(max);
 		this.role = role;
@@ -28,9 +28,9 @@ public class GeneralAssigner extends RoleAssigner
 	}
 
 	@Override
-	public TownRole[] getTownRoles()
+	public GameRole[] getTownRoles()
 	{
-		TownRole[] roles = {role};
+		GameRole[] roles = {role};
 		return roles;
 	}
 }

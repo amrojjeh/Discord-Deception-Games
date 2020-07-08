@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
-import town.TownRole;
+import town.GameRole;
 import town.persons.assigner.Assigner;
 import town.persons.assigner.GeneralAssigner;
 
@@ -26,7 +26,7 @@ public class Rule
 		return false;
 	}
 
-	public void addRole(TownRole role, int max, boolean isDefault)
+	public void addRole(GameRole role, int max, boolean isDefault)
 	{
 		Role singleRole = new Role(role, max, isDefault);
 		roles.add(singleRole);
@@ -37,9 +37,9 @@ public class Rule
 		roles.add(role);
 	}
 
-	public Set<TownRole> getRoles()
+	public Set<GameRole> getRoles()
 	{
-		HashSet<TownRole> allRoles = new HashSet<>();
+		HashSet<GameRole> allRoles = new HashSet<>();
 		for (Role sr : roles)
 			allRoles.add(sr.role);
 	return allRoles;

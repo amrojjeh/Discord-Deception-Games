@@ -1,8 +1,8 @@
 package town.persons;
 
 import town.DiscordGame;
-import town.TownFaction;
-import town.TownRole;
+import town.GameFaction;
+import town.GameRole;
 import town.phases.Morning;
 import town.phases.Night;
 import town.phases.Phase;
@@ -11,14 +11,14 @@ import town.phases.Phase;
 public class Medium extends Person{
 	public Medium(DiscordGame game, int num, Long id)
 	{
-		super(game, num, id, TownRole.MEDIUM);
+		super(game, num, id, GameRole.MEDIUM);
 	}
 
 	@Override
 	public boolean canWin()
 	{
 		// TODO: We can put commonly used victories in a static class
-		return getGame().getPlayers().stream().filter((person) -> person.getType().getFaction() == TownFaction.TOWN
+		return getGame().getPlayers().stream().filter((person) -> person.getType().getFaction() == GameFaction.TOWN
 				&& person.alive).count() == getGame().getPlayers().stream().filter((person) -> person.alive).count();
 	}
 

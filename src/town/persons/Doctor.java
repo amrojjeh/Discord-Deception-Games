@@ -3,8 +3,8 @@ package town.persons;
 import java.util.List;
 
 import town.DiscordGame;
-import town.TownFaction;
-import town.TownRole;
+import town.GameFaction;
+import town.GameRole;
 import town.events.DoctorTownEvent;
 import town.phases.Night;
 
@@ -13,7 +13,7 @@ public class Doctor extends Person {
 
 	public Doctor(DiscordGame game, int num, Long id)
 	{
-		super(game, num, id, TownRole.DOCTOR);
+		super(game, num, id, GameRole.DOCTOR);
 	}
 
 	public void selfHealed()
@@ -25,7 +25,7 @@ public class Doctor extends Person {
 	public boolean canWin()
 	{
 		// TODO: We can put commonly used victories in a static class
-		return getGame().getPlayers().stream().filter((person) -> person.getType().getFaction() == TownFaction.TOWN
+		return getGame().getPlayers().stream().filter((person) -> person.getType().getFaction() == GameFaction.TOWN
 				&& person.alive).count() == getGame().getPlayers().stream().filter((person) -> person.alive).count();
 	}
 

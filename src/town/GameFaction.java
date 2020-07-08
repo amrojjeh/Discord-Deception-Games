@@ -1,13 +1,13 @@
 package town;
 
-public enum TownFaction
+public enum GameFaction
 {
 	TOWN("Town"),
 	SERIAL_KILLER("Serial Killer");
 
 	private final String name;
 
-	TownFaction(String name)
+	GameFaction(String name)
 	{
 		this.name = name;
 	}

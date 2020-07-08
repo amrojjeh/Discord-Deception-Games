@@ -49,7 +49,7 @@ public class DiscordGame
 	// Important channels (Name : id)
 	private HashMap<String, Long> channels = new HashMap<>();
 	private HashMap<String, Long> roles = new HashMap<>();
-	private HashSet<TownFaction> wonTownRoles = new HashSet<TownFaction>();
+	private HashSet<GameFaction> wonTownRoles = new HashSet<GameFaction>();
 	private ArrayList<Person> persons = new ArrayList<>();
 	private LinkedList<Person> savedForMorning = new LinkedList<>();
 	private PriorityQueue<TownEvent> events = new PriorityQueue<>();
@@ -94,7 +94,7 @@ public class DiscordGame
 	public void createNewChannels(GuildAction g)
 	{
 		// this channel used for general game updates
-		for (TownRole role : config.getGame().getTownRoles())
+		for (GameRole role : config.getGame().getTownRoles())
 			g.newRole().setName(role.getName()).setPermissionsRaw(0l);
 
 		g.newRole().setName("Bot").addPermissions(Permission.ADMINISTRATOR).setColor(Color.YELLOW);
@@ -490,7 +490,7 @@ public class DiscordGame
 		return action;
 	}
 
-	public ArrayList<Person> findAllWithTownRole(TownRole role) {
+	public ArrayList<Person> findAllWithTownRole(GameRole role) {
 		ArrayList<Person> peeps = new ArrayList<>();
 		for(Person p : persons) {
 			if(p.getType().equals(role)) {
@@ -536,12 +536,12 @@ public class DiscordGame
 		m.mute(person.isMuted()).queue();
 	}
 
-	public void winTownFaction(TownFaction faction)
+	public void winTownFaction(GameFaction faction)
 	{
 		wonTownRoles.add(faction);
 	}
 
-	public boolean hasTownFactionWon(TownFaction faction)
+	public boolean hasTownFactionWon(GameFaction faction)
 	{
 		return wonTownRoles.contains(faction);
 	}

@@ -3,8 +3,8 @@ package town.persons;
 import java.util.List;
 
 import town.DiscordGame;
-import town.TownFaction;
-import town.TownRole;
+import town.GameFaction;
+import town.GameRole;
 import town.events.LookoutTownEvent;
 import town.phases.Night;
 
@@ -12,14 +12,14 @@ public class Lookout extends Person
 {
 	public Lookout(DiscordGame game, int num, Long id)
 	{
-		super(game, num, id, TownRole.LOOKOUT);
+		super(game, num, id, GameRole.LOOKOUT);
 	}
 
 	@Override
 	public boolean canWin()
 	{
 		// TODO: We can put commonly used victories in a static class
-		return getGame().getPlayers().stream().filter((person) -> person.getType().getFaction() == TownFaction.TOWN
+		return getGame().getPlayers().stream().filter((person) -> person.getType().getFaction() == GameFaction.TOWN
 				&& person.alive).count() == getGame().getPlayers().stream().filter((person) -> person.alive).count();
 	}
 

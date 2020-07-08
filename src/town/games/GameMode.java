@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import town.DiscordGame;
-import town.TownRole;
+import town.GameRole;
 import town.commands.CommandSet;
 import town.commands.TVMCommands;
 import town.games.parser.Rule;
@@ -21,7 +21,7 @@ public class GameMode
 	private final String description;
 	private final boolean isSpecial;
 	private final CommandSet gameCommands;
-	protected Set<TownRole> roles = new HashSet<>();
+	protected Set<GameRole> roles = new HashSet<>();
 
 	public GameMode(String name, String description, boolean special)
 	{
@@ -72,7 +72,7 @@ public class GameMode
 		rules.sort((s, o) -> s.totalPlayers - o.totalPlayers);
 	}
 
-	public Set<TownRole> getTownRoles()
+	public Set<GameRole> getTownRoles()
 	{
 		return roles;
 	}
@@ -101,7 +101,7 @@ public class GameMode
 	public void buildRand(DiscordGame game)
 	{
 		Assigner assigner = new Assigner();
-		for (TownRole role : roles)
+		for (GameRole role : roles)
 			assigner.addRole(new GeneralAssigner(role));
 		game.getPlayersCache().replaceAll(person -> assigner.generatePerson(game, 0, person.getNum(), person.getID()));
 	}

@@ -6,7 +6,7 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.TextChannel;
 import town.DiscordGame;
-import town.TownRole;
+import town.GameRole;
 import town.events.TownEvent;
 import town.phases.Morning;
 import town.phases.Night;
@@ -24,7 +24,7 @@ public abstract class Person
 	private int tempAttack = -1;
 	private boolean muted = false;
 
-	protected TownRole type;
+	protected GameRole type;
 	protected boolean disconnected = false;
 	protected boolean alive = true;
 	protected String causeOfDeath = String.format("<@%d> is still alive.", getID());
@@ -40,7 +40,7 @@ public abstract class Person
 	}
 
 	// Used by children of this class
-	protected Person(DiscordGame game, int refNum, long id, TownRole type)
+	protected Person(DiscordGame game, int refNum, long id, GameRole type)
 	{
 		this.game = game;
 		ID = id;
@@ -90,12 +90,12 @@ public abstract class Person
 		return realName;
 	}
 
-	public TownRole getType()
+	public GameRole getType()
 	{
 		return type;
 	}
 
-	public void setType(TownRole role)
+	public void setType(GameRole role)
 	{
 		type = role;
 	}
