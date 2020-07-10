@@ -1,4 +1,4 @@
-package town.phases;
+package town.mafia.phases;
 
 import java.awt.Color;
 import java.util.HashMap;
@@ -7,6 +7,8 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import town.DiscordGame;
 import town.persons.Person;
+import town.phases.Phase;
+import town.phases.PhaseManager;
 
 //Accusation is the phase where players can vote to put another player on trial. If a player receives enough
 //votes, the defense phase begins for that player. There can be 3 trials in a day. Night phase happens otherwise.
@@ -32,13 +34,13 @@ public class Accusation extends Phase
 				+ numTrials + " left in the day**. Vote up a person with `!vote [num|@mention]`.")
 		.flatMap(msg -> getGame().sendMessageToTextChannel("daytime_discussion", generateList()))
 		.queue(message -> {msgID = message.getIdLong(); message.pin().queue();});
-		phaseManager.setWarningInSeconds(5);
+		getPhaseManager().setWarningInSeconds(5);
 	}
 
 	@Override
 	public Phase getNextPhase()
 	{
-		return new Night(getGame(), phaseManager);
+		return new Night(getGame(), getPhaseManager());
 	}
 
 	@Override
@@ -49,10 +51,10 @@ public class Accusation extends Phase
 
 	public void putPlayerOnTrial(Person p)
 	{
-		phaseManager.end();
+		getPhaseManager().end();
 		getGame().getGameGuild().modifyMemberRoles(getGame().getMemberFromGame(p), getGame().getRole("defendant"))
 		.queue();
-		phaseManager.start(getGame(), new Trial(getGame(), phaseManager, p, numTrials - 1));
+		getPhaseManager().start(getGame(), new Trial(getGame(), getPhaseManager(), p, numTrials - 1));
 	}
 
 	public MessageEmbed generateList()

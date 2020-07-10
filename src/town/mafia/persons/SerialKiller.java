@@ -1,11 +1,12 @@
-package town.persons;
+package town.mafia.persons;
 
 import java.util.List;
 
 import town.DiscordGame;
-import town.GameRole;
 import town.events.MurderTownEvent;
-import town.phases.Night;
+import town.mafia.phases.Night;
+import town.persons.Person;
+import town.roles.GameRole;
 
 // A Serial Killer can kill a person each night.
 public class SerialKiller extends Person
@@ -13,27 +14,6 @@ public class SerialKiller extends Person
 	public SerialKiller(DiscordGame game, int refNum, long id)
 	{
 		super(game, refNum, id, GameRole.SERIAL_KILLER);
-	}
-
-	@Override
-	public boolean canWin()
-	{
-		return getGame().getPlayers().stream().filter((person) -> person instanceof SerialKiller && person.alive).count() ==
-				getGame().getPlayers().stream().filter((person) -> person.alive).count();
-	}
-
-	@Override
-	public boolean hasWon()
-	{
-		return getGame().hasTownFactionWon(getType().getFaction());
-	}
-
-	@Override
-	public void win()
-	{
-		getGame().winTownFaction(getType().getFaction());
-		getGame().sendMessageToTextChannel("daytime_discussion", "**Serial Killers have won!**").queue();
-		getGame().endGame();
 	}
 
 	@Override

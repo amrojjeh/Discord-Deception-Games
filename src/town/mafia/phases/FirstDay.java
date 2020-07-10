@@ -1,6 +1,8 @@
-package town.phases;
+package town.mafia.phases;
 
 import town.DiscordGame;
+import town.phases.Phase;
+import town.phases.PhaseManager;
 
 //Daytime is the phase where players can discuss what is happening. There are no features other than
 //a voice and text chat that all can use.
@@ -18,14 +20,14 @@ public class FirstDay extends Day
 		getGame().sendMessageToTextChannel("daytime_discussion", "Day " + getGame().getDayNum() + " started")
 		.flatMap(msg -> getGame().setChannelVisibility("player", "daytime_discussion", true, true))
 		.queue();
-		getGame().getPlayers().forEach((person) -> checkVictory(person));
-		phaseManager.setWarningInSeconds(5);
+		getGame().getPlayersCache().forEach((person) -> checkVictory(person));
+		getPhaseManager().setWarningInSeconds(5);
 	}
 
 	@Override
 	public Phase getNextPhase()
 	{
-		return new Night(getGame(), phaseManager);
+		return new Night(getGame(), getPhaseManager());
 	}
 
 	@Override

@@ -7,7 +7,7 @@ import town.DiscordGame;
 public abstract class Phase extends TimerTask
 {
 	//Phase Manager that drives the phases
-	PhaseManager phaseManager;
+	private PhaseManager phaseManager;
 	private DiscordGame game;
 
 	public Phase(DiscordGame game, PhaseManager pm)
@@ -20,6 +20,11 @@ public abstract class Phase extends TimerTask
 	public DiscordGame getGame()
 	{
 		return game;
+	}
+
+	public PhaseManager getPhaseManager()
+	{
+		return phaseManager;
 	}
 
 	public void start() { }

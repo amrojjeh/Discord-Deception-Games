@@ -1,4 +1,4 @@
-package town.commands;
+package town.mafia.commands;
 
 import java.awt.Color;
 import java.util.ArrayList;
@@ -9,9 +9,10 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import town.DiscordGame;
+import town.commands.CommandSet;
+import town.mafia.phases.Accusation;
+import town.mafia.phases.Judgment;
 import town.persons.Person;
-import town.phases.Accusation;
-import town.phases.Judgment;
 import town.phases.Phase;
 
 public class TVMCommands extends CommandSet

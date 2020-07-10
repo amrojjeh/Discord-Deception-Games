@@ -1,7 +1,9 @@
-package town.phases;
+package town.mafia.phases;
 
 import town.DiscordGame;
 import town.persons.Person;
+import town.phases.Phase;
+import town.phases.PhaseManager;
 import town.util.RestHelper;
 
 //Daytime is the phase where players can discuss what is happening. There are no features other than
@@ -24,7 +26,7 @@ public class Day extends Phase
 
 		getGame().getPlayers().forEach((person) -> checkVictory(person));
 		RestHelper.queueAll(getGame().muteAllInRole("dead", true));
-		phaseManager.setWarningInSeconds(5);
+		getPhaseManager().setWarningInSeconds(5);
 	}
 
 	public void checkVictory(Person person)
@@ -37,11 +39,11 @@ public class Day extends Phase
 	public Phase getNextPhase()
 	{
 		if (getGame().getAlivePlayers().size() > 2)
-		return new Accusation(getGame(), phaseManager, 3);
+		return new Accusation(getGame(), getPhaseManager(), 3);
 		else
 		{
 			getGame().sendMessageToTextChannel("daytime_discussion", "Accusation was skipped because there were only two people.").queue();
-			return new Night(getGame(), phaseManager);
+			return new Night(getGame(), getPhaseManager());
 		}
 	}
 

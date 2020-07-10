@@ -3,7 +3,7 @@ package town.events;
 import java.util.ArrayList;
 
 import town.DiscordGame;
-import town.persons.Doctor;
+import town.mafia.persons.Doctor;
 import town.persons.Person;
 
 public class DoctorTownEvent implements TownEvent

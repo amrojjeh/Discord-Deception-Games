@@ -5,14 +5,14 @@ import java.util.HashSet;
 import java.util.Set;
 
 import town.DiscordGame;
-import town.GameRole;
 import town.commands.CommandSet;
-import town.commands.TVMCommands;
 import town.games.parser.Rule;
+import town.mafia.commands.TVMCommands;
+import town.mafia.phases.FirstDay;
 import town.persons.assigner.Assigner;
 import town.persons.assigner.GeneralAssigner;
-import town.phases.FirstDay;
 import town.phases.PhaseManager;
+import town.roles.GameRole;
 
 public class GameMode
 {

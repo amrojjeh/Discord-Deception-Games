@@ -6,11 +6,11 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.TextChannel;
 import town.DiscordGame;
-import town.GameRole;
 import town.events.TownEvent;
-import town.phases.Morning;
-import town.phases.Night;
+import town.mafia.phases.Morning;
+import town.mafia.phases.Night;
 import town.phases.Phase;
+import town.roles.GameRole;
 
 public abstract class Person
 {
@@ -178,7 +178,7 @@ public abstract class Person
 
 	public int getDefense()
 	{
-		if (tempDefense < 0) return getType().getDefense();
+		if (tempDefense < 0) return getType().getAttack();
 		return tempDefense;
 	}
 
@@ -235,11 +235,20 @@ public abstract class Person
 		return type.getName() + " has no ability";
 	}
 
-	public abstract boolean hasWon();
+	public boolean hasWon()
+	{
+		return getGame().hasTownFactionWon(getType().getFaction());
+	}
 
-	public abstract boolean canWin();
+	public boolean canWin()
+	{
+		return getType().getFaction().canWin(getGame());
+	}
 
-	public abstract void win();
+	public void win()
+	{
+		getType().getFaction().win(getGame());
+	}
 
 	public abstract String getHelp();
 }

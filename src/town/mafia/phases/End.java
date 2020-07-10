@@ -1,6 +1,8 @@
-package town.phases;
+package town.mafia.phases;
 
 import town.DiscordGame;
+import town.phases.Phase;
+import town.phases.PhaseManager;
 import town.util.RestHelper;
 
 public class End extends Phase
@@ -13,7 +15,7 @@ public class End extends Phase
 	@Override
 	public Phase getNextPhase()
 	{
-		return new End(getGame(), phaseManager);
+		return new End(getGame(), getPhaseManager());
 	}
 
 	@Override
@@ -47,13 +49,13 @@ public class End extends Phase
 
 	public void transfer()
 	{
-		phaseManager.end();
+		getPhaseManager().end();
 		getGame().transferOrDelete();
 	}
 
 	public void delete()
 	{
-		phaseManager.end();
+		getPhaseManager().end();
 		getGame().sendMessageToTextChannel("daytime_discussion", "!delete").queue();
 	}
 }

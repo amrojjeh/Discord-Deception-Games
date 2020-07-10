@@ -32,10 +32,12 @@ import net.dv8tion.jda.api.requests.restaction.PermissionOverrideAction;
 import town.commands.GlobalCommands;
 import town.commands.PartyCommands;
 import town.events.TownEvent;
+import town.mafia.phases.End;
 import town.persons.Person;
-import town.phases.End;
 import town.phases.Phase;
 import town.phases.PhaseManager;
+import town.roles.GameFaction;
+import town.roles.GameRole;
 
 public class DiscordGame
 {

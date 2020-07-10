@@ -1,7 +1,9 @@
-package town.phases;
+package town.mafia.phases;
 
 import town.DiscordGame;
 import town.persons.Person;
+import town.phases.Phase;
+import town.phases.PhaseManager;
 import town.util.RestHelper;
 
 public class Night extends Phase
@@ -26,7 +28,7 @@ public class Night extends Phase
 		);
 
 		getGame().getPlayers().forEach(person -> person.sendMessage("Night " + getGame().getDayNum() + " started"));
-		phaseManager.setWarningToAll(5);
+		getPhaseManager().setWarningToAll(5);
 	}
 
 	public void checkVictory(Person person)
@@ -45,7 +47,7 @@ public class Night extends Phase
 	@Override
 	public Phase getNextPhase()
 	{
-		return new Morning(getGame(), phaseManager);
+		return new Morning(getGame(), getPhaseManager());
 	}
 
 	@Override

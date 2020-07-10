@@ -1,6 +1,6 @@
 package town.games.parser;
 
-import town.GameRole;
+import town.roles.GameRole;
 
 public  class Role
 {

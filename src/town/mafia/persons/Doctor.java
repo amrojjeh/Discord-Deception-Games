@@ -1,12 +1,12 @@
-package town.persons;
+package town.mafia.persons;
 
 import java.util.List;
 
 import town.DiscordGame;
-import town.GameFaction;
-import town.GameRole;
 import town.events.DoctorTownEvent;
-import town.phases.Night;
+import town.mafia.phases.Night;
+import town.persons.Person;
+import town.roles.GameRole;
 
 public class Doctor extends Person {
 	int selfHeal = 1;
@@ -19,28 +19,6 @@ public class Doctor extends Person {
 	public void selfHealed()
 	{
 		--selfHeal;
-	}
-
-	@Override
-	public boolean canWin()
-	{
-		// TODO: We can put commonly used victories in a static class
-		return getGame().getPlayers().stream().filter((person) -> person.getType().getFaction() == GameFaction.TOWN
-				&& person.alive).count() == getGame().getPlayers().stream().filter((person) -> person.alive).count();
-	}
-
-	@Override
-	public boolean hasWon()
-	{
-		return getGame().hasTownFactionWon(getType().getFaction());
-	}
-
-	@Override
-	public void win()
-	{
-		getGame().winTownFaction(getType().getFaction());
-		getGame().sendMessageToTextChannel("daytime_discussion", "**Town has won!**").queue();
-		getGame().endGame();
 	}
 
 	@Override

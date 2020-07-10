@@ -1,7 +1,9 @@
-package town.phases;
+package town.mafia.phases;
 
 import town.DiscordGame;
 import town.persons.Person;
+import town.phases.Phase;
+import town.phases.PhaseManager;
 import town.util.RestHelper;
 
 //Trial occurs when the Town agrees to put someone under suspicion. They are given this phase, a small window,
@@ -34,7 +36,7 @@ public class Trial extends Phase
 			getGame().muteAllInRoleExcept("player", true, defendant)
 		);
 
-		phaseManager.setWarningInSeconds(5);
+		getPhaseManager().setWarningInSeconds(5);
 	}
 
 	@Override
@@ -50,7 +52,7 @@ public class Trial extends Phase
 	@Override
 	public Phase getNextPhase()
 	{
-		return new Judgment(getGame(), phaseManager, defendant, numTrials);
+		return new Judgment(getGame(), getPhaseManager(), defendant, numTrials);
 	}
 
 	@Override

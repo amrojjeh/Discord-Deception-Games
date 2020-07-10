@@ -1,32 +1,35 @@
-package town;
+package town.roles;
 
-import town.persons.Civilian;
-import town.persons.Doctor;
-import town.persons.Lookout;
-import town.persons.Medium;
+import town.DiscordGame;
+import town.mafia.persons.Civilian;
+import town.mafia.persons.Doctor;
+import town.mafia.persons.Lookout;
+import town.mafia.persons.Medium;
+import town.mafia.persons.SerialKiller;
 import town.persons.Person;
 import town.persons.PersonBuilder;
-import town.persons.SerialKiller;
 
 public enum GameRole
 {
 	// Priority 0 if it's important to look at all events
 
-	LOOKOUT("Lookout", GameFaction.TOWN, 0, 0, 0, (g, n, id) -> new Lookout(g, n, id)),
-	MEDIUM("Medium", GameFaction.TOWN, 0, 0, 1, (g, n, id) -> new Medium(g, n, id)),
-	DOCTOR("Doctor", GameFaction.TOWN, 0, 0, 3, (g, n, id) -> new Doctor(g, n, id)),
-	SERIAL_KILLER("Serial Killer", GameFaction.SERIAL_KILLER, 1, 1, 5, (g, n, id) -> new SerialKiller(g, n, id)),
-	CIVILIAN("Civilian", GameFaction.TOWN, 0, 0, 6, (g, n, id) -> new Civilian(g, n, id));
+	LOOKOUT(GameType.MAFIA, "Lookout", GameFaction.TOWN, 0, 0, 0, (g, n, id) -> new Lookout(g, n, id)),
+	MEDIUM(GameType.MAFIA, "Medium", GameFaction.TOWN, 0, 0, 1, (g, n, id) -> new Medium(g, n, id)),
+	DOCTOR(GameType.MAFIA, "Doctor", GameFaction.TOWN, 0, 0, 3, (g, n, id) -> new Doctor(g, n, id)),
+	SERIAL_KILLER(GameType.MAFIA, "Serial Killer", GameFaction.SERIAL_KILLER, 1, 1, 5, (g, n, id) -> new SerialKiller(g, n, id)),
+	CIVILIAN(GameType.MAFIA, "Civilian", GameFaction.TOWN, 0, 0, 6, (g, n, id) -> new Civilian(g, n, id));
 
 	private final String name;
 	private final GameFaction faction;
+	private final GameType gameType;
 	private final int attack, defense, priority;
 	private final PersonBuilder builder;
 
-	GameRole(String name, GameFaction faction, int attack, int defense, int priority, PersonBuilder builder)
+	GameRole(GameType gameType, String name, GameFaction faction, int attack, int defense, int priority, PersonBuilder builder)
 	{
 		this.name = name;
 		this.faction = faction;
+		this.gameType = gameType;
 		this.attack = attack;
 		this.defense = defense;
 		this.priority = priority;
@@ -56,6 +59,11 @@ public enum GameRole
 	public int getPriority()
 	{
 		return priority;
+	}
+
+	public GameType getGameType()
+	{
+		return gameType;
 	}
 
 	public Person build(DiscordGame g, int ref, long id)

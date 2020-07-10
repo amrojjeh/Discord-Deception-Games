@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
-import town.GameRole;
 import town.persons.assigner.Assigner;
 import town.persons.assigner.GeneralAssigner;
+import town.roles.GameRole;
 
 public class Rule
 {

@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import town.games.parser.GameParser;
+import town.mafia.games.Mashup;
 import town.util.JavaHelper;
 
 public class GameModeLoader

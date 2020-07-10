@@ -7,8 +7,8 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import town.DiscordGame;
+import town.mafia.phases.Accusation;
 import town.persons.Person;
-import town.phases.Accusation;
 import town.phases.Phase;
 
 public class GlobalCommands extends CommandSet

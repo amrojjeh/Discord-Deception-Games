@@ -1,4 +1,4 @@
-package town.phases;
+package town.mafia.phases;
 
 import java.awt.Color;
 import java.util.HashMap;
@@ -8,6 +8,8 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import town.DiscordGame;
 import town.persons.Person;
+import town.phases.Phase;
+import town.phases.PhaseManager;
 
 //Judgment is the moment of fate. All players still alive vote on the life of the defendant.
 public class Judgment extends Phase
@@ -31,7 +33,7 @@ public class Judgment extends Phase
 	{
 		loadPlayers();
 		getGame().sendMessageToTextChannel("daytime_discussion", "Vote `!guilty` or `!innocent` in #private").queue();
-		phaseManager.setWarningInSeconds(5);
+		getPhaseManager().setWarningInSeconds(5);
 	}
 
 	@Override
@@ -45,15 +47,15 @@ public class Judgment extends Phase
 	public Phase getNextPhase()
 	{
 		if (guilty > innocent)
-			return new LastWords(getGame(), phaseManager, defendant);
+			return new LastWords(getGame(), getPhaseManager(), defendant);
 		else if(numTrials > 0)
 		{
 			if (!defendant.isDisconnected())
 				getGame().getGameGuild().modifyMemberRoles(getGame().getMemberFromGame(defendant), getGame().getRole("player")).queue();
-			return new Accusation(getGame(), phaseManager, numTrials);
+			return new Accusation(getGame(), getPhaseManager(), numTrials);
 		}
 		else
-			return new Night(getGame(), phaseManager);
+			return new Night(getGame(), getPhaseManager());
 	}
 
 	//Duration: 15-20 seconds

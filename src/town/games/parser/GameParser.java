@@ -2,8 +2,8 @@ package town.games.parser;
 
 import java.util.ArrayList;
 
-import town.GameRole;
 import town.games.GameMode;
+import town.roles.GameRole;
 import town.util.JavaHelper;
 
 public class GameParser

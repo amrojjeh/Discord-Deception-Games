@@ -1,7 +1,9 @@
-package town.phases;
+package town.mafia.phases;
 
 import town.DiscordGame;
 import town.persons.Person;
+import town.phases.Phase;
+import town.phases.PhaseManager;
 import town.util.RestHelper;
 
 public class LastWords extends Phase
@@ -39,7 +41,7 @@ public class LastWords extends Phase
 	@Override
 	public Phase getNextPhase()
 	{
-		return new Night(getGame(), phaseManager);
+		return new Night(getGame(), getPhaseManager());
 	}
 
 	@Override

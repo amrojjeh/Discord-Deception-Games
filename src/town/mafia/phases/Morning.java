@@ -1,11 +1,13 @@
-package town.phases;
+package town.mafia.phases;
 
 import town.DiscordGame;
 import town.persons.Person;
+import town.phases.Phase;
+import town.phases.PhaseManager;
 
 public class Morning extends Phase
 {
-	Phase nextPhase = new Day(getGame(), phaseManager);
+	Phase nextPhase = new Day(getGame(), getPhaseManager());
 
 	public Morning(DiscordGame game, PhaseManager pm)
 	{
@@ -21,7 +23,7 @@ public class Morning extends Phase
 		getGame().sendMessageToTextChannel("daytime_discussion", person.getCauseOfDeath() + "\nTheir role was: " + person.getType().getName())
 		.queue();
 		if (getGame().peekDeathForMorning() != null)
-			nextPhase = new Morning(getGame(), phaseManager);
+			nextPhase = new Morning(getGame(), getPhaseManager());
 	}
 
 	@Override

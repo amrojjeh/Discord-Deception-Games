@@ -1,8 +1,8 @@
 package town.persons.assigner;
 
 import town.DiscordGame;
-import town.GameRole;
 import town.persons.Person;
+import town.roles.GameRole;
 
 public abstract class RoleAssigner
 {
