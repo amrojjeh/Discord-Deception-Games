@@ -32,7 +32,7 @@ import town.commands.PartyCommands;
 import town.games.GameMode;
 import town.games.GameModeLoader;
 
-
+// This listens to discord messages and events. It also manages discord games.
 public class MainListener extends ListenerAdapter
 {
 	String prefix = "pg.";

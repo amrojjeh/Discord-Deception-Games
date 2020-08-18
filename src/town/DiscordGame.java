@@ -39,6 +39,8 @@ import town.phases.PhaseManager;
 import town.roles.GameFaction;
 import town.roles.GameRole;
 
+
+// This represents an ongoing deception game. It's instantiated with pg.startParty
 public class DiscordGame
 {
 	public final JDA jda;
