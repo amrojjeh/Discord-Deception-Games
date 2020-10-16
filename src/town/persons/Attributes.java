@@ -2,8 +2,8 @@ package town.persons;
 
 public class Attributes
 {
-	AttributeValue attack;
-	AttributeValue defense;
+	final AttributeValue attack;
+	final AttributeValue defense;
 
 	public Attributes(AttributeValue defense, AttributeValue attack)
 	{

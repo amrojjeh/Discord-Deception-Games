@@ -2,7 +2,6 @@ package town.roles;
 
 import java.util.List;
 
-import town.events.TownEvent;
 import town.persons.Attributes;
 import town.persons.Person;
 
@@ -12,7 +11,6 @@ public interface GameRole
 	 * Get the planned event.
 	 * @return The planned event.
 	 */
-	TownEvent getEvent(Person user);
 
 	Attributes getAttributes();
 
@@ -30,14 +28,16 @@ public interface GameRole
 
 	String getName();
 
+	GameFaction getFaction();
+
 	/**
 	 * Cancel the planned action.
 	 * @return A string meant for the user to read.
 	 */
 	default String cancelAction(Person user)
 	{
-		if (getEvent(user) == null) return "There's no action to cancel";
-		user.getGame().removeEvent(getEvent(user));
+		if (user.getTownEvent() == null) return "There's no action to cancel";
+		user.getGame().removeEvent(user.getTownEvent());
 		return "Action canceled";
 	}
 }
