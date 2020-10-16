@@ -10,10 +10,9 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.TextChannel;
 import town.DiscordGame;
 import town.events.TownEvent;
-import town.mafia.phases.Morning;
 import town.mafia.phases.Night;
-import town.phases.Phase;
-import town.roles.GameRole;
+import town.roles.Role;
+import town.roles.RoleData;
 
 /**
 * The person class is the class used to refer to discord members within a game or party.
@@ -29,7 +28,9 @@ public class Person
 	private Attributes tempAttributes = null;
 	private boolean muted = false;
 
-	private GameRole role;
+	private Role role;
+	private RoleData roleData;
+
 	private boolean disconnected = false;
 	private boolean alive = true;
 	private String causeOfDeath = String.format("<@%d> is still alive.", getID());
@@ -106,18 +107,29 @@ public class Person
 	 * @return The person's role.
 	 */
 	@Nullable
-	public GameRole getType()
+	public Role getRole()
 	{
 		return role;
 	}
 
 	/**
-	 * Set the person's role.
+	 * Set the person's role. Automatically constructs initial role data.
 	 * @param role The role which the person will assume.
 	 */
-	public void setType(GameRole role)
+	public void setRole(Role role)
 	{
 		this.role = role;
+		this.roleData = role.getInitialRoleData();
+	}
+
+	/**
+	 * Returns the role data associated with person.
+	 * @return The Role data associated with person.
+	 */
+	@Nullable
+	public RoleData getRoleData()
+	{
+		return roleData;
 	}
 
 	/**
@@ -207,7 +219,7 @@ public class Person
 		if (!alive) return;
 		if (!reason.isEmpty()) causeOfDeath = reason;
 		if (!isDisconnected())
-			getGame().modifyMemberRoles(this, "dead", getType().getName()).queue();
+			getGame().modifyMemberRoles(this, "dead", getRole().getName()).queue();
 		if (saveForMorning)
 			getGame().saveForMorning(this);
 		alive = false;
@@ -239,7 +251,7 @@ public class Person
 	 */
 	public Attributes getAttributes()
 	{
-		if (tempAttributes == null) return getType().getAttributes();
+		if (tempAttributes == null) return getRole().getAttributes();
 		return tempAttributes;
 	}
 
@@ -300,19 +312,5 @@ public class Person
 	public void clearTownEvent()
 	{
 		setTownEvent(null);
-	}
-
-	/**
-	 * This method should be called when the phase changes.
-	 * @param phase The new phase.
-	 */
-	public void onPhaseChange(@Nonnull Phase phase)
-	{
-		if (phase == null) throw new NullPointerException("Phase cannot be null");
-		if (phase instanceof Morning)
-		{
-			event = null;
-			tempAttributes = null;
-		}
 	}
 }
