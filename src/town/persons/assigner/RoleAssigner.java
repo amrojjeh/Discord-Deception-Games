@@ -2,7 +2,7 @@ package town.persons.assigner;
 
 import town.DiscordGame;
 import town.persons.Person;
-import town.roles.GameRole;
+import town.roles.Role;
 
 public abstract class RoleAssigner
 {
@@ -48,5 +48,5 @@ public abstract class RoleAssigner
 	}
 
 	public abstract Person getPerson(DiscordGame game, int ref, long id);
-	public abstract GameRole[] getTownRoles();
+	public abstract Role[] getTownRoles();
 }
