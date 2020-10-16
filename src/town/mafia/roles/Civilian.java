@@ -1,4 +1,4 @@
-package town.mafia.persons;
+package town.mafia.roles;
 
 import java.util.List;
 
@@ -8,23 +8,32 @@ import javax.annotation.Nullable;
 import town.persons.AttributeValue;
 import town.persons.Attributes;
 import town.persons.Person;
-import town.roles.GameFaction;
-import town.roles.GameRole;
+import town.roles.EmptyRoleData;
+import town.roles.Faction;
+import town.roles.Role;
+import town.roles.RoleData;
 
-public class Civilian implements GameRole
+public class Civilian implements Role
 {
-	private Attributes attr = new Attributes(AttributeValue.NONE, AttributeValue.NONE);
+	public final Attributes attr = new Attributes(AttributeValue.NONE, AttributeValue.NONE);
+	public final String name = "Civillian";
 
 	@Override
 	public String getHelp()
 	{
-		return "Civilian. You can't do anything, so wish best of luck.";
+		return "Civilian. You can't do anything, so best of luck.";
 	}
 
 	@Override
 	public Attributes getAttributes()
 	{
 		return attr;
+	}
+
+	@Override
+	public RoleData getInitialRoleData()
+	{
+		return new EmptyRoleData();
 	}
 
 	@Override
@@ -43,33 +52,14 @@ public class Civilian implements GameRole
 
 	@Override
 	@Nonnull
-	public GameFaction getFaction()
+	public Faction getFaction()
 	{
-		return GameFaction.TOWN;
-	}
-
-	@Override
-	public boolean hasWon(@Nonnull Person user)
-	{
-		if (user == null) throw new NullPointerException("User cannot be an exception");
-		return user.getGame().hasTownFactionWon(getFaction());
-	}
-
-	@Override
-	public boolean canWin(@Nullable Person user)
-	{
-		return true;
-	}
-
-	@Override
-	public void win(Person user)
-	{
-		getFaction().win(user.getGame());
+		return Faction.TOWN;
 	}
 
 	@Override
 	public String getName()
 	{
-		return "Civillian";
+		return name;
 	}
 }
