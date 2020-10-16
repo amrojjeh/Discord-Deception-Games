@@ -261,7 +261,8 @@ public class Person
 	public void disconnect()
 	{
 		disconnected = true;
-		die(String.format("<@%d> (%d) committed suicide.", getID(), getNum()), true);
+//		die(String.format("<@%d> (%d) committed suicide.", getID(), getNum()), true);
+		die(String.format("<@%d> committed suicide.", getID()), true);
 	}
 
 	/**
