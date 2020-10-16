@@ -12,7 +12,7 @@ import town.mafia.phases.FirstDay;
 import town.persons.assigner.Assigner;
 import town.persons.assigner.GeneralAssigner;
 import town.phases.PhaseManager;
-import town.roles.GameRole;
+import town.roles.Role;
 
 public class GameMode
 {
@@ -21,7 +21,7 @@ public class GameMode
 	private final String description;
 	private final boolean isSpecial;
 	private final CommandSet gameCommands;
-	protected Set<GameRole> roles = new HashSet<>();
+	protected Set<Role> roles = new HashSet<>();
 
 	public GameMode(String name, String description, boolean special)
 	{
@@ -72,7 +72,7 @@ public class GameMode
 		rules.sort((s, o) -> s.totalPlayers - o.totalPlayers);
 	}
 
-	public Set<GameRole> getTownRoles()
+	public Set<Role> getTownRoles()
 	{
 		return roles;
 	}
@@ -101,7 +101,7 @@ public class GameMode
 	public void buildRand(DiscordGame game)
 	{
 		Assigner assigner = new Assigner();
-		for (GameRole role : roles)
+		for (Role role : roles)
 			assigner.addRole(new GeneralAssigner(role));
 		game.getPlayersCache().replaceAll(person -> assigner.generatePerson(game, 0, person.getNum(), person.getID()));
 	}

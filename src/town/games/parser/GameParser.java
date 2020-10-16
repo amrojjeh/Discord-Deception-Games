@@ -3,7 +3,7 @@ package town.games.parser;
 import java.util.ArrayList;
 
 import town.games.GameMode;
-import town.roles.GameRole;
+import town.roles.Role;
 import town.util.JavaHelper;
 
 public class GameParser
@@ -70,7 +70,7 @@ public class GameParser
 		splitTuple[splitTuple.length - 1] = "";
 		String roleName = String.join(" ", splitTuple);
 
-		GameRole role = GameRole.getRoleFromName(roleName.strip());
+		Role role = Role.getRoleFromName(roleName.strip());
 		if (role == null)
 			throw new IllegalArgumentException("Role name (" + roleName.strip() + ") not found in: **" + tuple + "**");
 		return new Role(role, roleMax, tuple.charAt(tuple.length() - 1) == '+');

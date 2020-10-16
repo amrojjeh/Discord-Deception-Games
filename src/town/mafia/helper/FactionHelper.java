@@ -4,32 +4,32 @@ import java.util.List;
 
 import town.DiscordGame;
 import town.persons.Person;
-import town.roles.GameFaction;
+import town.roles.Faction;
 
 public class FactionHelper
 {
 	public static boolean isTownLeft(DiscordGame game)
 	{
-		System.out.println(game.getCurrentPhase().getClass().getName() + " " + isFactionLeft(game, GameFaction.TOWN));
-		return isFactionLeft(game, GameFaction.TOWN);
+		System.out.println(game.getCurrentPhase().getClass().getName() + " " + isFactionLeft(game, Faction.TOWN));
+		return isFactionLeft(game, Faction.TOWN);
 	}
 
 	public static void townWin(DiscordGame game)
 	{
-		factionWin(game, GameFaction.TOWN);
+		factionWin(game, Faction.TOWN);
 	}
 
 	public static boolean isSKLeft(DiscordGame game)
 	{
-		return isFactionLeft(game, GameFaction.SERIAL_KILLER);
+		return isFactionLeft(game, Faction.SERIAL_KILLER);
 	}
 
 	public static void skWin(DiscordGame game)
 	{
-		factionWin(game, GameFaction.SERIAL_KILLER);
+		factionWin(game, Faction.SERIAL_KILLER);
 	}
 
-	public static boolean isFactionLeft(DiscordGame game, GameFaction faction)
+	public static boolean isFactionLeft(DiscordGame game, Faction faction)
 	{
 		int townAlive = 0;
 		List<Person> alivePlayers = game.getAlivePlayers();
@@ -39,7 +39,7 @@ public class FactionHelper
 		return townAlive == alivePlayers.size();
 	}
 
-	public static void factionWin(DiscordGame game, GameFaction faction)
+	public static void factionWin(DiscordGame game, Faction faction)
 	{
 		System.out.println("faction won");
 		game.winTownFaction(faction);

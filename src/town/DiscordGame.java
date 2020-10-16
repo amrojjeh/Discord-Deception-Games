@@ -36,8 +36,8 @@ import town.mafia.phases.End;
 import town.persons.Person;
 import town.phases.Phase;
 import town.phases.PhaseManager;
-import town.roles.GameFaction;
-import town.roles.GameRole;
+import town.roles.Faction;
+import town.roles.Role;
 
 
 // This represents an ongoing deception game. It's instantiated with pg.startParty
@@ -53,7 +53,7 @@ public class DiscordGame
 	// Important channels (Name : id)
 	private HashMap<String, Long> channels = new HashMap<>();
 	private HashMap<String, Long> roles = new HashMap<>();
-	private HashSet<GameFaction> wonTownRoles = new HashSet<GameFaction>();
+	private HashSet<Faction> wonTownRoles = new HashSet<Faction>();
 	private ArrayList<Person> persons = new ArrayList<>();
 	private LinkedList<Person> savedForMorning = new LinkedList<>();
 	private PriorityQueue<TownEvent> events = new PriorityQueue<>();
@@ -98,7 +98,7 @@ public class DiscordGame
 	public void createNewChannels(GuildAction g)
 	{
 		// this channel used for general game updates
-		for (GameRole role : config.getGame().getTownRoles())
+		for (Role role : config.getGame().getTownRoles())
 			g.newRole().setName(role.getName()).setPermissionsRaw(0l);
 
 		g.newRole().setName("Bot").addPermissions(Permission.ADMINISTRATOR).setColor(Color.YELLOW);
@@ -494,7 +494,7 @@ public class DiscordGame
 		return action;
 	}
 
-	public ArrayList<Person> findAllWithTownRole(GameRole role) {
+	public ArrayList<Person> findAllWithTownRole(Role role) {
 		ArrayList<Person> peeps = new ArrayList<>();
 		for(Person p : persons) {
 			if(p.getType().equals(role)) {
@@ -540,12 +540,12 @@ public class DiscordGame
 		m.mute(person.isMuted()).queue();
 	}
 
-	public void winTownFaction(GameFaction faction)
+	public void winTownFaction(Faction faction)
 	{
 		wonTownRoles.add(faction);
 	}
 
-	public boolean hasTownFactionWon(GameFaction faction)
+	public boolean hasTownFactionWon(Faction faction)
 	{
 		return wonTownRoles.contains(faction);
 	}
