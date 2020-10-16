@@ -1,5 +1,6 @@
 package town.persons;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.jetbrains.annotations.NotNull;
@@ -40,8 +41,9 @@ public class Person
 	* @param game The Discord Game which the person is in.
 	* @param id The Discord ID which represents the actual discord user.
 	*/
-	public Person(DiscordGame game, long id)
+	public Person(@Nonnull DiscordGame game, long id)
 	{
+		if (game == null) throw new NullPointerException("DiscordGame game cannot be null");
 		this.game = game;
 		ID = id;
 	}
@@ -83,6 +85,7 @@ public class Person
 	 * Get the person's DiscordGame.
 	 * @return The Discord Game the person resides in.
 	 */
+	@Nonnull
 	public DiscordGame getGame()
 	{
 		return game;
@@ -92,6 +95,7 @@ public class Person
 	 * Get the Discord account's name. This is not the nickname of the person.
 	 * @return The account name.
 	 */
+	@Nonnull
 	public String getRealName()
 	{
 		return game.getUser(this).getName();
@@ -101,6 +105,7 @@ public class Person
 	 * Get the person's role. Ex. Civillian, Serial Killer...
 	 * @return The person's role.
 	 */
+	@Nullable
 	public GameRole getType()
 	{
 		return role;
@@ -128,8 +133,9 @@ public class Person
 	 * Send a message to the person's private channel.
 	 * @param msg The message content in String.
 	 */
-	public void sendMessage(String msg)
+	public void sendMessage(@Nonnull String msg)
 	{
+		if (msg == null) throw new NullPointerException("Message cannot be null");
 		if (privateChannelID != 0)
 			game.sendMessageToTextChannel(privateChannelID, msg).queue();
 		else
@@ -140,8 +146,9 @@ public class Person
 	 * Send a message to the person's private channel.
 	 * @param msg The message content with MessageEmbed type.
 	 */
-	public void sendMessage(MessageEmbed msg)
+	public void sendMessage(@Nonnull MessageEmbed msg)
 	{
+		if (msg == null) throw new NullPointerException("Message cannot be null");
 		if (privateChannelID != 0)
 			game.sendMessageToTextChannel(privateChannelID, msg).queue();
 		else
@@ -161,6 +168,7 @@ public class Person
 	 * Get the private channel ID.
 	 * @return Returns the private channel ID. Null if not assigned.
 	 */
+	@Nullable
 	public Long getPrivateChannelID()
 	{
 		return privateChannelID;
@@ -170,6 +178,7 @@ public class Person
 	 * Get the private channel object.
 	 * @return The private chanenl object as a TextChannel.
 	 */
+	@Nullable
 	public TextChannel getChannel()
 	{
 		return getGame().getTextChannel(getPrivateChannelID());
@@ -208,6 +217,7 @@ public class Person
 	 * Get the cause of death, assigned by the method {@code die()}.
 	 * @return The cause of death.
 	 */
+	@Nullable
 	public String getCauseOfDeath()
 	{
 		return causeOfDeath;
@@ -217,8 +227,9 @@ public class Person
 	 * Responds to game events.
 	 * @param event The event that took place.
 	 */
-	public void onEvent(TownEvent event)
+	public void onEvent(@Nonnull TownEvent event)
 	{
+		if (event == null) throw new NullPointerException("Event cannot be null");
 		event.standard(this);
 	}
 
@@ -295,8 +306,9 @@ public class Person
 	 * This method should be called when the phase changes.
 	 * @param phase The new phase.
 	 */
-	public void onPhaseChange(Phase phase)
+	public void onPhaseChange(@Nonnull Phase phase)
 	{
+		if (phase == null) throw new NullPointerException("Phase cannot be null");
 		if (phase instanceof Morning)
 		{
 			event = null;
