@@ -6,7 +6,7 @@ import java.util.function.Predicate;
 import town.DiscordGame;
 import town.mafia.helper.FactionHelper;
 
-public enum GameFaction
+public enum Faction
 {
 	TOWN("Town", FactionHelper::isTownLeft, FactionHelper::townWin),
 	SERIAL_KILLER("Serial Killer", FactionHelper::isSKLeft, FactionHelper::skWin);
@@ -15,7 +15,7 @@ public enum GameFaction
 	private final Predicate<DiscordGame> canWin;
 	private final Consumer<DiscordGame> win;
 
-	GameFaction(String name, Predicate<DiscordGame> canWin, Consumer<DiscordGame> win)
+	Faction(String name, Predicate<DiscordGame> canWin, Consumer<DiscordGame> win)
 	{
 		this.name = name;
 		this.canWin = canWin;

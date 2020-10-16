@@ -18,13 +18,13 @@ public enum GameType
 		return name;
 	}
 
-	public GameRole[] getAllRoles()
+	public Role[] getAllRoles()
 	{
-		ArrayList<GameRole> roles = new ArrayList<>(GameRole.values().length);
-		for (GameRole role : GameRole.values())
+		ArrayList<Role> roles = new ArrayList<>(Role.values().length);
+		for (Role role : Role.values())
 			if (role.getGameType() == this)
 				roles.add(role);
-		GameRole[] arrayRoles = new GameRole[roles.size()];
+		Role[] arrayRoles = new Role[roles.size()];
 		roles.toArray(arrayRoles);
 		return arrayRoles;
 	}
