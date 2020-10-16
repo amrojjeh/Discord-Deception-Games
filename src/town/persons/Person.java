@@ -1,6 +1,8 @@
 package town.persons;
 
-import java.util.List;
+import javax.annotation.Nullable;
+
+import org.jetbrains.annotations.NotNull;
 
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -12,48 +14,51 @@ import town.mafia.phases.Night;
 import town.phases.Phase;
 import town.roles.GameRole;
 
-public abstract class Person
+/**
+* The person class is the class used to refer to discord members within a game or party.
+*
+* @author Amr Ojjeh
+*/
+public class Person
 {
-	private final long ID; // Used to identify each person. For Discord, it's a snowflake
-	private final DiscordGame game; // Should be put into its own interface to seperate the game and discord
-	private final String realName;
+	private final long ID;
+	private final DiscordGame game;
 
 	private long privateChannelID = 0;
-	private int refNum; // This is how players can refer to other players without mentioning them
-	private int tempDefense = -1;
-	private int tempAttack = -1;
+	private Attributes tempAttributes = null;
 	private boolean muted = false;
 
-	protected GameRole type;
-	protected boolean disconnected = false;
-	protected boolean alive = true;
-	protected String causeOfDeath = String.format("<@%d> is still alive.", getID());
-	protected TownEvent event;
+	private GameRole role;
+	private boolean disconnected = false;
+	private boolean alive = true;
+	private String causeOfDeath = String.format("<@%d> is still alive.", getID());
+	private TownEvent event;
 
-	// In case the role hasn't been yet figured out
-	protected Person(DiscordGame game, int refNum, long id)
+	/**
+	* A public constructor used to create person.
+	*
+	* @param game The Discord Game which the person is in.
+	* @param id The Discord ID which represents the actual discord user.
+	*/
+	public Person(DiscordGame game, long id)
 	{
 		this.game = game;
 		ID = id;
-		this.refNum = refNum;
-		realName = game.getUser(this).getName();
 	}
 
-	// Used by children of this class
-	protected Person(DiscordGame game, int refNum, long id, GameRole type)
-	{
-		this.game = game;
-		ID = id;
-		this.refNum = refNum;
-		this.type = type;
-		realName = game.getUser(this).getName();
-	}
-
+	/**
+	 * Check if the person is considered muted.
+	 * @return true if the person is muted, otherwise false.
+	 */
 	public boolean isMuted()
 	{
 		return muted;
 	}
 
+	/**
+	 * Mute the person.
+	 * @param val If val is true, then the person will be muted. Otherwise person will be unmuted.
+	 */
 	public void mute(boolean val)
 	{
 		muted = val;
@@ -65,46 +70,64 @@ public abstract class Person
 		}
 	}
 
+	/**
+	 * Get the person's Discord ID.
+	 * @return the Discord ID.
+	 */
 	public long getID()
 	{
 		return ID;
 	}
 
-	public int getNum()
-	{
-		return refNum;
-	}
-
-	public void setNum(int val)
-	{
-		refNum = val;
-	}
-
+	/**
+	 * Get the person's DiscordGame.
+	 * @return The Discord Game the person resides in.
+	 */
 	public DiscordGame getGame()
 	{
 		return game;
 	}
 
+	/**
+	 * Get the Discord account's name. This is not the nickname of the person.
+	 * @return The account name.
+	 */
 	public String getRealName()
 	{
-		return realName;
+		return game.getUser(this).getName();
 	}
 
+	/**
+	 * Get the person's role. Ex. Civillian, Serial Killer...
+	 * @return The person's role.
+	 */
 	public GameRole getType()
 	{
-		return type;
+		return role;
 	}
 
+	/**
+	 * Set the person's role.
+	 * @param role The role which the person will assume.
+	 */
 	public void setType(GameRole role)
 	{
-		type = role;
+		this.role = role;
 	}
 
+	/**
+	 * Is the person alive?
+	 * @return True if the person is alive.
+	 */
 	public boolean isAlive()
 	{
 		return alive;
 	}
 
+	/**
+	 * Send a message to the person's private channel.
+	 * @param msg The message content in String.
+	 */
 	public void sendMessage(String msg)
 	{
 		if (privateChannelID != 0)
@@ -113,6 +136,10 @@ public abstract class Person
 			System.out.println("Could not send to private channel");
 	}
 
+	/**
+	 * Send a message to the person's private channel.
+	 * @param msg The message content with MessageEmbed type.
+	 */
 	public void sendMessage(MessageEmbed msg)
 	{
 		if (privateChannelID != 0)
@@ -121,22 +148,38 @@ public abstract class Person
 			System.out.println("Could not send to private channel");
 	}
 
-	public void assignPrivateChannel(long channelID)
+	/**
+	 * Assign a private channel to the user.
+	 * @param channelID The private channel ID to be assigned.
+	 */
+	public void setPrivateChannel(long channelID)
 	{
 		privateChannelID = channelID;
 	}
 
-	public Long getChannelID()
+	/**
+	 * Get the private channel ID.
+	 * @return Returns the private channel ID. Null if not assigned.
+	 */
+	public Long getPrivateChannelID()
 	{
 		return privateChannelID;
 	}
 
+	/**
+	 * Get the private channel object.
+	 * @return The private chanenl object as a TextChannel.
+	 */
 	public TextChannel getChannel()
 	{
-		return getGame().getTextChannel(getChannelID());
+		return getGame().getTextChannel(getPrivateChannelID());
 	}
 
-	public void die(String reason)
+	/**
+	 * Kill the person.
+	 * @param reason The reason why the person died.
+	 */
+	public void die(@NotNull String reason)
 	{
 		if (getGame().getCurrentPhase() instanceof Night)
 			die(reason, true);
@@ -144,7 +187,12 @@ public abstract class Person
 			die(reason, false);
 	}
 
-	public void die(String reason, boolean saveForMorning)
+	/**
+	 * Kill the person.
+	 * @param reason The reason why the person died.
+	 * @param saveForMorning If true, the person's death will be revealed in the morning.
+	 */
+	public void die(@NotNull String reason, boolean saveForMorning)
 	{
 		muted = true;
 		if (!alive) return;
@@ -156,99 +204,102 @@ public abstract class Person
 		alive = false;
 	}
 
-	public void onEvent(TownEvent event)
-	{
-		event.standard(this);
-	}
-
-	public TownEvent getEvent()
-	{
-		return event;
-	}
-
-	public void setChannelID(Long id)
-	{
-		privateChannelID = id;
-	}
-
+	/**
+	 * Get the cause of death, assigned by the method {@code die()}.
+	 * @return The cause of death.
+	 */
 	public String getCauseOfDeath()
 	{
 		return causeOfDeath;
 	}
 
-	public int getDefense()
+	/**
+	 * Responds to game events.
+	 * @param event The event that took place.
+	 */
+	public void onEvent(TownEvent event)
 	{
-		if (tempDefense < 0) return getType().getAttack();
-		return tempDefense;
+		event.standard(this);
 	}
 
-	public void setDefense(int val)
+	/**
+	 * Get the person's current attributes. If a temporary attribute is set, then that's given instead.
+	 * @return The player's current attributes.
+	 */
+	public Attributes getAttributes()
 	{
-		tempDefense = val;
+		if (tempAttributes == null) return getType().getAttributes();
+		return tempAttributes;
 	}
 
-	public int getAttack()
+	/**
+	 * Set the person's temporary attributes. Unless null, this overrides the default attack.
+	 * @param atr The player's temporary attributes.
+	 */
+	public void setTemporaryAttributes(@Nullable Attributes atr)
 	{
-		if (tempAttack < 0) return getType().getAttack();
-		return tempAttack;
+		tempAttributes = atr;
 	}
 
-	public void setAttack(int val)
+	public void clearTemporaryAttributes()
 	{
-		tempAttack = val;
+		setTemporaryAttributes(null);
 	}
 
+	/**
+	 * Has the user left the game server?
+	 * @return True if the user left the game server.
+	 */
 	public boolean isDisconnected()
 	{
 		return disconnected;
 	}
 
+	/**
+	 * This method should be called when the person leaves the game server.
+	 */
 	public void disconnect()
 	{
 		disconnected = true;
 		die(String.format("<@%d> (%d) committed suicide.", getID(), getNum()), true);
 	}
 
-	public String cancel()
+	/**
+	 * Set the person's event.
+	 * @param e The town event to be used
+	 */
+	public void setTownEvent(@Nullable TownEvent e)
 	{
-		if (event == null) return "There's no action to cancel";
-		getGame().removeEvent(event);
-		return "Action canceled";
+		event = e;
 	}
 
+	/**
+	 * Get the person's event.
+	 * @return The person's event.
+	 */
+	public TownEvent getTownEvent()
+	{
+		return event;
+	}
+
+	/**
+	 * Clears the person's town event.
+	 */
+	public void clearTownEvent()
+	{
+		setTownEvent(null);
+	}
+
+	/**
+	 * This method should be called when the phase changes.
+	 * @param phase The new phase.
+	 */
 	public void onPhaseChange(Phase phase)
 	{
 		if (phase instanceof Morning)
 		{
 			event = null;
-			tempDefense = -1;
+			tempAttributes = null;
 		}
 	}
-
-	public List<Person> getPossibleTargets()
-	{
-		return null;
-	}
-
-	public String ability(List<Person> list)
-	{
-		return type.getName() + " has no ability";
-	}
-
-	public boolean hasWon()
-	{
-		return getGame().hasTownFactionWon(getType().getFaction());
-	}
-
-	public boolean canWin()
-	{
-		return getType().getFaction().canWin(getGame());
-	}
-
-	public void win()
-	{
-		getType().getFaction().win(getGame());
-	}
-
-	public abstract String getHelp();
 }
