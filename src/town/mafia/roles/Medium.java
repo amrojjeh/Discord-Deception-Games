@@ -16,7 +16,13 @@ import town.roles.Faction;
 import town.roles.Role;
 import town.roles.RoleData;
 
-//Medium can talk to the dead at night.
+/**
+ * The Medium class represnts the role "Medium."
+ * Medium is able to talk to the dead during the night.
+ * This is done by giving access to the dead textchannel during the night, and revoking that channel during the day.
+ * @author Amr Ojjeh
+ *
+ */
 public class Medium implements Role
 {
 	public final String name = "Medium";
