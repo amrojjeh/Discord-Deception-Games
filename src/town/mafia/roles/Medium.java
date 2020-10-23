@@ -9,7 +9,7 @@ import town.mafia.phases.Morning;
 import town.mafia.phases.Night;
 import town.persons.AttributeValue;
 import town.persons.Attributes;
-import town.persons.Person;
+import town.persons.DiscordGamePerson;
 import town.phases.Phase;
 import town.roles.EmptyRoleData;
 import town.roles.Faction;
@@ -35,7 +35,7 @@ public class Medium implements Role
 	}
 
 	@Override
-	public void onPhaseChange(@Nonnull Person user, @Nonnull Phase phase)
+	public void onPhaseChange(@Nonnull DiscordGamePerson user, @Nonnull Phase phase)
 	{
 		// The default method checks if user and phase are null
 		Role.super.onPhaseChange(user, phase);
@@ -54,14 +54,14 @@ public class Medium implements Role
 
 	@Override
 	@Nullable
-	public List<Person> getPossibleTargets(Person user)
+	public List<DiscordGamePerson> getPossibleTargets(DiscordGamePerson user)
 	{
 		return null;
 	}
 
 	@Override
 	@Nonnull
-	public String ability(Person user, List<Person> list)
+	public String ability(DiscordGamePerson user, List<DiscordGamePerson> list)
 	{
 		return getName() + " has no ability";
 	}
@@ -85,5 +85,11 @@ public class Medium implements Role
 	public RoleData getInitialRoleData()
 	{
 		return new EmptyRoleData();
+	}
+
+	@Override
+	public int getPriority()
+	{
+		return 0;
 	}
 }

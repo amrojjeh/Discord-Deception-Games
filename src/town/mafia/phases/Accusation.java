@@ -32,7 +32,7 @@ public class Accusation extends Phase
 	{
 		getGame().sendMessageToTextChannel("daytime_discussion", "The Accusation phase has started. **There are "
 				+ numTrials + " left in the day**. Vote up a person with `!vote [num|@mention]`.")
-		.flatMap(msg -> getGame().sendMessageToTextChannel("daytime_discussion", generateList()))
+		.flatMap(msg -> getGameMode().sendMessageToTextChannel("daytime_discussion", generateList()))
 		.queue(message -> {msgID = message.getIdLong(); message.pin().queue();});
 		getPhaseManager().setWarningInSeconds(5);
 	}

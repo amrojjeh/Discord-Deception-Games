@@ -6,12 +6,12 @@ import town.games.parser.GameParser;
 
 public class DiscordGameConfig
 {
-	private String prefix = "pg.";
 	private boolean noMinPlayers = false;
 	private boolean isRand = false;
+
 	private GameMode gameMode;
 
-	public GameMode getGame()
+	public GameMode getGameMode()
 	{
 		return gameMode;
 	}
@@ -37,11 +37,6 @@ public class DiscordGameConfig
 			return "FAILED: " + e.getMessage();
 		}
 		return "Game mode was set to **Custom.**";
-	}
-
-	public String getPrefix()
-	{
-		return prefix;
 	}
 
 	public boolean isRandom()

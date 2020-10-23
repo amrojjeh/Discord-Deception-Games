@@ -4,21 +4,20 @@ import java.util.ArrayList;
 import java.util.function.BiConsumer;
 
 import net.dv8tion.jda.api.entities.Message;
-import town.DiscordGame;
 
-public class CommandSet
+public class CommandSet<T>
 {
-	ArrayList<Command> commands = new ArrayList<>();
+	ArrayList<Command<T>> commands = new ArrayList<>();
 
-	public void addCommand(boolean startsWith, BiConsumer<DiscordGame, Message> c, String... names)
+	public void addCommand(boolean startsWith, BiConsumer<T, Message> c, String... names)
 	{
-		commands.add(new Command(startsWith, c, names));
+		commands.add(new Command<T>(startsWith, c, names));
 	}
 
-	public Command getCommand(String prefix, Message message)
+	public Command<T> getCommand(String prefix, Message message)
 	{
 		String lowerCaseMessage = message.getContentRaw().toLowerCase();
-		for (Command command : commands)
+		for (Command<T> command : commands)
 		{
 			if (command.check(lowerCaseMessage, prefix))
 				return command;
@@ -26,12 +25,12 @@ public class CommandSet
 		return null;
 	}
 
-	public static boolean executeCommand(DiscordGame game, CommandSet commandSet, String prefix, Message message)
+	public boolean executeCommand(T obj, String prefix, Message message)
 	{
-		Command command = commandSet.getCommand(prefix, message);
+		Command<T> command = getCommand(prefix, message);
 		if (command != null)
 		{
-			command.accept(game, message);
+			command.accept(obj, message);
 			return true;
 		}
 		return false;

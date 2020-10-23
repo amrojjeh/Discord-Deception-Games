@@ -8,10 +8,7 @@ import town.DiscordGame;
 import town.commands.CommandSet;
 import town.games.parser.Rule;
 import town.mafia.commands.TVMCommands;
-import town.mafia.phases.FirstDay;
 import town.persons.assigner.Assigner;
-import town.persons.assigner.GeneralAssigner;
-import town.phases.PhaseManager;
 import town.roles.Role;
 
 public class GameMode
@@ -20,7 +17,7 @@ public class GameMode
 	private final String name;
 	private final String description;
 	private final boolean isSpecial;
-	private final CommandSet gameCommands;
+	private final CommandSet<DiscordGame> gameCommands;
 	protected Set<Role> roles = new HashSet<>();
 
 	public GameMode(String name, String description, boolean special)
@@ -28,7 +25,7 @@ public class GameMode
 		this(name, description, special, new TVMCommands());
 	}
 
-	public GameMode(String name, String description, boolean special, CommandSet gameCommands)
+	public GameMode(String name, String description, boolean special, CommandSet<DiscordGame> gameCommands)
 	{
 		this.name = name;
 		this.description = description;
@@ -51,7 +48,7 @@ public class GameMode
 		return isSpecial;
 	}
 
-	public CommandSet getCommands()
+	public CommandSet<DiscordGame> getCommands()
 	{
 		return gameCommands;
 	}
@@ -93,17 +90,21 @@ public class GameMode
 		int totalPlayers = game.getPlayersCache().size();
 		Assigner assigner;
 		Rule ruleFloor = getClosestRule(totalPlayers);
-		assigner = ruleFloor.buildAssigner();
-		int basePlayers = ruleFloor.totalPlayers;
-		game.getPlayersCache().replaceAll(person -> assigner.generatePerson(game, basePlayers, person.getNum(), person.getID()));
+//		assigner = ruleFloor.buildAssigner();
+//		int basePlayers = ruleFloor.totalPlayers;
+//		game.getPlayersCache().replaceAll(person -> assigner.generatePerson(game, basePlayers, person.getNum(), person.getID()));
+		throw new UnsupportedOperationException();
+
 	}
 
 	public void buildRand(DiscordGame game)
 	{
-		Assigner assigner = new Assigner();
-		for (Role role : roles)
-			assigner.addRole(new GeneralAssigner(role));
-		game.getPlayersCache().replaceAll(person -> assigner.generatePerson(game, 0, person.getNum(), person.getID()));
+//		Assigner assigner = new Assigner();
+//		for (Role role : roles)
+//			assigner.addRole(new GeneralAssigner(role));
+//		game.getPlayersCache().replaceAll(person -> assigner.generatePerson(game, 0, person.getNum(), person.getID()));
+		throw new UnsupportedOperationException();
+
 	}
 
 	public Rule getClosestRule(int totalPlayers)
@@ -117,8 +118,9 @@ public class GameMode
 		return ruleFloor;
 	}
 
-	public void start(DiscordGame game, PhaseManager pm)
-	{
-		pm.start(game, new FirstDay(game, pm));
-	}
+//	public void start(DiscordGame game, PhaseManager pm)
+//	{
+//		throw new UnsupportedOperationException();
+//		pm.start(game, new FirstDay(game, pm));
+//	}
 }

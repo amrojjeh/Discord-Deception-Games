@@ -1,27 +1,34 @@
 package town.events;
 
 import town.DiscordGame;
-import town.persons.Person;
+import town.persons.DiscordGamePerson;
+import town.roles.Role;
 
 public class MurderTownEvent implements TownEvent
 {
-	private Person murderer;
-	private Person victim;
+	private DiscordGamePerson user;
+	private Role role;
+	private DiscordGamePerson victim;
 	private DiscordGame game;
 
-	public MurderTownEvent(DiscordGame game, Person m, Person v)
+	public MurderTownEvent(DiscordGame game, DiscordGamePerson m, DiscordGamePerson v)
 	{
 		this.game = game;
-		murderer = m;
-		victim = v;
+		this.user = m;
+		this.victim = v;
 	}
 
-	public Person getMurderer()
+	public Role getRole()
 	{
-		return murderer;
+		return role;
 	}
 
-	public Person getVictim()
+	public DiscordGamePerson getMurderer()
+	{
+		return user;
+	}
+
+	public DiscordGamePerson getVictim()
 	{
 		return victim;
 	}
@@ -33,14 +40,14 @@ public class MurderTownEvent implements TownEvent
 	}
 
 	@Override
-	public void standard(Person person)
+	public void standard(DiscordGamePerson person)
 	{
 		if (person == getMurderer())
 			attackVictim();
 	}
 
 	@Override
-	public Person getTarget()
+	public DiscordGamePerson getTarget()
 	{
 		return victim;
 	}
@@ -48,14 +55,14 @@ public class MurderTownEvent implements TownEvent
 	@Override
 	public int getPriority()
 	{
-		return murderer.getType().getPriority();
+		return getRole().getPriority();
 	}
 
 	public void attackVictim()
 	{
-		murderer.sendMessage("You attacked <@" + victim.getID() + ">");
+		getMurderer().sendMessage("You attacked <@" + victim.getID() + ">");
 		victim.sendMessage("You were attacked");
-		if(murderer.getAttack() > victim.getDefense())
-			victim.die(String.format("<@%d> (%d) was murdered by a serial killer.", victim.getID(), victim.getNum()));
+		if(getMurderer().getAttributes().attack.getVal() > victim.getAttributes().defense.getVal())
+			victim.die(String.format("<@%d> was murdered by a serial killer.", getVictim().getID()));
 	}
 }

@@ -2,6 +2,7 @@ package town.persons;
 
 public enum AttributeValue
 {
+	DEFAULT(-1),
 	NONE(0),
 	BASIC(1),
 	POWERFUL(2),

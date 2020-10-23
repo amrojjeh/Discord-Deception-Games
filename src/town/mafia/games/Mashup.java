@@ -11,8 +11,8 @@ public class Mashup extends GameMode
 	{
 		super("Mashup", "Play with all the roles, no limits!", true);
 		Rule rule = new Rule(0);
-		Role[] roles = GameType.MAFIA.getAllRoles();
-		for (Role role : roles)
+		RoleInfo[] roles = GameType.MAFIA.getAllRoles();
+		for (RoleInfo role : roles)
 		{
 			System.out.println(role.getName());
 			rule.addRole(role, -1, true);

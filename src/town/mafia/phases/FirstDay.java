@@ -18,7 +18,7 @@ public class FirstDay extends Day
 	{
 		getGame().toggleVC("Daytime", true).queue();
 		getGame().sendMessageToTextChannel("daytime_discussion", "Day " + getGame().getDayNum() + " started")
-		.flatMap(msg -> getGame().setChannelVisibility("player", "daytime_discussion", true, true))
+		.flatMap(msg -> getGameMode().setChannelVisibility("player", "daytime_discussion", true, true))
 		.queue();
 		getGame().getPlayersCache().forEach((person) -> checkVictory(person));
 		getPhaseManager().setWarningInSeconds(5);

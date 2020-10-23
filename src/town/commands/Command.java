@@ -3,15 +3,14 @@ package town.commands;
 import java.util.function.BiConsumer;
 
 import net.dv8tion.jda.api.entities.Message;
-import town.DiscordGame;
 
-public class Command
+public class Command<T>
 {
 	private String[] commands;
 	private boolean startsWith;
-	private BiConsumer<DiscordGame, Message> consumer;
+	private BiConsumer<T, Message> consumer;
 
-	public Command(boolean startsWith, BiConsumer<DiscordGame, Message> consumer, String...commands)
+	public Command(boolean startsWith, BiConsumer<T, Message> consumer, String...commands)
 	{
 		this.startsWith = startsWith;
 		this.consumer = consumer;
@@ -28,7 +27,7 @@ public class Command
 		return startsWith;
 	}
 
-	public void accept(DiscordGame game, Message message)
+	public void accept(T game, Message message)
 	{
 		consumer.accept(game, message);
 	}

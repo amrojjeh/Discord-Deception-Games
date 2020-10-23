@@ -3,7 +3,6 @@ package town.games.parser;
 import java.util.ArrayList;
 
 import town.games.GameMode;
-import town.roles.Role;
 import town.util.JavaHelper;
 
 public class GameParser
@@ -61,27 +60,31 @@ public class GameParser
 		return rule;
 	}
 
-	public static Role getRoleFromTuple(String tuple)
+	public static RoleInfo getRoleFromTuple(String tuple)
 	{
-		String[] splitTuple = tuple.split(" ");
-		Integer roleMax = JavaHelper.parseInt(splitTuple[splitTuple.length - 1].replace("+", ""));
-		if (roleMax == null)
-			throw new IllegalArgumentException("No role max was passed in the tuple: " + tuple);
-		splitTuple[splitTuple.length - 1] = "";
-		String roleName = String.join(" ", splitTuple);
+//		String[] splitTuple = tuple.split(" ");
+//		Integer roleMax = JavaHelper.parseInt(splitTuple[splitTuple.length - 1].replace("+", ""));
+//		if (roleMax == null)
+//			throw new IllegalArgumentException("No role max was passed in the tuple: " + tuple);
+//		splitTuple[splitTuple.length - 1] = "";
+//		String roleName = String.join(" ", splitTuple);
+//
+//		Role role = Role.getRoleFromName(roleName.strip());
+//		if (role == null)
+//			throw new IllegalArgumentException("Role name (" + roleName.strip() + ") not found in: **" + tuple + "**");
+//		return new Role(role, roleMax, tuple.charAt(tuple.length() - 1) == '+');
+		throw new UnsupportedOperationException();
 
-		Role role = Role.getRoleFromName(roleName.strip());
-		if (role == null)
-			throw new IllegalArgumentException("Role name (" + roleName.strip() + ") not found in: **" + tuple + "**");
-		return new Role(role, roleMax, tuple.charAt(tuple.length() - 1) == '+');
 	}
 
-	public static int calculateImplicitTotalPlayers(ArrayList<Role> singleRoles)
+	public static int calculateImplicitTotalPlayers(ArrayList<RoleInfo> singleRoles)
 	{
 		int sum = 0;
-		for (Role sr : singleRoles)
-			sum += sr.max;
-		return sum;
+//		for (Role sr : singleRoles)
+//			sum += sr.max;
+//		return sum;
+		throw new UnsupportedOperationException();
+
 	}
 
 	public static int getExplicitTotalPlayers(String str)

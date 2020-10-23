@@ -1,14 +1,18 @@
 package town.mafia.roles;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Nonnull;
 
-import town.events.DoctorTownEvent;
+import town.DiscordGame;
+import town.events.MurderTownEvent;
+import town.events.TownEvent;
 import town.mafia.phases.Night;
 import town.mafia.roles.data.DoctorData;
 import town.persons.AttributeValue;
 import town.persons.Attributes;
+import town.persons.DiscordGamePerson;
 import town.persons.Person;
 import town.roles.Faction;
 import town.roles.Role;
@@ -19,7 +23,7 @@ public class Doctor implements Role
 	public final Attributes attr = new Attributes(AttributeValue.NONE, AttributeValue.NONE);
 	public final String name = "Civillian";
 
-	public DoctorData getRoleDataFromPerson(Person user)
+	public DoctorData getRoleDataFromPerson(DiscordGamePerson user)
 	{
 		RoleData data = user.getRoleData();
 		if (data == null)
@@ -30,7 +34,7 @@ public class Doctor implements Role
 	}
 
 	@Override
-	public String ability(Person user, List<Person> references)
+	public String ability(DiscordGamePerson user, List<DiscordGamePerson> references)
 	{
 		String msg = "";
 		DoctorData data = getRoleDataFromPerson(user);
@@ -57,18 +61,18 @@ public class Doctor implements Role
 			msg += "Remember, you only get one self-heal.";
 		}
 
-		user.setTownEvent(new DoctorTownEvent(user.getGame(), this, references.get(0)));
+		user.setTownEvent(new DoctorTownEvent(user.getGame(), user, this, references.get(0)));
 		user.getGame().addEvent(user.getTownEvent());
 
 		return msg + String.format("You will heal <@%d> tonight.", references.get(0).getID());
 	}
 
 	@Override
-	public List<Person> getPossibleTargets(Person user)
+	public ArrayList<DiscordGamePerson> getPossibleTargets(DiscordGamePerson user)
 	{
 		DoctorData data = getRoleDataFromPerson(user);
 
-		List<Person> targets = user.getGame().getAlivePlayers();
+		ArrayList<DiscordGamePerson> targets = user.getGame().getAlivePlayers();
 		if (!data.canSelfHeal())
 			targets.remove(user);
 		return targets;
@@ -106,5 +110,81 @@ public class Doctor implements Role
 	public RoleData getInitialRoleData()
 	{
 		return new DoctorData(1);
+	}
+
+	@Override
+	public int getPriority()
+	{
+		return 3;
+	}
+}
+
+class DoctorTownEvent implements TownEvent
+{
+	private final DiscordGamePerson user;
+	private final Doctor role;
+	private final DiscordGamePerson target;
+	private final DiscordGame game;
+	private final ArrayList<Person> visitors = new ArrayList<>();
+
+	public DoctorTownEvent(DiscordGame game, DiscordGamePerson user, Doctor role, DiscordGamePerson target)
+	{
+		this.game = game;
+		this.user = user;
+		this.target = target;
+		this.role = role;
+	}
+
+	public DiscordGamePerson getDoctor()
+	{
+		return user;
+	}
+
+	public Doctor getRole()
+	{
+		return role;
+	}
+
+	@Override
+	public DiscordGamePerson getTarget()
+	{
+		return target;
+	}
+
+	@Override
+	public DiscordGame getGame()
+	{
+		return game;
+	}
+
+	@Override
+	public int getPriority()
+	{
+		return role.getPriority();
+	}
+
+	@Override
+	public void standard(DiscordGamePerson person)
+	{
+		if (isVisitingTarget(person) && person.getTownEvent() instanceof MurderTownEvent)
+			visitors.add(person);
+		else if (getTarget() == person)
+		{
+			protect();
+			if (person == getDoctor())
+				getRole().getRoleDataFromPerson(user).useSelfHeal();
+		}
+	}
+
+	@Override
+	public void postDispatch()
+	{
+		if (visitors.size() == 0) getDoctor().sendMessage(String.format("No one attacked <@%d>.", getTarget().getID()));
+		else getDoctor().sendMessage(String.format("Your target, <@%d>, was attacked.", getTarget().getID()));
+	}
+
+	public void protect()
+	{
+		getTarget().setTemporaryAttributes(new Attributes(AttributeValue.POWERFUL, AttributeValue.DEFAULT));
 	}
 }

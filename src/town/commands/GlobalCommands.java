@@ -6,10 +6,9 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import town.DiscordGame;
+import town.DiscordGameConfig;
 import town.mafia.phases.Accusation;
 import town.persons.Person;
-import town.phases.Phase;
 
 public class GlobalCommands extends CommandSet
 {
@@ -18,7 +17,7 @@ public class GlobalCommands extends CommandSet
 		addCommand(false, GlobalCommands::displayParty, "party");
 	}
 
-	public static void displayParty(DiscordGame game, Message message)
+	public static void displayParty(DiscordGameConfig config, Message message)
 	{
 		Phase currentPhase = game.getCurrentPhase();
 		MessageChannel channelUsed = message.getChannel();

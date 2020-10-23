@@ -1,13 +1,16 @@
 package town.mafia.roles;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Nonnull;
 
-import town.events.LookoutTownEvent;
+import town.DiscordGame;
+import town.events.TownEvent;
 import town.mafia.phases.Night;
 import town.persons.AttributeValue;
 import town.persons.Attributes;
+import town.persons.DiscordGamePerson;
 import town.persons.Person;
 import town.roles.EmptyRoleData;
 import town.roles.Faction;
@@ -21,7 +24,7 @@ public class Lookout implements Role
 
 	@Override
 	@Nonnull
-	public String ability(Person user, List<Person> references)
+	public String ability(DiscordGamePerson user, List<DiscordGamePerson> references)
 	{
 		if (!user.isAlive())
 			return "Can't watch people if you're dead.";
@@ -45,14 +48,14 @@ public class Lookout implements Role
 			user.clearTownEvent();
 		}
 
-		user.setTownEvent(new LookoutTownEvent(user.getGame(), user, references.get(0)));
+		user.setTownEvent(new LookoutTownEvent(user.getGame(), user, this, references.get(0)));
 		user.getGame().addEvent(user.getTownEvent());
 
 		return msg + String.format("You will watch <@%d> tonight.", references.get(0).getID());
 	}
 
 	@Override
-	public List<Person> getPossibleTargets(Person user)
+	public ArrayList<DiscordGamePerson> getPossibleTargets(DiscordGamePerson user)
 	{
 		return user.getGame().getAlivePlayers();
 	}
@@ -92,5 +95,75 @@ public class Lookout implements Role
 	public RoleData getInitialRoleData()
 	{
 		return new EmptyRoleData();
+	}
+
+	@Override
+	public int getPriority()
+	{
+		return 0;
+	}
+}
+
+class LookoutTownEvent implements TownEvent
+{
+	private final DiscordGamePerson user;
+	private final DiscordGamePerson target;
+	private final Lookout role;
+	private final DiscordGame game;
+	private final ArrayList<Person> visitors = new ArrayList<>();
+
+	public LookoutTownEvent(DiscordGame game, DiscordGamePerson l, Lookout role, DiscordGamePerson t)
+	{
+		this.game = game;
+		this.user = l;
+		this.role = role;
+		this.target = t;
+	}
+
+	public Lookout getRole()
+	{
+		return role;
+	}
+
+	public DiscordGamePerson getLookout()
+	{
+		return user;
+	}
+
+	@Override
+	public DiscordGamePerson getTarget()
+	{
+		return target;
+	}
+
+	@Override
+	public DiscordGame getGame()
+	{
+		return game;
+	}
+
+	@Override
+	public void standard(DiscordGamePerson person)
+	{
+		if (isVisitingTarget(person))
+			visitors.add(person);
+	}
+
+	@Override
+	public void postDispatch()
+	{
+		if (visitors.size() == 1) getLookout().sendMessage(String.format("No one visited <@%d>", target.getID()));
+		else
+		{
+			StringBuilder message = new StringBuilder(String.format("You watched <@%d> over night, here are the visitors\n", getTarget().getID()));
+			visitors.forEach(person -> {if (person != getLookout()) message.append(String.format("- <@%d>\n", person.getID()));});
+			getLookout().sendMessage(message.toString());
+		}
+	}
+
+	@Override
+	public int getPriority()
+	{
+		return getRole().getPriority();
 	}
 }

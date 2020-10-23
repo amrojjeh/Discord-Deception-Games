@@ -19,7 +19,7 @@ public class Day extends Phase
 	public void start()
 	{
 		getGame().sendMessageToTextChannel("daytime_discussion", "Day " + getGame().getDayNum() + " started")
-		.flatMap(msg -> getGame().setChannelVisibility("player", "daytime_discussion", true, true))
+		.flatMap(msg -> getGameMode().setChannelVisibility("player", "daytime_discussion", true, true))
 		.queue();
 
 		getGame().toggleVC("Daytime", true).queue();

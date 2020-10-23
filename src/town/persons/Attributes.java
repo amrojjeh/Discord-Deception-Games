@@ -2,8 +2,8 @@ package town.persons;
 
 public class Attributes
 {
-	final AttributeValue attack;
-	final AttributeValue defense;
+	public final AttributeValue attack;
+	public final AttributeValue defense;
 
 	/**
 	 * Construct a new Attributes class. Used by roles to denote defense and attack.

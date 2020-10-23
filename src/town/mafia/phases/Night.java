@@ -1,7 +1,7 @@
 package town.mafia.phases;
 
 import town.DiscordGame;
-import town.persons.Person;
+import town.persons.DiscordGamePerson;
 import town.phases.Phase;
 import town.phases.PhaseManager;
 import town.util.RestHelper;
@@ -27,11 +27,11 @@ public class Night extends Phase
 				getGame().setChannelVisibility("player", "daytime_discussion", true, false)
 		);
 
-		getGame().getPlayers().forEach(person -> person.sendMessage("Night " + getGame().getDayNum() + " started"));
+		getGame().getPlayers().forEach(person -> person.sendMessage("Night " + getGameMode().getDayNum() + " started"));
 		getPhaseManager().setWarningToAll(5);
 	}
 
-	public void checkVictory(Person person)
+	public void checkVictory(DiscordGamePerson person)
 	{
 		if (!person.hasWon() && person.canWin())
 			person.win();

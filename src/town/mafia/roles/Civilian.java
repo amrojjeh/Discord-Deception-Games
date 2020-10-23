@@ -1,5 +1,6 @@
 package town.mafia.roles;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Nonnull;
@@ -7,7 +8,7 @@ import javax.annotation.Nullable;
 
 import town.persons.AttributeValue;
 import town.persons.Attributes;
-import town.persons.Person;
+import town.persons.DiscordGamePerson;
 import town.roles.EmptyRoleData;
 import town.roles.Faction;
 import town.roles.Role;
@@ -38,14 +39,14 @@ public class Civilian implements Role
 
 	@Override
 	@Nullable
-	public List<Person> getPossibleTargets(Person user)
+	public ArrayList<DiscordGamePerson> getPossibleTargets(DiscordGamePerson user)
 	{
 		return null;
 	}
 
 	@Override
 	@Nonnull
-	public String ability(@Nullable Person user, @Nullable List<Person> list)
+	public String ability(@Nullable DiscordGamePerson user, @Nullable List<DiscordGamePerson> list)
 	{
 		return getName() + " has no ability";
 	}
@@ -61,5 +62,11 @@ public class Civilian implements Role
 	public String getName()
 	{
 		return name;
+	}
+
+	@Override
+	public int getPriority()
+	{
+		return 0;
 	}
 }

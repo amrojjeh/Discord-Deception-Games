@@ -3,13 +3,13 @@ package town.events;
 import javax.annotation.Nullable;
 
 import town.DiscordGame;
-import town.persons.Person;
+import town.persons.DiscordGamePerson;
 
 public interface TownEvent extends Comparable<TownEvent>
 {
 	DiscordGame getGame();
-	void standard(Person person);
-	@Nullable Person getTarget();
+	void standard(DiscordGamePerson person);
+	@Nullable DiscordGamePerson getTarget();
 	int getPriority();
 
 	default void postDispatch() { }
@@ -20,8 +20,8 @@ public interface TownEvent extends Comparable<TownEvent>
 		return getPriority() - e.getPriority();
 	}
 
-	default boolean isVisitor(Person person)
+	default boolean isVisitingTarget(DiscordGamePerson person)
 	{
-		return person.getEvent() != null && person.getEvent().getTarget() == getTarget();
+		return person.getTownEvent() != null && person.getTownEvent().getTarget() == getTarget();
 	}
 }

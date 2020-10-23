@@ -11,7 +11,7 @@ import town.roles.Role;
 public class Rule
 {
 	public int totalPlayers;
-	public ArrayList<Role> roles = new ArrayList<>();
+	public ArrayList<RoleInfo> roles = new ArrayList<>();
 
 	public Rule(int totalPlayers)
 	{
@@ -20,19 +20,13 @@ public class Rule
 
 	public boolean hasDefault()
 	{
-		for (Role role : roles)
+		for (RoleInfo role : roles)
 			if (role.isDefault)
 				return true;
 		return false;
 	}
 
-	public void addRole(Role role, int max, boolean isDefault)
-	{
-		Role singleRole = new Role(role, max, isDefault);
-		roles.add(singleRole);
-	}
-
-	public void addRole(Role role)
+	public void addRole(RoleInfo role)
 	{
 		roles.add(role);
 	}
@@ -40,15 +34,15 @@ public class Rule
 	public Set<Role> getRoles()
 	{
 		HashSet<Role> allRoles = new HashSet<>();
-		for (Role sr : roles)
+		for (RoleInfo sr : roles)
 			allRoles.add(sr.role);
-	return allRoles;
+		return allRoles;
 	}
 
 	public Assigner buildAssigner()
 	{
 		Assigner assigner = new Assigner();
-		for (Role sr : roles)
+		for (RoleInfo sr : roles)
 		{
 			GeneralAssigner ga = new GeneralAssigner(sr.role, sr.max);
 			ga.setDefault(sr.isDefault);
@@ -63,11 +57,12 @@ public class Rule
 		StringBuilder builder = new StringBuilder(totalPlayers + " ");
 		for (int x = 0; x < roles.size(); ++x)
 		{
-			Role role = roles.get(x);
+			RoleInfo role = roles.get(x);
 			builder.append(role.role.getName() + " " + role.max + (role.isDefault ? "+" : ""));
 			if (x != roles.size() - 1)
 				builder.append(", ");
 		}
 		return builder.toString();
+
 	}
 }

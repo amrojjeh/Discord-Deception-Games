@@ -6,7 +6,7 @@ import town.events.MurderTownEvent;
 import town.mafia.phases.Night;
 import town.persons.AttributeValue;
 import town.persons.Attributes;
-import town.persons.Person;
+import town.persons.DiscordGamePerson;
 import town.roles.EmptyRoleData;
 import town.roles.Faction;
 import town.roles.Role;
@@ -19,7 +19,7 @@ public class SerialKiller implements Role
 	public final Attributes attr = new Attributes(AttributeValue.BASIC, AttributeValue.BASIC);
 
 	@Override
-	public String ability(Person user, List<Person> references)
+	public String ability(DiscordGamePerson user, List<DiscordGamePerson> references)
 	{
 		if (!user.isAlive())
 			return "Can't kill if you're dead.";
@@ -52,9 +52,9 @@ public class SerialKiller implements Role
 	}
 
 	@Override
-	public List<Person> getPossibleTargets(Person user)
+	public List<DiscordGamePerson> getPossibleTargets(DiscordGamePerson user)
 	{
-		List<Person> targets = user.getGame().getAlivePlayers();
+		List<DiscordGamePerson> targets = user.getGame().getAlivePlayers();
 		targets.remove(user);
 		return targets;
 	}
@@ -89,5 +89,11 @@ public class SerialKiller implements Role
 	public RoleData getInitialRoleData()
 	{
 		return new EmptyRoleData();
+	}
+
+	@Override
+	public int getPriority()
+	{
+		return 5;
 	}
 }
