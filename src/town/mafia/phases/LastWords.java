@@ -1,16 +1,16 @@
 package town.mafia.phases;
 
 import town.DiscordGame;
-import town.persons.Person;
+import town.persons.DiscordGamePerson;
 import town.phases.Phase;
 import town.phases.PhaseManager;
 import town.util.RestHelper;
 
 public class LastWords extends Phase
 {
-	Person defendant;
+	DiscordGamePerson defendant;
 
-	public LastWords(DiscordGame game, PhaseManager pm, Person defendant)
+	public LastWords(DiscordGame game, PhaseManager pm, DiscordGamePerson defendant)
 	{
 		super(game, pm);
 		this.defendant = defendant;
@@ -32,7 +32,7 @@ public class LastWords extends Phase
 	public void end()
 	{
 		defendant.die(String.format("<@%d> was lynched in the open.", defendant.getID()));
-		getGame().sendMessageToTextChannel("daytime_discussion", "Their role was: " + defendant.getType().getName())
+		getGame().sendMessageToTextChannel("daytime_discussion", "Their role was: " + defendant.getRole().getName())
 		.queue();
 
 		RestHelper.queueAll(getGame().muteAllInRole("player", false));
