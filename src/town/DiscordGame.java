@@ -233,30 +233,30 @@ public class DiscordGame
 //	{
 //		return initiated;
 //	}
-//
-//	public void transferOrDelete()
-//	{
-//		if (!transfer()) deleteServer();
-//	}
-//
-//	public void deleteServer()
-//	{
-//		phaseManager.end();
-//		getGameGuild().delete().queue();
-//	}
-//
-//	public boolean transfer()
-//	{
-//		phaseManager.end();
-//		for (Person p : getPlayers())
-//		{
-//			Member member = getMemberFromGame(p);
-//			if (member == null) continue;
-//			getGameGuild().transferOwnership(member).reason("The game has ended").queue();
-//			return true;
-//		}
-//		return false;
-//	}
+
+	public void transferOrDelete()
+	{
+		if (!transfer()) deleteServer();
+	}
+
+	public void deleteServer()
+	{
+		phaseManager.end();
+		getGuild().delete().queue();
+	}
+
+	public boolean transfer()
+	{
+		phaseManager.end();
+		for (DiscordGamePerson p : getPlayersCache())
+		{
+			Member member = getMemberFromGame(p);
+			if (member == null) continue;
+			getGuild().transferOwnership(member).reason("The game has ended").queue();
+			return true;
+		}
+		return false;
+	}
 
 	public DiscordGamePerson getPerson(Member member)
 	{
@@ -449,10 +449,10 @@ public class DiscordGame
 		return setChannelVisibility(getRole(roleName), channelName, read, write);
 	}
 
-//	public void openPrivateChannels()
-//	{
-//		getPlayersCache().forEach(p -> setChannelVisibility(getGameGuild().getPublicRole(), p.getChannel(), true, false).queue());
-//	}
+	public void openPrivateChannels()
+	{
+		getPlayersCache().forEach(p -> setChannelVisibility(getGuild().getPublicRole(), p.getPrivateChannel(), true, false).queue());
+	}
 
 	public PermissionOverrideAction setChannelVisibility(DiscordGamePerson p, String channelName, boolean read, boolean write)
 	{

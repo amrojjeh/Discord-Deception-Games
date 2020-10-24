@@ -14,7 +14,6 @@ import town.commands.CommandSet;
 import town.mafia.phases.Accusation;
 import town.mafia.phases.Judgment;
 import town.persons.DiscordGamePerson;
-import town.persons.Person;
 import town.phases.Phase;
 
 public class TVMCommands extends CommandSet<DiscordGame>
@@ -116,8 +115,8 @@ public class TVMCommands extends CommandSet<DiscordGame>
 			return;
 		}
 
-		Person accuser = game.getPerson(message.getMember());;
-		Person accused = referenced.get(0);
+		DiscordGamePerson accuser = game.getPerson(message.getMember());;
+		DiscordGamePerson accused = referenced.get(0);
 
 		Accusation acc = (Accusation)phase;
 		game.sendMessageToTextChannel("daytime_discussion", acc.vote(accuser, accused)).queue();
