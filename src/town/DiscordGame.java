@@ -542,12 +542,12 @@ public class DiscordGame
 	{
 		return wonTownRoles.contains(faction);
 	}
-//
-//	public void saveForMorning(Person p)
-//	{
-//		savedForMorning.add(p);
-//	}
-//
+
+	public void saveForMorning(Person p)
+	{
+		savedForMorning.add(p);
+	}
+
 //	public Person getDeathForMorning()
 //	{
 //		if (savedForMorning.isEmpty())
