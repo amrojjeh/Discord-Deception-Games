@@ -13,10 +13,14 @@ import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.IPermissionHolder;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.VoiceChannel;
+import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.requests.restaction.GuildAction;
 import net.dv8tion.jda.api.requests.restaction.GuildAction.RoleData;
+import net.dv8tion.jda.api.requests.restaction.MessageAction;
 import net.dv8tion.jda.api.requests.restaction.PermissionOverrideAction;
 import town.events.TownEvent;
 import town.persons.DiscordGamePerson;
@@ -69,19 +73,19 @@ public class DiscordGame
 		return config;
 	}
 
-	public static DiscordGame createServer(GameParty party, int identifier)
+	public ArrayList<DiscordGamePerson> getPlayersCache()
+	{
+		return players;
+	}
+
+	public static DiscordGame createServer(GameParty party, long identifier)
 	{
 		DiscordGame game = new DiscordGame(party.getJDA(), party.getConfig());
 		game.createServer(identifier);
 		return game;
 	}
 
-	public ArrayList<DiscordGamePerson> getPlayersCache()
-	{
-		return players;
-	}
-
-	public void createServer(int identifier)
+	public void createServer(long identifier)
 	{
 		getConfig().getGameMode().build(this, getConfig().isRandom());
 		GuildAction ga = getJDA().createGuild(config.getGameMode().getName());
@@ -251,12 +255,12 @@ public class DiscordGame
 //		}
 //		return false;
 //	}
-//
-//	public Person getPerson(Member member)
-//	{
-//		return getPerson(member.getIdLong());
-//	}
-//
+
+	public DiscordGamePerson getPerson(Member member)
+	{
+		return getPerson(member.getIdLong());
+	}
+
 //	public Person getPerson(int refNum)
 //	{
 //		for (Person person : persons)
@@ -264,14 +268,14 @@ public class DiscordGame
 //				return person;
 //		return null;
 //	}
-//
-//	public Person getPerson(long id)
-//	{
-//		for (Person person : persons)
-//			if (person.getID() == id)
-//				return person;
-//		return null;
-//	}
+
+	public DiscordGamePerson getPerson(long id)
+	{
+		for (DiscordGamePerson person : getPlayersCache())
+			if (person.getID() == id)
+				return person;
+		return null;
+	}
 
 	public ArrayList<DiscordGamePerson> getAlivePlayers()
 	{
@@ -373,37 +377,37 @@ public class DiscordGame
 		return id;
 	}
 
-//	private RestAction<Message> sendDMTo(Person person, String msg)
-//	{
-//		return jda.getUserById(person.getID()).openPrivateChannel()
-//		.flatMap((channel) -> channel.sendMessage(msg));
-//	}
-//
-//	public MessageAction sendMessageToTextChannel(String channelName, String msg)
-//	{
-//		return getTextChannel(channelName).sendMessage(msg);
-//	}
-//
-//	public MessageAction sendMessageToTextChannel(Long channelID, String msg)
-//	{
-//		return getTextChannel(channelID).sendMessage(msg);
-//	}
-//
-//	public MessageAction sendMessageToTextChannel(String channelName, MessageEmbed embed)
-//	{
-//		return getTextChannel(channelName).sendMessage(embed);
-//	}
-//
-//	public MessageAction sendMessageToTextChannel(Long channelID, MessageEmbed embed)
-//	{
-//		return getTextChannel(channelID).sendMessage(embed);
-//	}
-//
-//	public RestAction<Message> getMessage(String channelName, long messageID)
-//	{
-//		return getTextChannel(channelName).retrieveMessageById(messageID);
-//	}
-//
+	private RestAction<Message> sendDMTo(Person person, String msg)
+	{
+		return jda.getUserById(person.getID()).openPrivateChannel()
+		.flatMap((channel) -> channel.sendMessage(msg));
+	}
+
+	public MessageAction sendMessageToTextChannel(String channelName, String msg)
+	{
+		return getTextChannel(channelName).sendMessage(msg);
+	}
+
+	public MessageAction sendMessageToTextChannel(Long channelID, String msg)
+	{
+		return getTextChannel(channelID).sendMessage(msg);
+	}
+
+	public MessageAction sendMessageToTextChannel(String channelName, MessageEmbed embed)
+	{
+		return getTextChannel(channelName).sendMessage(embed);
+	}
+
+	public MessageAction sendMessageToTextChannel(Long channelID, MessageEmbed embed)
+	{
+		return getTextChannel(channelID).sendMessage(embed);
+	}
+
+	public RestAction<Message> getMessage(String channelName, long messageID)
+	{
+		return getTextChannel(channelName).retrieveMessageById(messageID);
+	}
+
 //	public void startGame()
 //	{
 //		config.getGameMode().start(this, phaseManager);
@@ -572,18 +576,18 @@ public class DiscordGame
 //	{
 //		dayNum++;
 //	}
-//
-//	public RestAction<Void> modifyMemberRoles(Person person, String... roleNames)
-//	{
-//		Role[] roles = new Role[roleNames.length];
-//		for (int x = 0; x < roleNames.length; ++x)
-//		{
-//			Role role = getRole(roleNames[x]);
-//			if (role == null) throw new IllegalArgumentException("Role name does not exist");
-//			roles[x] = role;
-//		}
-//		return getGameGuild().modifyMemberRoles(getMemberFromGame(person), roles);
-//	}
+
+	public RestAction<Void> modifyMemberRoles(Person person, String... roleNames)
+	{
+		net.dv8tion.jda.api.entities.Role[] roles = new net.dv8tion.jda.api.entities.Role[roleNames.length];
+		for (int x = 0; x < roleNames.length; ++x)
+		{
+			net.dv8tion.jda.api.entities.Role role = getRole(roleNames[x]);
+			if (role == null) throw new IllegalArgumentException("Role name does not exist");
+			roles[x] = role;
+		}
+		return getGuild().modifyMemberRoles(getMemberFromGame(person), roles);
+	}
 
 	// Quick Permissions
 	private static class QP

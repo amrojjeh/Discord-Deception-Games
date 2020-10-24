@@ -2,17 +2,22 @@ package town.mafia.commands;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.List;
 
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import town.DiscordGame;
 import town.commands.CommandSet;
 import town.mafia.phases.Accusation;
 import town.mafia.phases.Judgment;
+import town.persons.DiscordGamePerson;
 import town.persons.Person;
+import town.phases.Phase;
 
-public class TVMCommands extends CommandSet
+public class TVMCommands extends CommandSet<DiscordGame>
 {
 	public TVMCommands()
 	{
@@ -25,15 +30,37 @@ public class TVMCommands extends CommandSet
 		addCommand(false, TVMCommands::getTargets, "t", "targets");
 	}
 
+	public static void displayParty(DiscordGame game, Message message)
+	{
+		Phase currentPhase = game.getCurrentPhase();
+		MessageChannel channelUsed = message.getChannel();
+		if (currentPhase instanceof Accusation)
+		{
+			Accusation acc = (Accusation)currentPhase;
+			channelUsed.sendMessage(acc.generateList()).queue();
+			return;
+		}
+
+		String description = "";
+		String format = "%d. <@%d> ";
+		for (int x = 1; x <= game.getPlayersCache().size(); ++x)
+		{
+			DiscordGamePerson p = game.getPlayersCache().get(x - 1);
+			description += String.format(format, x, p.getID()) + (p.isDisconnected() ? "(d)\n" : "\n");
+		}
+		MessageEmbed embed = new EmbedBuilder().setColor(Color.GREEN).setTitle("Party members").setDescription(description).build();
+		channelUsed.sendMessage(embed).queue();
+	}
+
 	public static void activateAbility(DiscordGame game, Message message)
 	{
-		Person user = game.getPerson(message.getMember());
-		user.sendMessage(user.ability(getPersonsFromMessage(game, message)));
+		DiscordGamePerson user = game.getPerson(message.getMember());
+		user.sendMessage(user.getRole().ability(user, getPersonsFromMessage(game, message)));
 	}
 
 	public static void cancel(DiscordGame game, Message message)
 	{
-		Person user = game.getPerson(message.getMember());
+		DiscordGamePerson user = game.getPerson(message.getMember());
 		Phase currentPhase = game.getCurrentPhase();
 		if (currentPhase instanceof Accusation)
 		{
@@ -51,13 +78,14 @@ public class TVMCommands extends CommandSet
 			return;
 		}
 
-		message.getChannel().sendMessage(user.cancel()).queue();
+		user.clearTownEvent();
+		message.getChannel().sendMessage("Cancelled action").queue();
 	}
 
 	public static void roleHelp(DiscordGame game, Message message)
 	{
-		Person user = game.getPerson(message.getMember());
-		user.sendMessage(user.getHelp());
+		DiscordGamePerson user = game.getPerson(message.getMember());
+		user.sendMessage(user.getRole().getHelp());
 	}
 
 	public static void vote(DiscordGame game, Message message)
@@ -69,7 +97,7 @@ public class TVMCommands extends CommandSet
 			return;
 		}
 
-		List<Person> referenced = getPersonsFromMessage(game, message);
+		List<DiscordGamePerson> referenced = getPersonsFromMessage(game, message);
 		if (referenced == null)
 		{
 			System.out.println("Thing was null mate");
@@ -78,13 +106,13 @@ public class TVMCommands extends CommandSet
 
 		if (referenced.isEmpty())
 		{
-			message.getChannel().sendMessage("You have to vote one person! Ex: `" + game.config.getPrefix() + "vote 2`").queue();
+			message.getChannel().sendMessage("You have to vote one person! Ex: `" + game.getPrefix() + "vote 2`").queue();
 			return;
 		}
 
 		if (referenced.size() > 1)
 		{
-			message.getChannel().sendMessage("You can only vote one person! Ex: `" + game.config.getPrefix() + "vote 2`").queue();
+			message.getChannel().sendMessage("You can only vote one person! Ex: `" + game.getPrefix() + "vote 2`").queue();
 			return;
 		}
 
@@ -97,7 +125,7 @@ public class TVMCommands extends CommandSet
 
 	public static void guilty(DiscordGame game, Message message)
 	{
-		Person user = game.getPerson(message.getMember());
+		DiscordGamePerson user = game.getPerson(message.getMember());
 		Phase currentPhase = game.getCurrentPhase();
 
 		if (!(currentPhase instanceof Judgment))
@@ -115,7 +143,7 @@ public class TVMCommands extends CommandSet
 
 	public static void innocent(DiscordGame game, Message message)
 	{
-		Person user = game.getPerson(message.getMember());
+		DiscordGamePerson user = game.getPerson(message.getMember());
 		Phase currentPhase = game.getCurrentPhase();
 
 		if (!(currentPhase instanceof Judgment))
@@ -133,8 +161,8 @@ public class TVMCommands extends CommandSet
 
 	public static void getTargets(DiscordGame game, Message message)
 	{
-		Person user = game.getPerson(message.getMember());
-		List<Person> targets = user.getPossibleTargets();
+		DiscordGamePerson user = game.getPerson(message.getMember());
+		List<DiscordGamePerson> targets = user.getRole().getPossibleTargets(user);
 
 		if (targets == null || targets.isEmpty())
 		{
@@ -144,31 +172,34 @@ public class TVMCommands extends CommandSet
 
 		String description = "";
 		String format = "%d. <@%d> ";
-		for (Person p : targets)
-			description += String.format(format, p.getNum(), p.getID()) + (p.isDisconnected() ? "(d)\n" : "\n");
+		for (int x = 1; x < game.getPlayersCache().size(); ++x)
+		{
+			DiscordGamePerson p = game.getPlayersCache().get(x - 1);
+			description += String.format(format, x, p.getID()) + (p.isDisconnected() ? "(d)\n" : "\n");
+		}
 		MessageEmbed embed = new EmbedBuilder().setColor(Color.GREEN).setTitle("Possible targets").setDescription(description).build();
 		user.sendMessage(embed);
 	}
 
-	private static List<Person> getPersonsFromMessage(DiscordGame game, Message message)
+	private static List<DiscordGamePerson> getPersonsFromMessage(DiscordGame game, Message message)
 	{
-		List<Person> references = getPersonsFromMessageUsingNumReferences(game, message);
+		List<DiscordGamePerson> references = getPersonsFromMessageUsingNumReferences(game, message);
 		if (references != null)
 			return references;
 
 		return getPersonsFromMessageUsingMentions(game, message);
 	}
 
-	private static List<Person> getPersonsFromMessageUsingMentions(DiscordGame game, Message message)
+	private static List<DiscordGamePerson> getPersonsFromMessageUsingMentions(DiscordGame game, Message message)
 	{
 		List<Member> members = message.getMentionedMembers();
-		ArrayList<Person> mentioned = new ArrayList<>();
+		ArrayList<DiscordGamePerson> mentioned = new ArrayList<>();
 
 		if (members.size() == 0) return mentioned;
 
 		for (Member m : members)
 		{
-			Person p = game.getPerson(m);
+			DiscordGamePerson p = game.getPerson(m);
 			if (p == null)
 			{
 				message.getChannel().sendMessage(String.format("Person <@%d> isn't a player", m.getIdLong())).queue();
@@ -180,9 +211,9 @@ public class TVMCommands extends CommandSet
 		return mentioned;
 	}
 
-	private static List<Person> getPersonsFromMessageUsingNumReferences(DiscordGame game, Message message)
+	private static List<DiscordGamePerson> getPersonsFromMessageUsingNumReferences(DiscordGame game, Message message)
 	{
-		ArrayList<Person> references = new ArrayList<>();
+		ArrayList<DiscordGamePerson> references = new ArrayList<>();
 		String[] words = message.getContentStripped().split(" ");
 		if (words.length == 1) return references;
 		for (int x = 1; x < words.length; ++x)
@@ -198,7 +229,7 @@ public class TVMCommands extends CommandSet
 				return null;
 			}
 
-			Person reference = game.getPerson(personNum);
+			DiscordGamePerson reference = game.getPerson(personNum);
 			if (reference == null)
 			{
 				message.getChannel().sendMessage(String.format("Person with number %d doesn't exist", personNum)).queue();

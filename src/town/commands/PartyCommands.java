@@ -1,11 +1,19 @@
 package town.commands;
 
+import java.awt.Color;
+
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.MessageEmbed;
+import town.DiscordGame;
 import town.DiscordGameConfig;
 import town.GameParty;
+import town.MainListener;
 import town.PartyIsEmptyException;
 import town.PartyIsFullException;
+import town.persons.LobbyPerson;
 
 public class PartyCommands extends CommandSet<GameParty>
 {
@@ -33,8 +41,14 @@ public class PartyCommands extends CommandSet<GameParty>
 		else
 		{
 			message.getChannel().sendMessage("Game has started! Creating server...").queue();
-			// TODO: Make a server here
-//			DiscordGame.createServer();
+			DiscordGame game = DiscordGame.createServer(p, message.getIdLong());
+			// Add game to main listener
+			JDA jda = message.getJDA();
+			MainListener ml = null;
+			for (Object obj : jda.getRegisteredListeners())
+				if (obj instanceof MainListener)
+					ml = (MainListener)obj;
+			ml.addDiscordGame(game, p);
 		}
 	}
 
@@ -123,6 +137,20 @@ public class PartyCommands extends CommandSet<GameParty>
 
 		String message = String.format("You've been removed from the party <@%d>", id);
 		channelUsed.sendMessage(message).queue();
+	}
+
+	public static void displayParty(GameParty game, Message message)
+	{
+		MessageChannel channelUsed = message.getChannel();
+		String description = "";
+		String format = "%d. <@%d> ";
+		for (int x = 1; x <= game.getPlayersCache().size(); ++x)
+		{
+			LobbyPerson p = game.getPlayersCache().get(x - 1);
+			description += String.format(format, x, p.getID());
+		}
+		MessageEmbed embed = new EmbedBuilder().setColor(Color.GREEN).setTitle("Party members").setDescription(description).build();
+		channelUsed.sendMessage(embed).queue();
 	}
 
 //	public static void noMin(GameParty party, Message message)

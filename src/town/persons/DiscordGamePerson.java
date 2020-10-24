@@ -96,7 +96,7 @@ public class DiscordGamePerson implements Person
 	@Nonnull
 	public String getRealName()
 	{
-		return game.getUser(this).getName();
+		return game.getMemberFromGame(this).getEffectiveName();
 	}
 
 	/**
