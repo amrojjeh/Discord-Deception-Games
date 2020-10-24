@@ -3,6 +3,12 @@ package town.games.parser;
 import java.util.ArrayList;
 
 import town.games.GameMode;
+import town.mafia.roles.Civilian;
+import town.mafia.roles.Doctor;
+import town.mafia.roles.Lookout;
+import town.mafia.roles.Medium;
+import town.mafia.roles.SerialKiller;
+import town.roles.Role;
 import town.util.JavaHelper;
 
 public class GameParser
@@ -62,29 +68,44 @@ public class GameParser
 
 	public static RoleInfo getRoleFromTuple(String tuple)
 	{
-//		String[] splitTuple = tuple.split(" ");
-//		Integer roleMax = JavaHelper.parseInt(splitTuple[splitTuple.length - 1].replace("+", ""));
-//		if (roleMax == null)
-//			throw new IllegalArgumentException("No role max was passed in the tuple: " + tuple);
-//		splitTuple[splitTuple.length - 1] = "";
-//		String roleName = String.join(" ", splitTuple);
-//
-//		Role role = Role.getRoleFromName(roleName.strip());
-//		if (role == null)
-//			throw new IllegalArgumentException("Role name (" + roleName.strip() + ") not found in: **" + tuple + "**");
-//		return new Role(role, roleMax, tuple.charAt(tuple.length() - 1) == '+');
-		throw new UnsupportedOperationException();
+		String[] splitTuple = tuple.split(" ");
+		Integer roleMax = JavaHelper.parseInt(splitTuple[splitTuple.length - 1].replace("+", ""));
+		if (roleMax == null)
+			throw new IllegalArgumentException("No role max was passed in the tuple: " + tuple);
+		splitTuple[splitTuple.length - 1] = "";
+		String roleName = String.join(" ", splitTuple);
 
+		Role role = getRoleFromName(roleName.strip().toLowerCase());
+		if (role == null)
+			throw new IllegalArgumentException("Role name (" + roleName.strip() + ") not found in: **" + tuple + "**");
+		return new RoleInfo(role, roleMax, tuple.charAt(tuple.length() - 1) == '+');
+	}
+
+	public static Role getRoleFromName(String roleName)
+	{
+		switch (roleName)
+		{
+		case "serial killer":
+			return new SerialKiller();
+		case "doctor":
+			return new Doctor();
+		case "medium":
+			return new Medium();
+		case "civilian":
+			return new Civilian();
+		case "lookout":
+			return new Lookout();
+		default:
+			return null;
+		}
 	}
 
 	public static int calculateImplicitTotalPlayers(ArrayList<RoleInfo> singleRoles)
 	{
 		int sum = 0;
-//		for (Role sr : singleRoles)
-//			sum += sr.max;
-//		return sum;
-		throw new UnsupportedOperationException();
-
+		for (RoleInfo sr : singleRoles)
+			sum += sr.max;
+		return sum;
 	}
 
 	public static int getExplicitTotalPlayers(String str)

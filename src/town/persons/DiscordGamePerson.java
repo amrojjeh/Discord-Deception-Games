@@ -37,11 +37,12 @@ public class DiscordGamePerson implements Person
 	* @param game The Discord Game which the person is in.
 	* @param id The Discord ID which represents the actual discord user.
 	*/
-	public DiscordGamePerson(@Nonnull DiscordGame game, long id)
+	public DiscordGamePerson(@Nonnull DiscordGame game, long id, @Nonnull Role role)
 	{
 		if (game == null) throw new NullPointerException("DiscordGame game cannot be null");
 		this.game = game;
 		this.id = id;
+		setRole(role);
 	}
 
 	/**
@@ -103,7 +104,7 @@ public class DiscordGamePerson implements Person
 	 * Get the person's role. Ex. Civillian, Serial Killer...
 	 * @return The person's role.
 	 */
-	@Nullable
+	@Nonnull
 	public Role getRole()
 	{
 		return role;
@@ -113,17 +114,19 @@ public class DiscordGamePerson implements Person
 	 * Set the person's role. Automatically constructs initial role data.
 	 * @param role The role which the person will assume.
 	 */
-	public void setRole(Role role)
+	public void setRole(@Nonnull Role role)
 	{
 		this.role = role;
+		if (role == null) throw new IllegalArgumentException("Role was null");
 		this.roleData = role.getInitialRoleData();
+		if (roleData == null) throw new IllegalArgumentException("No roledata found from " + role.getName());
 	}
 
 	/**
 	 * Returns the role data associated with person.
 	 * @return The Role data associated with person.
 	 */
-	@Nullable
+	@Nonnull
 	public RoleData getRoleData()
 	{
 		return roleData;

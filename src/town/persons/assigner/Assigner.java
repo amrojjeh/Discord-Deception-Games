@@ -4,11 +4,20 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import town.DiscordGame;
-import town.persons.Person;
+import town.GameParty;
+import town.persons.DiscordGamePerson;
+import town.persons.LobbyPerson;
+import town.roles.Role;
 
 public class Assigner
 {
-	ArrayList<RoleAssigner> roles = new ArrayList<>();
+	private ArrayList<RoleAssigner> roles = new ArrayList<>();
+	private final int minimumRequiredPlayers;
+
+	public Assigner(int minimumPlayers)
+	{
+		this.minimumRequiredPlayers = minimumPlayers;
+	}
 
 	public void addRole(RoleAssigner assigner)
 	{
@@ -20,14 +29,27 @@ public class Assigner
 		return roles;
 	}
 
-	public Person generatePerson(DiscordGame game, int baseNumberOfPlayers, int refNum, long id)
+	public ArrayList<DiscordGamePerson> assignRoles(GameParty party, DiscordGame game)
+	{
+		ArrayList<DiscordGamePerson> people = new ArrayList<>();
+		for (LobbyPerson person : party.getPlayersCache())
+		{
+			Role role = getRole(game, minimumRequiredPlayers, party.getPlayerSize(), person);
+			DiscordGamePerson player = new DiscordGamePerson(game, person.getID(), role);
+			people.add(player);
+		}
+		return people;
+	}
+
+	private Role getRole(DiscordGame game, int min, int total, LobbyPerson person)
 	{
 		Random random = new Random();
 		int randNum;
 		do
 		{
 			randNum = random.nextInt(roles.size());
-		} while (!roles.get(randNum).check(baseNumberOfPlayers, refNum));
-		return roles.get(randNum).getPerson(game, refNum, id);
+		} while (!roles.get(randNum).check(min, total));
+
+		return roles.get(randNum).useRole();
 	}
 }

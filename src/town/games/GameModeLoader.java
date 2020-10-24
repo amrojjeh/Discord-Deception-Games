@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import town.games.parser.GameParser;
-import town.mafia.games.Mashup;
 import town.util.JavaHelper;
 
 public class GameModeLoader
@@ -30,7 +29,7 @@ public class GameModeLoader
 		return loadedGameModes;
 	}
 
-	public static List<GameMode> loadGameModesFromFolder(String relativePath)
+	public static ArrayList<GameMode> loadGameModesFromFolder(String relativePath)
 	{
 		ArrayList<GameMode> games = new ArrayList<>();
 		try (Stream<Path> paths = Files.walk(Paths.get(relativePath)))
@@ -81,7 +80,7 @@ public class GameModeLoader
 	public static List<GameMode> loadSpecialGameModes()
 	{
 		specialGameModes.clear();
-		specialGameModes.add(new Mashup());
+//		specialGameModes.add(new Mashup());
 		return specialGameModes;
 	}
 

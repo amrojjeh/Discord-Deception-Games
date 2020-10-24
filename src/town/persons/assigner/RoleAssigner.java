@@ -1,32 +1,32 @@
 package town.persons.assigner;
 
-import town.DiscordGame;
-import town.persons.Person;
 import town.roles.Role;
 
-public abstract class RoleAssigner
+public class RoleAssigner
 {
-	int amount = 0;
-	int maxAmount = -1;
-	boolean isDefault = false;
+	private final Role role;
+	private int amount = 0;
+	private int maxAmount = -1;
+	private boolean isDefault = false;
 
-	RoleAssigner()
+	public RoleAssigner(Role role)
 	{
-
+		this.role = role;
 	}
 
-	RoleAssigner(int maxAmount)
+	public RoleAssigner(Role role, int max)
 	{
-		this.maxAmount = maxAmount;
+		maxAmount = max;
+		this.role = role;
 	}
 
-	public boolean check(int baseTotalOfPlayers, int totalPlayers)
+	public boolean check(int min, int totalPlayers)
 	{
 		if (maxAmount == -1) return true;
 		// Adjust maxAmount if default is set
 		int newMax = maxAmount;
-		if (isDefault && totalPlayers >= baseTotalOfPlayers)
-			newMax = totalPlayers - baseTotalOfPlayers + maxAmount;
+		if (isDefault && totalPlayers >= min)
+			newMax = totalPlayers - min + maxAmount;
 
 		return amount < newMax;
 	}
@@ -42,11 +42,20 @@ public abstract class RoleAssigner
 		return maxAmount;
 	}
 
+	public Role getRole()
+	{
+		return role;
+	}
+
+	public Role useRole()
+	{
+		++amount;
+		return role;
+	}
+
 	public void setDefault(boolean value)
 	{
 		isDefault = value;
 	}
 
-	public abstract Person getPerson(DiscordGame game, int ref, long id);
-	public abstract Role[] getTownRoles();
 }

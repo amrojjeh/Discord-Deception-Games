@@ -90,7 +90,7 @@ public class GameMode
 		int totalPlayers = game.getPlayersCache().size();
 		Assigner assigner;
 		Rule ruleFloor = getClosestRule(totalPlayers);
-//		assigner = ruleFloor.buildAssigner();
+		assigner = ruleFloor.buildAssigner();
 //		int basePlayers = ruleFloor.totalPlayers;
 //		game.getPlayersCache().replaceAll(person -> assigner.generatePerson(game, basePlayers, person.getNum(), person.getID()));
 		throw new UnsupportedOperationException();

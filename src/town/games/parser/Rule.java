@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import town.persons.assigner.Assigner;
-import town.persons.assigner.GeneralAssigner;
+import town.persons.assigner.RoleAssigner;
 import town.roles.Role;
 
 public class Rule
@@ -41,10 +41,10 @@ public class Rule
 
 	public Assigner buildAssigner()
 	{
-		Assigner assigner = new Assigner();
+		Assigner assigner = new Assigner(totalPlayers);
 		for (RoleInfo sr : roles)
 		{
-			GeneralAssigner ga = new GeneralAssigner(sr.role, sr.max);
+			RoleAssigner ga = new RoleAssigner(sr.role, sr.max);
 			ga.setDefault(sr.isDefault);
 			assigner.addRole(ga);
 		}

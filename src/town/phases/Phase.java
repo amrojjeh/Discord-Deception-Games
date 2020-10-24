@@ -14,7 +14,7 @@ public abstract class Phase extends TimerTask
 	{
 		phaseManager = pm;
 		this.game = game;
-		getGame().getPlayersCache().forEach(person -> person.onPhaseChange(this));
+		getGame().getPlayersCache().forEach(person -> person.getRole().onPhaseChange(person, this));
 	}
 
 	public DiscordGame getGame()

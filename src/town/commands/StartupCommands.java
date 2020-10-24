@@ -4,6 +4,7 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import town.GameParty;
 import town.MainListener;
+import town.PartyIsFullException;
 
 public class StartupCommands extends CommandSet<MainListener>
 {
@@ -43,6 +44,13 @@ public class StartupCommands extends CommandSet<MainListener>
 			}
 
 			ml.addGameParty(party);
+			try {
+				// TODO: Make him game leader automatically when he first joins
+				party.joinGame(message.getMember());
+				party.setGameLeader(party.getPerson(message.getMember()));
+			} catch (PartyIsFullException e) {
+				e.panicInDiscord(channelUsed);
+			}
 		}
 	}
 }

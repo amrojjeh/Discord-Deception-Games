@@ -23,6 +23,7 @@ public class PartyCommands extends CommandSet<GameParty>
 		addCommand(false, PartyCommands::joinGame, "join");
 		addCommand(false, PartyCommands::leave, "leave");
 		addCommand(true, PartyCommands::setGame, "setgame");
+		addCommand(false, PartyCommands::displayParty, "party");
 //		addCommand(true, PartyCommands::noMin, "nomin");
 //		addCommand(true, PartyCommands::setRand, "setrand");
 	}

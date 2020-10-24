@@ -27,6 +27,7 @@ public class TVMCommands extends CommandSet<DiscordGame>
 		addCommand(false, TVMCommands::guilty, "g", "guilty");
 		addCommand(false, TVMCommands::innocent, "i", "inno", "innocent");
 		addCommand(false, TVMCommands::getTargets, "t", "targets");
+		addCommand(false, TVMCommands::displayParty, "p", "party");
 	}
 
 	public static void displayParty(DiscordGame game, Message message)
