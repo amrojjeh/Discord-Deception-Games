@@ -6,6 +6,7 @@ import java.util.HashMap;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import town.DiscordGame;
+import town.persons.DiscordGamePerson;
 import town.persons.Person;
 import town.phases.Phase;
 import town.phases.PhaseManager;
@@ -15,8 +16,8 @@ import town.phases.PhaseManager;
 public class Accusation extends Phase
 {
 	long msgID;
-	HashMap<Person, Integer> numOfVotes = new HashMap<>();
-	HashMap<Person, Person> voters = new HashMap<>();
+	HashMap<DiscordGamePerson, Integer> numOfVotes = new HashMap<>();
+	HashMap<DiscordGamePerson, DiscordGamePerson> voters = new HashMap<>();
 	int numVotesNeeded;
 	int numTrials;
 
@@ -32,7 +33,7 @@ public class Accusation extends Phase
 	{
 		getGame().sendMessageToTextChannel("daytime_discussion", "The Accusation phase has started. **There are "
 				+ numTrials + " left in the day**. Vote up a person with `!vote [num|@mention]`.")
-		.flatMap(msg -> getGameMode().sendMessageToTextChannel("daytime_discussion", generateList()))
+		.flatMap(msg -> getGame().sendMessageToTextChannel("daytime_discussion", generateList()))
 		.queue(message -> {msgID = message.getIdLong(); message.pin().queue();});
 		getPhaseManager().setWarningInSeconds(5);
 	}
@@ -52,7 +53,7 @@ public class Accusation extends Phase
 	public void putPlayerOnTrial(Person p)
 	{
 		getPhaseManager().end();
-		getGame().getGameGuild().modifyMemberRoles(getGame().getMemberFromGame(p), getGame().getRole("defendant"))
+		getGame().getGuild().modifyMemberRoles(getGame().getMemberFromGame(p), getGame().getRole("defendant"))
 		.queue();
 		getPhaseManager().start(getGame(), new Trial(getGame(), getPhaseManager(), p, numTrials - 1));
 	}
@@ -60,12 +61,12 @@ public class Accusation extends Phase
 	public MessageEmbed generateList()
 	{
 		String description = "";
-		for (Person p : getGame().getAlivePlayers())
+		for (DiscordGamePerson p : getGame().getAlivePlayers())
 		{
 			Integer vote = numOfVotes.get(p);
 			if (vote == null) vote = 0;
 			description += "(votes " + vote + ") ";
-			description += p.getNum() + ". <@" + p.getID() + ">\n";
+			description += ". <@" + p.getID() + ">\n";
 		}
 		return new EmbedBuilder().setTitle("Players Alive").setColor(Color.GREEN).setDescription(description).build();
 	}
@@ -77,9 +78,9 @@ public class Accusation extends Phase
 		.queue();
 	}
 
-	public String vote(Person accuser, Person accused)
+	public String vote(DiscordGamePerson accuser, DiscordGamePerson accused)
 	{
-		Person previousAccused = voters.get(accuser);
+		DiscordGamePerson previousAccused = voters.get(accuser);
 		String message = "";
 
 		if (!accused.isAlive())
@@ -107,9 +108,9 @@ public class Accusation extends Phase
 		return message + String.format("<@%d> (%d) was accused by <@%d>", accused.getID(), numOfVotes.get(accused), accuser.getID());
 	}
 
-	public String cancelVote(Person accuser)
+	public String cancelVote(DiscordGamePerson accuser)
 	{
-		Person previousAccused = voters.get(accuser);
+		DiscordGamePerson previousAccused = voters.get(accuser);
 		if (previousAccused == null)
 			return "No vote to cancel";
 
