@@ -7,7 +7,6 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import town.DiscordGame;
 import town.persons.DiscordGamePerson;
-import town.persons.Person;
 import town.phases.Phase;
 import town.phases.PhaseManager;
 
@@ -50,7 +49,7 @@ public class Accusation extends Phase
 		return 120;
 	}
 
-	public void putPlayerOnTrial(Person p)
+	public void putPlayerOnTrial(DiscordGamePerson p)
 	{
 		getPhaseManager().end();
 		getGame().getGuild().modifyMemberRoles(getGame().getMemberFromGame(p), getGame().getRole("defendant"))

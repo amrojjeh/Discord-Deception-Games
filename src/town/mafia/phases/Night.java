@@ -4,6 +4,7 @@ import town.DiscordGame;
 import town.persons.DiscordGamePerson;
 import town.phases.Phase;
 import town.phases.PhaseManager;
+import town.roles.Role;
 import town.util.RestHelper;
 
 public class Night extends Phase
@@ -16,10 +17,10 @@ public class Night extends Phase
 	@Override
 	public void start()
 	{
-		getGame().getPlayers().forEach(person -> checkVictory(person));
+		getGame().getPlayersCache().forEach(person -> checkVictory(person));
 
-		if (getGame().hasEnded())
-			return;
+//		if (getGame().hasEnded())
+//			return;
 
 		RestHelper.queueAll
 		(
@@ -27,21 +28,22 @@ public class Night extends Phase
 				getGame().setChannelVisibility("player", "daytime_discussion", true, false)
 		);
 
-		getGame().getPlayers().forEach(person -> person.sendMessage("Night " + getGameMode().getDayNum() + " started"));
+		getGame().getPlayersCache().forEach(person -> person.sendMessage("Night " + getGame().getDayNum() + " started"));
 		getPhaseManager().setWarningToAll(5);
 	}
 
 	public void checkVictory(DiscordGamePerson person)
 	{
-		if (!person.hasWon() && person.canWin())
-			person.win();
+		Role role = person.getRole();
+		if (!role.hasWon(person) && role.canWin(person))
+			role.win(person);
 	}
 
 	@Override
 	public void end()
 	{
 		getGame().dispatchEvents();
-		getGame().nextDayStarted();
+		getGame().startNextDay();
 	}
 
 	@Override

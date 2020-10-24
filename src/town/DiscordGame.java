@@ -503,21 +503,21 @@ public class DiscordGame
 		return role.getManager().setPermissions(Permission.VOICE_SPEAK);
 	}
 
-//	public RoleManager muteAllInRoleExcept(String roleName, boolean shouldMute, Person p)
-//	{
-//		Role role = getRole(roleName);
-//		List<Member> members = getGameGuild().getMembersWithRoles(role);
-//		for (Member member : members)
-//		{
-//			Person person = getPerson(member);
-//			if (person != p)
-//				person.mute(shouldMute);
-//		}
-//		if (shouldMute)
-//			return role.getManager().revokePermissions(Permission.VOICE_SPEAK);
-//		return role.getManager().setPermissions(Permission.VOICE_SPEAK);
-//	}
-//
+	public RoleManager muteAllInRoleExcept(String roleName, boolean shouldMute, DiscordGamePerson p)
+	{
+		net.dv8tion.jda.api.entities.Role role = getRole(roleName);
+		List<Member> members = getGuild().getMembersWithRoles(role);
+		for (Member member : members)
+		{
+			DiscordGamePerson person = getPerson(member);
+			if (person != p)
+				person.mute(shouldMute);
+		}
+		if (shouldMute)
+			return role.getManager().revokePermissions(Permission.VOICE_SPEAK);
+		return role.getManager().setPermissions(Permission.VOICE_SPEAK);
+	}
+
 //	public void gameGuildVoiceJoin(Member m, VoiceChannel channel)
 //	{
 //		if (!initiated) return;
@@ -566,10 +566,10 @@ public class DiscordGame
 		return dayNum;
 	}
 
-//	public void nextDayStarted()
-//	{
-//		dayNum++;
-//	}
+	public void startNextDay()
+	{
+		dayNum++;
+	}
 
 	public RestAction<Void> modifyMemberRoles(Person person, String... roleNames)
 	{

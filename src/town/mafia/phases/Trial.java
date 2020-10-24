@@ -1,7 +1,7 @@
 package town.mafia.phases;
 
 import town.DiscordGame;
-import town.persons.Person;
+import town.persons.DiscordGamePerson;
 import town.phases.Phase;
 import town.phases.PhaseManager;
 import town.util.RestHelper;
@@ -10,17 +10,17 @@ import town.util.RestHelper;
 //to defend themselves without any outside noise. After this, their fate is judged by the town.
 public class Trial extends Phase
 {
-	Person defendant;
+	DiscordGamePerson defendant;
 	int numTrials;
 
-	public Trial(DiscordGame game, PhaseManager pm, Person p, int numTrials)
+	public Trial(DiscordGame game, PhaseManager pm, DiscordGamePerson p, int numTrials)
 	{
 		super(game, pm);
 		defendant = p;
 		this.numTrials = numTrials;
 	}
 
-	public Person getDefendant()
+	public DiscordGamePerson getDefendant()
 	{
 		return defendant;
 	}
