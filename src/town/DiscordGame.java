@@ -45,10 +45,12 @@ public class DiscordGame
 	private HashMap<String, Long> channels = new HashMap<>();
 	private HashMap<String, Long> roles = new HashMap<>();
 	private HashSet<Faction> wonTownRoles = new HashSet<Faction>();
-	private LinkedList<Person> savedForMorning = new LinkedList<>();
 	private PriorityQueue<TownEvent> events = new PriorityQueue<>();
 	private PhaseManager phaseManager = new PhaseManager();
+
+	private LinkedList<DiscordGamePerson> savedForMorning = new LinkedList<>();
 	private ArrayList<DiscordGamePerson> players = new ArrayList<>();
+
 	private int dayNum = 1;
 
 	boolean initiated = false;
@@ -535,23 +537,23 @@ public class DiscordGame
 		return wonTownRoles.contains(faction);
 	}
 
-	public void saveForMorning(Person p)
+	public void saveForMorning(DiscordGamePerson p)
 	{
 		savedForMorning.add(p);
 	}
 
-//	public Person getDeathForMorning()
-//	{
-//		if (savedForMorning.isEmpty())
-//			return null;
-//		return savedForMorning.pop();
-//	}
-//
-//	public Person peekDeathForMorning()
-//	{
-//		return savedForMorning.peek();
-//	}
-//
+	public DiscordGamePerson getDeathForMorning()
+	{
+		if (savedForMorning.isEmpty())
+			return null;
+		return savedForMorning.pop();
+	}
+
+	public DiscordGamePerson peekDeathForMorning()
+	{
+		return savedForMorning.peek();
+	}
+
 //	public void memberLeftGameGuild(Member member)
 //	{
 //		Person person = getPerson(member);

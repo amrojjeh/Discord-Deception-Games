@@ -1,7 +1,7 @@
 package town.mafia.phases;
 
 import town.DiscordGame;
-import town.persons.Person;
+import town.persons.DiscordGamePerson;
 import town.phases.Phase;
 import town.phases.PhaseManager;
 
@@ -19,8 +19,8 @@ public class Morning extends Phase
 	{
 		if (getGame().peekDeathForMorning() == null)
 			return;
-		Person person = getGame().getDeathForMorning();
-		getGame().sendMessageToTextChannel("daytime_discussion", person.getCauseOfDeath() + "\nTheir role was: " + person.getType().getName())
+		DiscordGamePerson person = getGame().getDeathForMorning();
+		getGame().sendMessageToTextChannel("daytime_discussion", person.getCauseOfDeath() + "\nTheir role was: " + person.getRole().getName())
 		.queue();
 		if (getGame().peekDeathForMorning() != null)
 			nextPhase = new Morning(getGame(), getPhaseManager());
