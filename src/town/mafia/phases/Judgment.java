@@ -7,20 +7,20 @@ import java.util.List;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import town.DiscordGame;
-import town.persons.Person;
+import town.persons.DiscordGamePerson;
 import town.phases.Phase;
 import town.phases.PhaseManager;
 
 //Judgment is the moment of fate. All players still alive vote on the life of the defendant.
 public class Judgment extends Phase
 {
-	Person defendant;
-	HashMap<Person, voteType> votes = new HashMap<>();
+	DiscordGamePerson defendant;
+	HashMap<DiscordGamePerson, voteType> votes = new HashMap<>();
 	int guilty = 0;
 	int innocent = 0;
 	int numTrials;
 
-	public Judgment(DiscordGame game, PhaseManager pm, Person p, int numTrials)
+	public Judgment(DiscordGame game, PhaseManager pm, DiscordGamePerson p, int numTrials)
 	{
 		super(game, pm);
 		defendant = p;
@@ -51,7 +51,7 @@ public class Judgment extends Phase
 		else if(numTrials > 0)
 		{
 			if (!defendant.isDisconnected())
-				getGame().getGameGuild().modifyMemberRoles(getGame().getMemberFromGame(defendant), getGame().getRole("player")).queue();
+				getGame().getGuild().modifyMemberRoles(getGame().getMemberFromGame(defendant), getGame().getRole("player")).queue();
 			return new Accusation(getGame(), getPhaseManager(), numTrials);
 		}
 		else
@@ -65,7 +65,7 @@ public class Judgment extends Phase
 		return 40;
 	}
 
-	public String guilty(Person person)
+	public String guilty(DiscordGamePerson person)
 	{
 		if (person == defendant)
 			return defendantVoting();
@@ -77,7 +77,7 @@ public class Judgment extends Phase
 		return String.format("<@%d> Voted guilty", person.getID());
 	}
 
-	public String innocent(Person person)
+	public String innocent(DiscordGamePerson person)
 	{
 		if (person == defendant)
 			return defendantVoting();
@@ -89,7 +89,7 @@ public class Judgment extends Phase
 		return String.format("<@%d> Voted innocent", person.getID());
 	}
 
-	public String abstain(Person person)
+	public String abstain(DiscordGamePerson person)
 	{
 		if (person == defendant)
 			return defendantVoting();
@@ -113,8 +113,8 @@ public class Judgment extends Phase
 
 	private void loadPlayers()
 	{
-		List<Person> persons = getGame().getAlivePlayers();
-		for (Person p : persons)
+		List<DiscordGamePerson> persons = getGame().getAlivePlayers();
+		for (DiscordGamePerson p : persons)
 			if (p != defendant)
 				votes.put(p, voteType.ABSTAINED);
 	}
