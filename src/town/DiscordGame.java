@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.PriorityQueue;
 
 import net.dv8tion.jda.api.JDA;
@@ -17,6 +18,7 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.VoiceChannel;
+import net.dv8tion.jda.api.managers.RoleManager;
 import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.requests.restaction.GuildAction;
 import net.dv8tion.jda.api.requests.restaction.GuildAction.RoleData;
@@ -433,14 +435,14 @@ public class DiscordGame
 //		if (shouldKick)
 //			member.kick("He was not part of the lobby").queue();
 //	}
-//
-//	public RestAction<?> toggleVC(String channelName, boolean show)
-//	{
-//		if (!show)
-//			return getVoiceChannel(channelName).delete();
-//		else
-//			return getGameGuild().createVoiceChannel("Daytime");
-//	}
+
+	public RestAction<?> toggleVC(String channelName, boolean show)
+	{
+		if (!show)
+			return getVoiceChannel(channelName).delete();
+		else
+			return getGuild().createVoiceChannel("Daytime");
+	}
 
 	public PermissionOverrideAction setChannelVisibility(String roleName, String channelName, boolean read, boolean write)
 	{
@@ -487,28 +489,18 @@ public class DiscordGame
 		return action;
 	}
 
-//	public ArrayList<Person> findAllWithTownRole(Role role) {
-//		ArrayList<Person> peeps = new ArrayList<>();
-//		for(Person p : persons) {
-//			if(p.getType().equals(role)) {
-//				peeps.add(p);
-//			}
-//		}
-//		return peeps;
-//	}
-//
-//	public RoleManager muteAllInRole(String roleName, boolean shouldMute)
-//	{
-//		Role role = getRole(roleName);
-//		List<Member> members = getGameGuild().getMembersWithRoles(role);
-//		for (Member member : members)
-//			getPerson(member).mute(shouldMute);
-//
-//		if (shouldMute)
-//			return role.getManager().revokePermissions(Permission.VOICE_SPEAK);
-//		return role.getManager().setPermissions(Permission.VOICE_SPEAK);
-//	}
-//
+	public RoleManager muteAllInRole(String roleName, boolean shouldMute)
+	{
+		net.dv8tion.jda.api.entities.Role role = getRole(roleName);
+		List<Member> members = getGuild().getMembersWithRoles(role);
+		for (Member member : members)
+			getPerson(member).mute(shouldMute);
+
+		if (shouldMute)
+			return role.getManager().revokePermissions(Permission.VOICE_SPEAK);
+		return role.getManager().setPermissions(Permission.VOICE_SPEAK);
+	}
+
 //	public RoleManager muteAllInRoleExcept(String roleName, boolean shouldMute, Person p)
 //	{
 //		Role role = getRole(roleName);
@@ -566,12 +558,12 @@ public class DiscordGame
 //		if (person != null)
 //			person.disconnect();
 //	}
-//
-//	public int getDayNum()
-//	{
-//		return dayNum;
-//	}
-//
+
+	public int getDayNum()
+	{
+		return dayNum;
+	}
+
 //	public void nextDayStarted()
 //	{
 //		dayNum++;
