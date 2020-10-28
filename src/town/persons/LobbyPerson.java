@@ -3,7 +3,7 @@ package town.persons;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import town.GameParty;
 
-public class LobbyPerson implements Person
+public class LobbyPerson
 {
 	GameParty party;
 	long id;
@@ -14,13 +14,11 @@ public class LobbyPerson implements Person
 		this.id = id;
 	}
 
-	@Override
 	public long getID()
 	{
 		return id;
 	}
 
-	@Override
 	public String getRealName()
 	{
 		return party.getUser(this).getName();

@@ -14,7 +14,7 @@ import town.mafia.phases.Night;
 import town.roles.Role;
 import town.roles.RoleData;
 
-public class DiscordGamePerson implements Person
+public class DiscordGamePerson
 {
 	private final long id;
 	private final DiscordGame game;
@@ -74,7 +74,6 @@ public class DiscordGamePerson implements Person
 	 * Get the person's Discord ID.
 	 * @return the Discord ID.
 	 */
-	@Override
 	public long getID()
 	{
 		return id;
@@ -94,7 +93,6 @@ public class DiscordGamePerson implements Person
 	 * Get the Discord account's name. This is not the nickname of the person.
 	 * @return The account name.
 	 */
-	@Override
 	@Nonnull
 	public String getRealName()
 	{

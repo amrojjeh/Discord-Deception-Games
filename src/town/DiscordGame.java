@@ -30,7 +30,6 @@ import net.dv8tion.jda.api.requests.restaction.MessageAction;
 import net.dv8tion.jda.api.requests.restaction.PermissionOverrideAction;
 import town.events.TownEvent;
 import town.persons.DiscordGamePerson;
-import town.persons.Person;
 import town.phases.Phase;
 import town.phases.PhaseManager;
 import town.roles.Faction;
@@ -151,7 +150,7 @@ public class DiscordGame extends ListenerAdapter
 		.addPermissionOverride(g.getPublicRole(), QP.readPermissions(), QP.writePermissions())
 		.addPermissionOverride(defendantRoleData, QP.readPermissions() | QP.writePermissions(), 0);
 
-		for (Person p : getPlayersCache())
+		for (DiscordGamePerson p : getPlayersCache())
 		{
 			g.newChannel(ChannelType.TEXT, "private")
 			.setPosition(1)
@@ -192,7 +191,7 @@ public class DiscordGame extends ListenerAdapter
 //	}
 //
 
-	public Member getMemberFromGame(Person person)
+	public Member getMemberFromGame(DiscordGamePerson person)
 	{
 		if (!serverCreated) throw new IllegalStateException("Server not created yet");
 		return getMemberFromGame(person.getID());
@@ -339,7 +338,7 @@ public class DiscordGame extends ListenerAdapter
 		return phaseManager.getCurrentPhase();
 	}
 
-	public User getUser(Person person)
+	public User getUser(DiscordGamePerson person)
 	{
 		return getJDA().getUserById(person.getID());
 	}
@@ -553,7 +552,7 @@ public class DiscordGame extends ListenerAdapter
 		dayNum++;
 	}
 
-	public RestAction<Void> modifyMemberRoles(Person person, String... roleNames)
+	public RestAction<Void> modifyMemberRoles(DiscordGamePerson person, String... roleNames)
 	{
 		net.dv8tion.jda.api.entities.Role[] roles = new net.dv8tion.jda.api.entities.Role[roleNames.length];
 		for (int x = 0; x < roleNames.length; ++x)

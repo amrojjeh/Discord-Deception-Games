@@ -11,7 +11,6 @@ import town.mafia.phases.Night;
 import town.persons.AttributeValue;
 import town.persons.Attributes;
 import town.persons.DiscordGamePerson;
-import town.persons.Person;
 import town.roles.EmptyRoleData;
 import town.roles.Faction;
 import town.roles.Role;
@@ -110,7 +109,7 @@ class LookoutTownEvent implements TownEvent
 	private final DiscordGamePerson target;
 	private final Lookout role;
 	private final DiscordGame game;
-	private final ArrayList<Person> visitors = new ArrayList<>();
+	private final ArrayList<DiscordGamePerson> visitors = new ArrayList<>();
 
 	public LookoutTownEvent(DiscordGame game, DiscordGamePerson l, Lookout role, DiscordGamePerson t)
 	{

@@ -14,7 +14,6 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import town.commands.PartyCommands;
 import town.games.parser.Rule;
 import town.persons.LobbyPerson;
-import town.persons.Person;
 
 public class GameParty extends ListenerAdapter
 {
@@ -24,7 +23,7 @@ public class GameParty extends ListenerAdapter
 
 	DiscordGameConfig config;
 	private String prefix;
-	private Person gameLeader;
+	private LobbyPerson gameLeader;
 	private ArrayList<LobbyPerson> persons = new ArrayList<>();
 	private boolean registeredListener;
 
@@ -72,12 +71,12 @@ public class GameParty extends ListenerAdapter
 		return new ArrayList<>(persons);
 	}
 
-	public Person getGameLeader()
+	public LobbyPerson getGameLeader()
 	{
 		return gameLeader;
 	}
 
-	public void setGameLeader(Person p)
+	public void setGameLeader(LobbyPerson p)
 	{
 		gameLeader = p;
 	}
@@ -97,7 +96,7 @@ public class GameParty extends ListenerAdapter
 		return null;
 	}
 
-	public boolean hasPersonJoined(Person person)
+	public boolean hasPersonJoined(LobbyPerson person)
 	{
 		return hasPersonJoined(person.getID());
 	}
@@ -146,7 +145,7 @@ public class GameParty extends ListenerAdapter
 		return registeredListener;
 	}
 
-	public User getUser(Person person)
+	public User getUser(LobbyPerson person)
 	{
 		return getJDA().getUserById(person.getID());
 	}
@@ -203,7 +202,7 @@ public class GameParty extends ListenerAdapter
 		getPlayersCache().remove(getPerson(member));
 	}
 
-	public void leaveGame(Person person) throws PartyIsEmptyException
+	public void leaveGame(LobbyPerson person) throws PartyIsEmptyException
 	{
 		if (isPartyEmpty()) throw new PartyIsEmptyException(this);
 		getPlayersCache().remove(person);

@@ -13,7 +13,6 @@ import town.mafia.roles.data.DoctorData;
 import town.persons.AttributeValue;
 import town.persons.Attributes;
 import town.persons.DiscordGamePerson;
-import town.persons.Person;
 import town.roles.Faction;
 import town.roles.Role;
 import town.roles.RoleData;
@@ -125,7 +124,7 @@ class DoctorTownEvent implements TownEvent
 	private final Doctor role;
 	private final DiscordGamePerson target;
 	private final DiscordGame game;
-	private final ArrayList<Person> visitors = new ArrayList<>();
+	private final ArrayList<DiscordGamePerson> visitors = new ArrayList<>();
 
 	public DoctorTownEvent(DiscordGame game, DiscordGamePerson user, Doctor role, DiscordGamePerson target)
 	{
