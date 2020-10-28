@@ -18,7 +18,7 @@ import town.persons.Person;
 
 public class GameParty extends ListenerAdapter
 {
-	private final JDA jda;
+	private final MainListener ml;
 	private final PartyCommands commands;
 	private final long channelId;
 
@@ -28,9 +28,9 @@ public class GameParty extends ListenerAdapter
 	private ArrayList<LobbyPerson> persons = new ArrayList<>();
 	private boolean registeredListener;
 
-	private GameParty(JDA jda, long channelId, long partyLeaderId)
+	private GameParty(MainListener ml, long channelId, long partyLeaderId)
 	{
-		this.jda = jda;
+		this.ml = ml;
 		this.channelId = channelId;
 		// TODO: Join the party leader and make him leader since no one's in the list
 		config = new DiscordGameConfig();
@@ -42,12 +42,17 @@ public class GameParty extends ListenerAdapter
 
 	public JDA getJDA()
 	{
-		return jda;
+		return ml.getJDA();
 	}
 
-	public static GameParty createParty(JDA jda, TextChannel tc, Member member)
+	public MainListener getMainListener()
 	{
-		GameParty gp = new GameParty(jda, tc.getIdLong(), member.getIdLong());
+		return ml;
+	}
+
+	public static GameParty createParty(MainListener ml, TextChannel tc, Member member)
+	{
+		GameParty gp = new GameParty(ml, tc.getIdLong(), member.getIdLong());
 		gp.registerAsListener(true);
 		return gp;
 	}
@@ -126,12 +131,12 @@ public class GameParty extends ListenerAdapter
 	{
 		if (register && !registeredListener)
 		{
-			jda.addEventListener(this);
+			getJDA().addEventListener(this);
 			registeredListener = true;
 		}
 		else if (!register && registeredListener)
 		{
-			jda.removeEventListener(this);
+			getJDA().removeEventListener(this);
 			registeredListener = false;
 		}
 	}
@@ -143,7 +148,7 @@ public class GameParty extends ListenerAdapter
 
 	public User getUser(Person person)
 	{
-		return jda.getUserById(person.getID());
+		return getJDA().getUserById(person.getID());
 	}
 
 	@Override

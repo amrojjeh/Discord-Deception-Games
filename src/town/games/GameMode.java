@@ -5,10 +5,13 @@ import java.util.HashSet;
 import java.util.Set;
 
 import town.DiscordGame;
+import town.GameParty;
 import town.commands.CommandSet;
 import town.games.parser.Rule;
 import town.mafia.commands.TVMCommands;
+import town.persons.DiscordGamePerson;
 import town.persons.assigner.Assigner;
+import town.persons.assigner.RoleAssigner;
 import town.roles.Role;
 
 public class GameMode
@@ -79,32 +82,26 @@ public class GameMode
 		return rules.get(0).totalPlayers;
 	}
 
-	public void build(DiscordGame game, boolean rand)
+	public ArrayList<DiscordGamePerson> build(GameParty gp, DiscordGame game, boolean rand)
 	{
-		if (rand) buildRand(game);
-		else buildDefault(game);
+		if (rand) return buildRand(gp, game);
+		return buildDefault(gp, game);
 	}
 
-	public void buildDefault(DiscordGame game)
+	public ArrayList<DiscordGamePerson> buildDefault(GameParty gp, DiscordGame game)
 	{
-		int totalPlayers = game.getPlayersCache().size();
-		Assigner assigner;
+		int totalPlayers = gp.getPlayerSize();
 		Rule ruleFloor = getClosestRule(totalPlayers);
-		assigner = ruleFloor.buildAssigner();
-//		int basePlayers = ruleFloor.totalPlayers;
-//		game.getPlayersCache().replaceAll(person -> assigner.generatePerson(game, basePlayers, person.getNum(), person.getID()));
-		throw new UnsupportedOperationException();
-
+		Assigner assigner = ruleFloor.buildAssigner();
+		return assigner.assignRoles(gp, game);
 	}
 
-	public void buildRand(DiscordGame game)
+	public ArrayList<DiscordGamePerson> buildRand(GameParty gp, DiscordGame game)
 	{
-//		Assigner assigner = new Assigner();
-//		for (Role role : roles)
-//			assigner.addRole(new GeneralAssigner(role));
-//		game.getPlayersCache().replaceAll(person -> assigner.generatePerson(game, 0, person.getNum(), person.getID()));
-		throw new UnsupportedOperationException();
-
+		Assigner assigner = new Assigner(0);
+		for (Role role : roles)
+			assigner.addRole(new RoleAssigner(role));
+		return assigner.assignRoles(gp, game);
 	}
 
 	public Rule getClosestRule(int totalPlayers)

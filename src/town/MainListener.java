@@ -5,6 +5,8 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.security.auth.login.LoginException;
 
 import net.dv8tion.jda.api.JDA;
@@ -12,11 +14,15 @@ import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.requests.GatewayIntent;
+import net.dv8tion.jda.api.utils.ChunkingFilter;
+import net.dv8tion.jda.api.utils.MemberCachePolicy;
+import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import town.commands.StartupCommands;
 
 // This listens to discord messages and events. It also manages discord games.
@@ -48,7 +54,13 @@ public class MainListener extends ListenerAdapter
 		try
 		{
 			MainListener ml = new MainListener();
-			ml.jda = new JDABuilder(token).addEventListeners(ml).setActivity(Activity.playing("Try pg.help")).build();
+			ml.jda = JDABuilder.create(token, GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_VOICE_STATES)
+					.disableCache(CacheFlag.ACTIVITY, CacheFlag.EMOTE, CacheFlag.CLIENT_STATUS)
+					.setMemberCachePolicy(MemberCachePolicy.ALL)
+					.setChunkingFilter(ChunkingFilter.ALL)
+					.addEventListeners(ml)
+					.setActivity(Activity.playing("Try pg.help"))
+					.build();
 		}
 		catch (LoginException e)
 		{
@@ -57,30 +69,29 @@ public class MainListener extends ListenerAdapter
 		}
 	}
 
-	public boolean isChannelUsedForParty(TextChannel channel)
+	@Nullable
+	public GameParty getGamePartyFromMessage(@Nonnull Message message)
 	{
-		return isChannelUsedForParty(channel.getIdLong());
-	}
-
-	public boolean isChannelUsedForParty(long channelId)
-	{
+		if (message == null) throw new NullPointerException("Message cannot be null");
+		long id = message.getChannel().getIdLong();
 		for (GameParty gp : parties)
-			if (gp.getChannelId() == channelId)
-				return true;
-		return false;
+		{
+			if (gp.getChannelId() == id)
+				return gp;
+		}
+		return null;
 	}
 
-	public boolean isGuildUsedForGame(Guild guild)
+	public DiscordGame getDiscordGameFromMessage(@Nonnull Message message)
 	{
-		return isGuildUsedForGame(guild.getIdLong());
-	}
-
-	public boolean isGuildUsedForGame(long guildId)
-	{
-		for (DiscordGame game : games)
-			if (game.getGuildId() == guildId)
-				return true;
-		return false;
+		if (message == null) throw new NullPointerException("Message cannot be null");
+		long id = message.getGuild().getIdLong();
+		for (DiscordGame g : games)
+		{
+			if (g.getGuildId() == id)
+				return g;
+		}
+		return null;
 	}
 
 	public JDA getJDA()
@@ -95,8 +106,14 @@ public class MainListener extends ListenerAdapter
 
 	public void addDiscordGame(DiscordGame dg, GameParty p)
 	{
-		parties.remove(p);
 		games.add(dg);
+		endParty(p);
+	}
+
+	public void endParty(GameParty party)
+	{
+		party.registerAsListener(false);
+		parties.remove(party);
 	}
 
 //	@Override
@@ -111,37 +128,19 @@ public class MainListener extends ListenerAdapter
 	public void onReady(ReadyEvent e)
 	{
 		System.out.println("Bot is ready to be used -- Refactored version");
-		e.getJDA().getGuilds().forEach((guild) -> delete(guild));
+		for (Guild g : e.getJDA().getGuilds())
+			delete(g);
 	}
 
 	public void delete(Guild guild)
 	{
-		if (guild.getOwner().getUser().isBot()) guild.delete().queue();
+		Member member = guild.getOwner();
+		if (member == null) guild.retrieveOwner().queue(m ->
+		{
+			if (m.getIdLong() == jda.getSelfUser().getIdLong()) guild.delete().queue();
+		});
+		else if (member.getIdLong() == jda.getSelfUser().getIdLong()) guild.delete().queue();
 	}
-
-//	@Override
-//	public void onGuildJoin(GuildJoinEvent e)
-//	{
-//		System.out.println("Joined new guild");
-//		Guild guild = e.getGuild();
-//		String roleName = guild.getRoles().get(0).getName();
-//		long oldGuildID = 0;
-//		try
-//		{
-//			oldGuildID = Long.parseLong(roleName);
-//		}
-//		catch (NumberFormatException exception)
-//		{
-//			return;
-//		}
-//
-//		DiscordGame game = parties.get(oldGuildID);
-//		if (game == null)
-//			return;
-//		game.getNewGuild(guild);
-//		games.put(guild.getIdLong(), game);
-//		parties.remove(oldGuildID);
-//	}
 
 	// Bot should leave the game once the owner has changed
 //	@Override
@@ -190,14 +189,8 @@ public class MainListener extends ListenerAdapter
 
 		commands.executeCommand(this, "pg.", message);
 
-//		else if (lowerCaseMessage.contentEquals(prefix + "endparty"))
-//			endLobby(e.getGuild().getIdLong(), e.getChannel(), message.getMember());
 //		else if (lowerCaseMessage.startsWith(prefix + "help"))
 //			e.getChannel().sendMessage(helpTable()).queue();
-//		else if (lowerCaseMessage.contentEquals(prefix + "games"))
-//				e.getChannel().sendMessage(displayGames()).queue();
-//		else if (lowerCaseMessage.startsWith(prefix + "config"))
-//			displayConfig(e.getChannel(), lowerCaseMessage, e.getGuild().getIdLong());
 //		else if (lowerCaseMessage.contentEquals(prefix + "delete") || lowerCaseMessage.contentEquals("!delete"))
 //		{
 //			DiscordGame game = games.get(message.getGuild().getIdLong());
@@ -221,86 +214,9 @@ public class MainListener extends ListenerAdapter
 //			}
 //			game.transferOrDelete(); // Game gets removed from games when ownership updates
 //		}
-//		else if (lowerCaseMessage.startsWith(prefix))
-//		{
-//			DiscordGame party = parties.get(e.getGuild().getIdLong());
-//			DiscordGame game = games.get(e.getGuild().getIdLong());
-//
-//			if (party != null)
-//				party.processMessage(e.getMessage());
-//			else if (game != null)
-//				game.processMessage(e.getMessage());
-//			else
-//				e.getChannel().sendMessage("Party hasn't been created yet. Do so with " + prefix + "startParty").queue();
-//		}
-//		else if (lowerCaseMessage.startsWith("!"))
-//		{
-//			DiscordGame game = games.get(e.getGuild().getIdLong());
-//			if (game != null)
-//				game.processMessage("!", e.getMessage());
-//		}
 	}
 
-//	private MessageEmbed displayGames()
-//	{
-//		EmbedBuilder builder = new EmbedBuilder().setTitle("Party Games").setColor(Color.GREEN);
-//		List<GameMode> gameModes = GameModeLoader.getGames(true);
-//		for (int x = 1; x <= gameModes.size(); ++x)
-//		{
-//			GameMode game = gameModes.get(x - 1);
-//			if (!game.isSpecial())
-//				builder.addField(x + ". " + game.getName(), game.getDescription(), false);
-//			else
-//				builder.addField(x + ". " + game.getName() + " (Special)", game.getDescription(), false);
-//		}
-//		return builder.build();
-//	}
-
-//	private void displayConfig(MessageChannel channelUsed, String message, long guildID)
-//	{
-//		EmbedBuilder embed = new EmbedBuilder();
-//		GameMode selectedGameMode;
-//		String[] words = message.split(" ", 2);
-//		if (words.length == 1)
-//		{
-//			if (!parties.containsKey(guildID) && !games.containsKey(guildID))
-//			{
-//				channelUsed.sendMessage("Syntax: pg.config [GAME_MODE]").queue();
-//				return;
-//			}
-//
-//			DiscordGame game;
-//			if (parties.containsKey(guildID)) game = parties.get(guildID);
-//			else game = games.get(guildID);
-//
-//			selectedGameMode = game.config.getGameMode();
-//
-//			boolean randomMode = game.config.isRandom();
-//			boolean noMin = game.config.getMin() == 0;
-//			long partyLeaderID = game.partyLeaderID;
-//
-//			embed
-//			.addField("Random", (randomMode ? "Yes" : "No"), true)
-//			.addField("Minimum Players", (noMin ? "0" : selectedGameMode.getMinimumTotalPlayers() + ""), true)
-//			.addField("Party leader","<@" + partyLeaderID + ">", true);
-//
-//		}
-//
-//		else
-//		{
-//			selectedGameMode = GameModeLoader.getGameMode(words[1], true);
-//			if (selectedGameMode == null)
-//				channelUsed.sendMessage("FAILED: Game mode **" + words[1] + "** does not exist.").queue();
-//		}
-//
-//			embed.setTitle(selectedGameMode.getName())
-//				.setDescription(selectedGameMode.getDescription())
-//				.setColor(Color.GREEN)
-//				.addField("Game Config", selectedGameMode.getConfig(), true);
-//
-//		channelUsed.sendMessage(embed.build()).queue();
-//	}
-
+	// TODO: Add multiple help tables
 	private String helpTable()
 	{
 		String commands =
@@ -322,17 +238,6 @@ public class MainListener extends ListenerAdapter
 
 		return "```\n" + commands + "```";
 	}
-
-//	private void endLobby(Long guildID, MessageChannel channelUsed, Member member)
-//	{
-//		if (!parties.containsKey(guildID))
-//			channelUsed.sendMessage("There is no party to end").queue();
-//		else if (!games.containsKey(guildID))
-//		{
-//			parties.remove(guildID);
-//			channelUsed.sendMessage("Party ended").queue();
-//		}
-//	}
 
 	public static String loadToken()
 			throws FileNotFoundException

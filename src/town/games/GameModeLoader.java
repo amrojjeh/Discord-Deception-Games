@@ -5,7 +5,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.stream.Stream;
 
 import town.games.parser.GameParser;
@@ -13,11 +12,11 @@ import town.util.JavaHelper;
 
 public class GameModeLoader
 {
-	public static List<GameMode> loadedGameModes = null;
-	public static List<GameMode> specialGameModes = new ArrayList<GameMode>();
+	public static ArrayList<GameMode> loadedGameModes = null;
+	public static ArrayList<GameMode> specialGameModes = new ArrayList<GameMode>();
 	public static String defaultPath = "Games";
 
-	public static List<GameMode> getGames(boolean forceReload)
+	public static ArrayList<GameMode> getGames(boolean forceReload)
 	{
 		loadedGameModes = new ArrayList<GameMode>();
 		if (forceReload || loadedGameModes == null)
@@ -77,9 +76,10 @@ public class GameModeLoader
 		return loadedGameModes.get(ref - 1);
 	}
 
-	public static List<GameMode> loadSpecialGameModes()
+	public static ArrayList<GameMode> loadSpecialGameModes()
 	{
 		specialGameModes.clear();
+		// TODO: Add mashup
 //		specialGameModes.add(new Mashup());
 		return specialGameModes;
 	}

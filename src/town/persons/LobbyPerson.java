@@ -26,14 +26,12 @@ public class LobbyPerson implements Person
 		return party.getUser(this).getName();
 	}
 
-	@Override
-	public void sendMessage(String msg)
+	public void sendDM(String msg)
 	{
 		party.getUser(this).openPrivateChannel().queue(pc -> pc.sendMessage(msg).queue());
 	}
 
-	@Override
-	public void sendMessage(MessageEmbed msg)
+	public void sendDM(MessageEmbed msg)
 	{
 		party.getUser(this).openPrivateChannel().queue(pc -> pc.sendMessage(msg).queue());
 	}

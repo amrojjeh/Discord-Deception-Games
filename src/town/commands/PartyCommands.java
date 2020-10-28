@@ -13,7 +13,9 @@ import town.GameParty;
 import town.MainListener;
 import town.PartyIsEmptyException;
 import town.PartyIsFullException;
+import town.games.GameMode;
 import town.persons.LobbyPerson;
+import town.util.JavaHelper;
 
 public class PartyCommands extends CommandSet<GameParty>
 {
@@ -24,8 +26,9 @@ public class PartyCommands extends CommandSet<GameParty>
 		addCommand(false, PartyCommands::leave, "leave");
 		addCommand(true, PartyCommands::setGame, "setgame");
 		addCommand(false, PartyCommands::displayParty, "party");
-//		addCommand(true, PartyCommands::noMin, "nomin");
-//		addCommand(true, PartyCommands::setRand, "setrand");
+		addCommand(true, PartyCommands::displayConfig, "config");
+		addCommand(true, PartyCommands::noMin, "nomin");
+		addCommand(true, PartyCommands::setRand, "setrand");
 	}
 
 	public static void startGame(GameParty p, Message message)
@@ -154,59 +157,91 @@ public class PartyCommands extends CommandSet<GameParty>
 		channelUsed.sendMessage(embed).queue();
 	}
 
-//	public static void noMin(GameParty party, Message message)
-//	{
-//		if (message.getMember().getIdLong() != game.partyLeaderID)
-//		{
-//			message.getChannel().sendMessage(String.format("Only party leader (<@%d>) can configure the game!", game.partyLeaderID)).queue();
-//			return;
-//		}
-//
-//		String syntax = "Syntax is: " + game.config.getPrefix() + "nomin [0|1]";
-//		String words[] = message.getContentRaw().split(" ");
-//		int activator = 0;
-//		if (words.length != 2) message.getChannel().sendMessage(syntax).queue();
-//		else
-//		{
-//			try
-//			{
-//				activator = Integer.parseInt(words[1]);
-//			}
-//			catch (NumberFormatException e)
-//			{
-//				message.getChannel().sendMessage(syntax).queue();
-//				return;
-//			}
-//			game.config.byPassMin(activator == 1);
-//			if (game.config.getMin() == 0) message.getChannel().sendMessage("No minimum players requried anymore.").queue();
-//			else message.getChannel().sendMessage("Default minimum players required.").queue();
-//		}
-//	}
+	public static void endParty(GameParty game, Message message)
+	{
+		game.registerAsListener(false);
+		game.getMainListener().endParty(game);
+		message.getChannel().sendMessage("Party ended").queue();
+	}
 
-//	public static void setRand(GameParty game, Message message)
-//	{
-//		if (message.getMember().getIdLong() != game.partyLeaderID)
-//		{
-//			message.getChannel().sendMessage(String.format("Only party leader (<@%d>) can configure the game!", game.partyLeaderID)).queue();
-//			return;
-//		}
-//
-//		String words[] = message.getContentRaw().split(" ");
-//		if (words.length != 2)
-//		{
-//			message.getChannel().sendMessage("Syntax is: `" + game.config.getPrefix() + "setRand [0|1]`");
-//			return;
-//		}
-//
-//		Integer activator = JavaHelper.parseInt(words[1]);
-//		if (activator == null)
-//		{
-//			message.getChannel().sendMessage("Syntax is: `" + game.config.getPrefix() + "setRand [0|1]`");
-//			return;
-//		}
-//
-//		game.config.setRandomMode(activator == 1);
-//		message.getChannel().sendMessage(game.config.setRandomMode(activator == 1)).queue();
-//
-//	}
+	public static void displayConfig(GameParty party, Message message)
+	{
+		String[] words = message.getContentRaw().split(" ", 2);
+
+		// Let StartupCommands::displayConfig handle it
+		if (words.length == 2)
+			return;
+
+		GameMode selectedGameMode = party.getConfig().getGameMode();
+
+		boolean randomMode = party.getConfig().isRandom();
+		boolean noMin = party.getConfig().getMin() == 0;
+		long partyLeaderID = party.getGameLeader().getID();
+
+		EmbedBuilder embed = new EmbedBuilder();
+		embed
+		.setTitle(selectedGameMode.getName())
+		.setDescription(selectedGameMode.getDescription())
+		.setColor(Color.GREEN)
+		.addField("Random", (randomMode ? "Yes" : "No"), true)
+		.addField("Minimum Players", (noMin ? "0" : selectedGameMode.getMinimumTotalPlayers() + ""), true)
+		.addField("Party leader","<@" + partyLeaderID + ">", true)
+		.addField("Game Config", selectedGameMode.getConfig(), true);
+
+		message.getChannel().sendMessage(embed.build()).queue();
+	}
+
+	public static void noMin(GameParty party, Message message)
+	{
+		if (message.getMember().getIdLong() != party.getGameLeader().getID())
+		{
+			message.getChannel().sendMessage(String.format("Only party leader (<@%d>) can configure the game!", party.getGameLeader().getID())).queue();
+			return;
+		}
+
+		String syntax = "Syntax is: " + party.getPrefix() + "nomin [0|1]";
+		String words[] = message.getContentRaw().split(" ");
+		int activator = 0;
+		if (words.length != 2) message.getChannel().sendMessage(syntax).queue();
+		else
+		{
+			try
+			{
+				activator = Integer.parseInt(words[1]);
+			}
+			catch (NumberFormatException e)
+			{
+				message.getChannel().sendMessage(syntax).queue();
+				return;
+			}
+			party.getConfig().byPassMin(activator == 1);
+			if (party.getConfig().getMin() == 0) message.getChannel().sendMessage("No minimum players requried anymore.").queue();
+			else message.getChannel().sendMessage("Default minimum players required.").queue();
+		}
+	}
+
+	public static void setRand(GameParty game, Message message)
+	{
+		if (message.getMember().getIdLong() != game.getGameLeader().getID())
+		{
+			message.getChannel().sendMessage(String.format("Only party leader (<@%d>) can configure the game!", game.getGameLeader().getID())).queue();
+			return;
+		}
+
+		String words[] = message.getContentRaw().split(" ");
+		if (words.length != 2)
+		{
+			message.getChannel().sendMessage("Syntax is: `" + game.getPrefix() + "setRand [0|1]`");
+			return;
+		}
+
+		Integer activator = JavaHelper.parseInt(words[1]);
+		if (activator == null)
+		{
+			message.getChannel().sendMessage("Syntax is: `" + game.getPrefix() + "setRand [0|1]`");
+			return;
+		}
+
+		message.getChannel().sendMessage(game.getConfig().setRandomMode(activator == 1)).queue();
+	}
 }

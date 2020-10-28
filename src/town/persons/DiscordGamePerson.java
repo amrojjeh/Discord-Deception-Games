@@ -22,6 +22,7 @@ public class DiscordGamePerson implements Person
 	private long privateChannelId = 0;
 	private Attributes tempAttributes = null;
 	private boolean muted = false;
+	private String realName = "";
 
 	private Role role;
 	private RoleData roleData;
@@ -97,7 +98,8 @@ public class DiscordGamePerson implements Person
 	@Nonnull
 	public String getRealName()
 	{
-		return game.getMemberFromGame(this).getEffectiveName();
+		if (realName.isEmpty()) realName = game.getUser(this).getName();
+		return realName;
 	}
 
 	/**
@@ -145,7 +147,6 @@ public class DiscordGamePerson implements Person
 	 * Send a message to the person's private channel.
 	 * @param msg The message content in String.
 	 */
-	@Override
 	public void sendMessage(@Nonnull String msg)
 	{
 		if (msg == null) throw new NullPointerException("Message cannot be null");
@@ -159,7 +160,6 @@ public class DiscordGamePerson implements Person
 	 * Send a message to the person's private channel.
 	 * @param msg The message content with MessageEmbed type.
 	 */
-	@Override
 	public void sendMessage(@Nonnull MessageEmbed msg)
 	{
 		if (msg == null) throw new NullPointerException("Message cannot be null");
@@ -167,6 +167,16 @@ public class DiscordGamePerson implements Person
 			game.sendMessageToTextChannel(privateChannelId, msg).queue();
 		else
 			System.out.println("Could not send to private channel");
+	}
+
+	public void sendDM(String msg)
+	{
+		getGame().getUser(this).openPrivateChannel().queue(pc -> pc.sendMessage(msg).queue());
+	}
+
+	public void sendDM(MessageEmbed msg)
+	{
+		getGame().getUser(this).openPrivateChannel().queue(pc -> pc.sendMessage(msg).queue());
 	}
 
 	/**

@@ -2,6 +2,7 @@ package town.mafia.games;
 
 public class Mashup // extends GameMode
 {
+	// TODO: Add mashup
 //	public Mashup()
 //	{
 //		super("Mashup", "Play with all the roles, no limits!", true);
