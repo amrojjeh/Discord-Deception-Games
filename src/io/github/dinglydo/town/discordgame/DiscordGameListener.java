@@ -53,6 +53,7 @@ public class DiscordGameListener extends ListenerAdapter
 		{
 			if (p.getID() == member.getIdLong())
 			{
+				p.join();
 				p.syncRoles();
 				p.syncPrivateChannel();
 				shouldKick = false;

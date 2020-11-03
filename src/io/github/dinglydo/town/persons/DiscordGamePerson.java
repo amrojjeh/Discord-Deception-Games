@@ -30,7 +30,8 @@ public class DiscordGamePerson
 	private Role role;
 	private RoleData roleData;
 
-	// TODO: Add joined server
+	// joinedServer will reamin true upon disconnection
+	// disconnected will also remain true even after joining back
 	private boolean joinedServer = false;
 	private boolean disconnected = false;
 	private boolean alive = true;
@@ -38,6 +39,7 @@ public class DiscordGamePerson
 	private TownEvent event;
 
 	private DiscordRoles discordRoles;
+	// Create a DiscordChannels visibleChannels;
 
 	/**
 	* A public constructor used to create person.
@@ -54,8 +56,18 @@ public class DiscordGamePerson
 		setRole(role);
 	}
 
+	/**
+	 * Can the person sync with Discord? In other words, is the person in the game server?
+	 * @return Whether the person is in the game server.
+	 */
+	public boolean canSync()
+	{
+		return hasJoined() && !isDisconnected();
+	}
+
 	public void syncMute()
 	{
+		if (!canSync()) throw new IllegalStateException("User is not in server, cannot sync");
 		if (game != null)
 		{
 			Member member = getMember();
@@ -66,12 +78,14 @@ public class DiscordGamePerson
 
 	public void syncPrivateChannel()
 	{
+		if (!canSync()) throw new IllegalStateException("User is not in server, cannot sync");
 		TextChannel textChannel = getGame().getTextChannel(getPrivateChannelID());
 		textChannel.putPermissionOverride(getMember()).setAllow(QP.readPermissions() | QP.writePermissions()).queue();
 	}
 
 	public void syncRoles()
 	{
+		if (!canSync()) throw new IllegalStateException("User is not in server, cannot sync");
 		net.dv8tion.jda.api.entities.Role[] roles = new net.dv8tion.jda.api.entities.Role[discordRoles.size()];
 		for (int x = 0; x < discordRoles.size(); ++x)
 			roles[x] = discordRoles.get(x).getRole();
@@ -85,6 +99,7 @@ public class DiscordGamePerson
 
 	public Member getMember()
 	{
+		if (!canSync()) throw new IllegalStateException("User is not in server, cannot sync");
 		if (!getGame().wasServerCreated()) throw new IllegalStateException("Server not created yet");
 		return getGame().getGuild().getMemberById(getID());
 	}
@@ -233,10 +248,9 @@ public class DiscordGamePerson
 
 	/**
 	 * Get the private channel ID.
-	 * @return Returns the private channel ID. Null if not assigned.
+	 * @return Returns the private channel ID. 0 if not assigned.
 	 */
-	@Nullable
-	public Long getPrivateChannelID()
+	public long getPrivateChannelID()
 	{
 		return privateChannelId;
 	}
@@ -264,23 +278,22 @@ public class DiscordGamePerson
 	}
 
 	/**
-	 * Kill the person.
+	 * Kill the person. Automatically syncs.
 	 * @param reason The reason why the person died.
 	 * @param saveForMorning If true, the person's death will be revealed in the morning.
 	 */
 	public void die(@NotNull String reason, boolean saveForMorning)
 	{
-		muted = true;
+		mute(true);
 		if (!alive) return;
 		if (!reason.isEmpty()) causeOfDeath = reason;
 		if (!isDisconnected())
-		{
 			addDiscordRole(getGame().getRole("dead"));
-			syncRoles();
-		}
 		if (saveForMorning)
 			getGame().saveForMorning(this);
 		alive = false;
+		syncRoles();
+		syncMute();
 	}
 
 	/**
@@ -330,7 +343,9 @@ public class DiscordGamePerson
 	}
 
 	/**
-	 * Has the user left the game server?
+	 * Has the user left the game server? Changes to false if the user joined back.
+	 * <br><br>
+	 * It's called "isDisconnected" rather than "hasDisconnected" because the value can change if the person joins back, unlike hasJoined.
 	 * @return True if the user left the game server.
 	 */
 	public boolean isDisconnected()
@@ -340,12 +355,30 @@ public class DiscordGamePerson
 
 	/**
 	 * This method should be called when the person leaves the game server.
+	 * It subsequently kills the person via suicide.
 	 */
 	public void disconnect()
 	{
 		disconnected = true;
-//		die(String.format("<@%d> (%d) committed suicide.", getID(), getNum()), true);
 		die(String.format("<@%d> committed suicide.", getID()), true);
+	}
+
+	/**
+	 * This method should be called when the person either joins or rejoins the game server.
+	 */
+	public void join()
+	{
+		joinedServer = true;
+		disconnected = false;
+	}
+
+	/**
+	 * Has the person joined the server? Will reamin true if the person disconnects the server.
+	 * @return true if the user joined the game server at least once
+	 */
+	public boolean hasJoined()
+	{
+		return joinedServer;
 	}
 
 	/**
