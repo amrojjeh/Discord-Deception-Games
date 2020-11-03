@@ -54,6 +54,7 @@ public class DiscordGameListener extends ListenerAdapter
 			if (p.getID() == member.getIdLong())
 			{
 				p.syncRoles();
+				p.syncPrivateChannel();
 				shouldKick = false;
 				if (game.getPlayersCache().size() == game.getGuild().getMemberCount() - 1) // -1 since Bot counts as a member
 					game.startGame();

@@ -376,9 +376,7 @@ public class DiscordGame
 
 	public void startGame()
 	{
-		// TODO: start game
-		System.out.println("Game started");
-//		config.getGameMode().start(this, phaseManager);
+		config.getGameMode().start(this, phaseManager);
 	}
 
 

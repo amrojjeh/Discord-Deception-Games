@@ -30,6 +30,8 @@ public class DiscordGamePerson
 	private Role role;
 	private RoleData roleData;
 
+	// TODO: Add joined server
+	private boolean joinedServer = false;
 	private boolean disconnected = false;
 	private boolean alive = true;
 	private String causeOfDeath = String.format("<@%d> is still alive.", getID());

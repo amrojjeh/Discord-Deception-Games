@@ -7,9 +7,11 @@ import town.commands.CommandSet;
 import town.discordgame.DiscordGame;
 import town.games.parser.Rule;
 import town.mafia.commands.TVMCommands;
+import town.mafia.phases.FirstDay;
 import town.persons.DiscordGamePerson;
 import town.persons.assigner.Assigner;
 import town.persons.assigner.RoleAssigner;
+import town.phases.PhaseManager;
 import town.roles.Role;
 
 public class GameMode
@@ -106,9 +108,8 @@ public class GameMode
 		return ruleFloor;
 	}
 
-//	public void start(DiscordGame game, PhaseManager pm)
-//	{
-//		throw new UnsupportedOperationException();
-//		pm.start(game, new FirstDay(game, pm));
-//	}
+	public void start(DiscordGame game, PhaseManager pm)
+	{
+		pm.start(game, new FirstDay(game, pm));
+	}
 }
