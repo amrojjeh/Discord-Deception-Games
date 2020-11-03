@@ -3,7 +3,7 @@ package town.phases;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import town.DiscordGame;
+import town.discordgame.DiscordGame;
 
 public class PhaseManager
 {

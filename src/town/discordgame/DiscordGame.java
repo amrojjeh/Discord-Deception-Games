@@ -1,4 +1,4 @@
-package town;
+package town.discordgame;
 
 import java.awt.Color;
 import java.util.ArrayList;
@@ -7,6 +7,8 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
+
+import javax.annotation.Nullable;
 
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.Permission;
@@ -20,14 +22,14 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.VoiceChannel;
-import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
-import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.managers.RoleManager;
 import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.requests.restaction.GuildAction;
 import net.dv8tion.jda.api.requests.restaction.GuildAction.RoleData;
 import net.dv8tion.jda.api.requests.restaction.MessageAction;
 import net.dv8tion.jda.api.requests.restaction.PermissionOverrideAction;
+import town.DiscordGameConfig;
+import town.GameParty;
+import town.MainListener;
 import town.events.TownEvent;
 import town.persons.DiscordGamePerson;
 import town.phases.Phase;
@@ -35,18 +37,15 @@ import town.phases.PhaseManager;
 import town.roles.Faction;
 import town.roles.Role;
 
-
 //// This represents an ongoing deception game. It's instantiated with pg.startParty
-public class DiscordGame extends ListenerAdapter
+public class DiscordGame
 {
 	private final MainListener ml;
 	private final DiscordGameConfig config;
 
-	private long gameGuildId;
-
 	// Important channels (Name : id)
 	private HashMap<String, Long> channels = new HashMap<>();
-	private HashMap<String, Long> roles = new HashMap<>();
+	private DiscordRoles discordRoles = new DiscordRoles(this);
 	private HashSet<Faction> wonTownRoles = new HashSet<Faction>();
 	private PriorityQueue<TownEvent> events = new PriorityQueue<>();
 	private PhaseManager phaseManager = new PhaseManager();
@@ -55,11 +54,14 @@ public class DiscordGame extends ListenerAdapter
 	private ArrayList<DiscordGamePerson> players = new ArrayList<>();
 
 	private int dayNum = 1;
-
-	private boolean serverCreated = false;
 	private boolean ended = false;
-	private long identifier = 0;
-	private boolean registeredListener = false;
+
+	// For listener
+	DiscordGameListener listener = new DiscordGameListener(this);
+	boolean serverCreated = false;
+	boolean registeredListener = false;
+	long identifier = 0;
+	long gameGuildId;
 
 	private DiscordGame(MainListener ml, DiscordGameConfig config)
 	{
@@ -91,12 +93,12 @@ public class DiscordGame extends ListenerAdapter
 	{
 		if (register && !registeredListener)
 		{
-			getJDA().addEventListener(this);
+			getJDA().addEventListener(listener);
 			registeredListener = true;
 		}
 		else if (!register && registeredListener)
 		{
-			getJDA().removeEventListener(this);
+			getJDA().removeEventListener(listener);
 			registeredListener = false;
 		}
 	}
@@ -116,7 +118,7 @@ public class DiscordGame extends ListenerAdapter
 		return game;
 	}
 
-	public void createServer()
+	private void createServer()
 	{
 		GuildAction ga = getJDA().createGuild(config.getGameMode().getName());
 		createNewChannels(ga);
@@ -124,10 +126,10 @@ public class DiscordGame extends ListenerAdapter
 		ga.queue();
 	}
 
-	public void createNewChannels(GuildAction g)
+	private void createNewChannels(GuildAction g)
 	{
 		// this channel used for general game updates
-		for (Role role : getConfig().getGameMode().getTownRoles())
+		for (Role role : getConfig().getGameMode().getClosestRule(getPlayersCache().size()).getRoles())
 			g.newRole().setName(role.getName()).setPermissionsRaw(0l);
 
 		g.newRole().setName("Bot").addPermissions(Permission.ADMINISTRATOR).setColor(Color.YELLOW);
@@ -166,11 +168,6 @@ public class DiscordGame extends ListenerAdapter
 	}
 
 
-//	public void processMessage(Message message)
-//	{
-//		processMessage(getPrefix(), message);
-//	}
-//
 //	public void processMessage(String prefix, Message message)
 //	{
 //		boolean fromGuild = isMessageFromGameGuild(message);
@@ -181,27 +178,7 @@ public class DiscordGame extends ListenerAdapter
 //			else if (initiated)
 //				executeCommand(this, config.getGameMode().getCommands(), prefix, message);
 //	}
-//
-//	private boolean isMessageFromGameGuild(Message message)
-//	{
-//		if (getGameGuild() != null)
-//			return message.getGuild().getIdLong() == getGameGuild().getIdLong();
-//		else
-//			return false;
-//	}
-//
 
-	public Member getMemberFromGame(DiscordGamePerson person)
-	{
-		if (!serverCreated) throw new IllegalStateException("Server not created yet");
-		return getMemberFromGame(person.getID());
-	}
-
-	private Member getMemberFromGame(long memberId)
-	{
-		if (!serverCreated) throw new IllegalStateException("Server not created yet");
-		return getGuild().getMemberById(memberId);
-	}
 
 //
 //	public void endGame()
@@ -215,11 +192,11 @@ public class DiscordGame extends ListenerAdapter
 //	{
 //		return ended;
 //	}
-//
-//	public boolean hasInitiated()
-//	{
-//		return initiated;
-//	}
+
+	public boolean wasServerCreated()
+	{
+		return serverCreated;
+	}
 
 	public void transferOrDelete()
 	{
@@ -237,7 +214,7 @@ public class DiscordGame extends ListenerAdapter
 		phaseManager.end();
 		for (DiscordGamePerson p : getPlayersCache())
 		{
-			Member member = getMemberFromGame(p);
+			Member member = p.getMember();
 			if (member == null) continue;
 			getGuild().transferOwnership(member).reason("The game has ended").queue();
 			return true;
@@ -354,18 +331,22 @@ public class DiscordGame extends ListenerAdapter
 		return getJDA().getGuildById(getGuildId());
 	}
 
-	public net.dv8tion.jda.api.entities.Role getRole(String roleName)
+	/**
+	 * Return discord role via name
+	 * @param roleName Role name
+	 * @return the DiscordRole corresponding to the name
+	 */
+	@Nullable
+	public DiscordRole getRole(String roleName)
 	{
-		return getGuild().getRoleById(getRoleID(roleName));
-	}
-
-	private long getRoleID(String roleName)
-	{
-		if (!serverCreated) throw new IllegalStateException("Game has not started, can't get roles");
-		Long id = roles.get(roleName.toLowerCase());
-		if (id == null)
-			throw new IllegalArgumentException("Role " + roleName + " not found");
-		return id;
+		for (DiscordRole role : discordRoles)
+		{
+			if (role.getName().equalsIgnoreCase(roleName))
+			{
+				return role;
+			}
+		}
+		return null;
 	}
 
 	public MessageAction sendMessageToTextChannel(String channelName, String msg)
@@ -393,31 +374,13 @@ public class DiscordGame extends ListenerAdapter
 		return getTextChannel(channelName).retrieveMessageById(messageID);
 	}
 
-//	public void startGame()
-//	{
+	public void startGame()
+	{
+		// TODO: start game
+		System.out.println("Game started");
 //		config.getGameMode().start(this, phaseManager);
-//	}
-//
-//	// Where the game ACTUALLY starts
-//	public void gameGuildJoin(Member member)
-//	{
-//		// Check if member was in the lobby
-//		boolean shouldKick = true;
-//		for (Person p : getPlayers())
-//			if (p.getID() == member.getUser().getIdLong())
-//			{
-//				getGameGuild().addRoleToMember(member, getRole("player")).queue();
-//				TextChannel textChannel = getTextChannel(p.getChannelID());
-//				textChannel.putPermissionOverride(getMemberFromGame(p)).setAllow(QP.readPermissions() | QP.writePermissions()).queue();
-//				shouldKick = false;
-//				if (getPlayers().size() == getGameGuild().getMemberCount() - 1) // -1 since Bot counts as a member
-//					startGame();
-//				break;
-//			}
-//
-//		if (shouldKick)
-//			member.kick("He was not part of the lobby").queue();
-//	}
+	}
+
 
 	public RestAction<?> toggleVC(String channelName, boolean show)
 	{
@@ -429,9 +392,12 @@ public class DiscordGame extends ListenerAdapter
 
 	public PermissionOverrideAction setChannelVisibility(String roleName, String channelName, boolean read, boolean write)
 	{
-		return setChannelVisibility(getRole(roleName), channelName, read, write);
+		return setChannelVisibility(getRole(roleName).getRole(), channelName, read, write);
 	}
 
+	/**
+	 * Open private channels to all players
+	 */
 	public void openPrivateChannels()
 	{
 		getPlayersCache().forEach(p -> setChannelVisibility(getGuild().getPublicRole(), p.getPrivateChannel(), true, false).queue());
@@ -440,7 +406,7 @@ public class DiscordGame extends ListenerAdapter
 	public PermissionOverrideAction setChannelVisibility(DiscordGamePerson p, String channelName, boolean read, boolean write)
 	{
 		if (p.isDisconnected()) return null;
-		Member member = getMemberFromGame(p);
+		Member member = p.getMember();
 		if (member == null) throw new IllegalArgumentException("Invalid person.");
 		return setChannelVisibility(member, channelName, read, write);
 	}
@@ -470,33 +436,6 @@ public class DiscordGame extends ListenerAdapter
 		}
 
 		return action;
-	}
-
-	public RoleManager muteAllInRole(String roleName, boolean shouldMute)
-	{
-		net.dv8tion.jda.api.entities.Role role = getRole(roleName);
-		List<Member> members = getGuild().getMembersWithRoles(role);
-		for (Member member : members)
-			getPerson(member).mute(shouldMute);
-
-		if (shouldMute)
-			return role.getManager().revokePermissions(Permission.VOICE_SPEAK);
-		return role.getManager().setPermissions(Permission.VOICE_SPEAK);
-	}
-
-	public RoleManager muteAllInRoleExcept(String roleName, boolean shouldMute, DiscordGamePerson p)
-	{
-		net.dv8tion.jda.api.entities.Role role = getRole(roleName);
-		List<Member> members = getGuild().getMembersWithRoles(role);
-		for (Member member : members)
-		{
-			DiscordGamePerson person = getPerson(member);
-			if (person != p)
-				person.mute(shouldMute);
-		}
-		if (shouldMute)
-			return role.getManager().revokePermissions(Permission.VOICE_SPEAK);
-		return role.getManager().setPermissions(Permission.VOICE_SPEAK);
 	}
 
 //	public void gameGuildVoiceJoin(Member m, VoiceChannel channel)
@@ -552,55 +491,24 @@ public class DiscordGame extends ListenerAdapter
 		dayNum++;
 	}
 
-	public RestAction<Void> modifyMemberRoles(DiscordGamePerson person, String... roleNames)
+	public void assignRoles(Guild guild)
 	{
-		net.dv8tion.jda.api.entities.Role[] roles = new net.dv8tion.jda.api.entities.Role[roleNames.length];
-		for (int x = 0; x < roleNames.length; ++x)
-		{
-			net.dv8tion.jda.api.entities.Role role = getRole(roleNames[x]);
-			if (role == null) throw new IllegalArgumentException("Role name does not exist");
-			roles[x] = role;
-		}
-		return getGuild().modifyMemberRoles(getMemberFromGame(person), roles);
-	}
-
-	@Override
-	public void onGuildJoin(GuildJoinEvent e)
-	{
-		System.out.println("Joined new guild");
-		Guild guild = e.getGuild();
-		String roleName = guild.getRoles().get(0).getName();
-		long roleNumber = 0;
-		try
-		{
-			roleNumber = Long.parseLong(roleName);
-		}
-		catch (NumberFormatException exception)
-		{
-			return;
-		}
-		if (roleNumber == identifier)
-			sendInviteToPlayers(guild);
-	}
-
-	public void sendInviteToPlayers(Guild guild)
-	{
-		serverCreated = true;
-		guild.getChannels().get(0).createInvite().queue((invite) -> getPlayersCache().forEach((person) -> person.sendDM(invite.getUrl())));
-		gameGuildId = guild.getIdLong();
-		guild.getChannels(true).forEach((channel) -> assignChannel(channel));
 		guild.addRoleToMember(getJDA().getSelfUser().getIdLong(), guild.getRolesByName("Bot", false).get(0)).queue();
 
 		List<net.dv8tion.jda.api.entities.Role> guildRoles = guild.getRoles();
-		for (int x = 0; x < config.getGameMode().getTownRoles().size(); ++x)
+		for (int x = 0; x < config.getGameMode().getClosestRule(getPlayersCache().size()).getRoles().size(); ++x)
 		{
 			net.dv8tion.jda.api.entities.Role townRole = guildRoles.get(guildRoles.size() - x - 2);
-			roles.put(townRole.getName().toLowerCase(), townRole.getIdLong());
+			discordRoles.add(townRole.getName().toLowerCase(), townRole.getIdLong());
 		}
 
-		roles.put("player", guild.getRolesByName("Player", false).get(0).getIdLong());
-		roles.put("dead", guild.getRolesByName("Dead", false).get(0).getIdLong());
-		roles.put("defendant", guild.getRolesByName("Defendant", false).get(0).getIdLong());
+		DiscordRole playerRole = new DiscordRole(this, "player", guild.getRolesByName("Player", false).get(0).getIdLong());
+		discordRoles.add(playerRole);
+
+		getPlayersCache().forEach(person -> person.addDiscordRole(playerRole));
+
+		discordRoles.add("dead", guild.getRolesByName("Dead", false).get(0).getIdLong());
+		discordRoles.add("defendant", guild.getRolesByName("Defendant", false).get(0).getIdLong());
 
 		for (DiscordGamePerson p : getPlayersCache())
 		{
@@ -608,8 +516,6 @@ public class DiscordGame extends ListenerAdapter
 			p.sendMessage(p.getRole().getHelp());
 		}
 
-		guild.getPublicRole().getManager().reset().queue();
-		sendMessageToTextChannel("daytime_discussion", "Waiting for players...").queue();
 	}
 
 	public void assignChannel(GuildChannel channel)
@@ -628,23 +534,8 @@ public class DiscordGame extends ListenerAdapter
 			}
 	}
 
-
-	// Quick Permissions
-	private static class QP
+	public void sendInviteToPlayers(Guild guild)
 	{
-		public static long readPermissions()
-		{
-			return Permission.getRaw(Permission.MESSAGE_READ, Permission.MESSAGE_HISTORY, Permission.VIEW_CHANNEL);
-		}
-
-		public static long writePermissions()
-		{
-			return Permission.getRaw(Permission.MESSAGE_WRITE, Permission.MESSAGE_ADD_REACTION);
-		}
-
-		public static long speakPermissions()
-		{
-			return Permission.getRaw(Permission.VOICE_SPEAK, Permission.PRIORITY_SPEAKER);
-		}
+		guild.getChannels().get(0).createInvite().queue((invite) -> getPlayersCache().forEach((person) -> person.sendDM(invite.getUrl())));
 	}
 }

@@ -5,7 +5,7 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 
-import town.DiscordGame;
+import town.discordgame.DiscordGame;
 import town.events.TownEvent;
 import town.mafia.phases.Night;
 import town.persons.AttributeValue;

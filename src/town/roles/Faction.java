@@ -3,7 +3,7 @@ package town.roles;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import town.DiscordGame;
+import town.discordgame.DiscordGame;
 import town.mafia.helper.FactionHelper;
 
 public enum Faction

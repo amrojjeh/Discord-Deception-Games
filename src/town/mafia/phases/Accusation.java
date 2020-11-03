@@ -5,7 +5,7 @@ import java.util.HashMap;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import town.DiscordGame;
+import town.discordgame.DiscordGame;
 import town.persons.DiscordGamePerson;
 import town.phases.Phase;
 import town.phases.PhaseManager;
@@ -52,7 +52,7 @@ public class Accusation extends Phase
 	public void putPlayerOnTrial(DiscordGamePerson p)
 	{
 		getPhaseManager().end();
-		getGame().getGuild().modifyMemberRoles(getGame().getMemberFromGame(p), getGame().getRole("defendant"))
+		getGame().getGuild().modifyMemberRoles(p.getMember(), getGame().getRole("defendant").getRole())
 		.queue();
 		getPhaseManager().start(getGame(), new Trial(getGame(), getPhaseManager(), p, numTrials - 1));
 	}

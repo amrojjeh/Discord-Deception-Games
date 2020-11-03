@@ -8,7 +8,10 @@ import org.jetbrains.annotations.NotNull;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.TextChannel;
-import town.DiscordGame;
+import town.discordgame.DiscordGame;
+import town.discordgame.DiscordRole;
+import town.discordgame.DiscordRoles;
+import town.discordgame.QP;
 import town.events.TownEvent;
 import town.mafia.phases.Night;
 import town.roles.Role;
@@ -32,6 +35,8 @@ public class DiscordGamePerson
 	private String causeOfDeath = String.format("<@%d> is still alive.", getID());
 	private TownEvent event;
 
+	private DiscordRoles discordRoles;
+
 	/**
 	* A public constructor used to create person.
 	*
@@ -43,7 +48,43 @@ public class DiscordGamePerson
 		if (game == null) throw new NullPointerException("DiscordGame game cannot be null");
 		this.game = game;
 		this.id = id;
+		this.discordRoles = new DiscordRoles(game);
 		setRole(role);
+	}
+
+	public void syncMute()
+	{
+		if (game != null)
+		{
+			Member member = getMember();
+			if (member.getVoiceState().inVoiceChannel())
+				game.getGuild().mute(member, muted).queue(e -> {}, e -> {});
+		}
+	}
+
+	public void syncPrivateChannel()
+	{
+		TextChannel textChannel = getGame().getTextChannel(getPrivateChannelID());
+		textChannel.putPermissionOverride(getMember()).setAllow(QP.readPermissions() | QP.writePermissions()).queue();
+	}
+
+	public void syncRoles()
+	{
+		net.dv8tion.jda.api.entities.Role[] roles = new net.dv8tion.jda.api.entities.Role[discordRoles.size()];
+		for (int x = 0; x < discordRoles.size(); ++x)
+			roles[x] = discordRoles.get(x).getRole();
+		getGame().getGuild().modifyMemberRoles(getMember(), roles).queue();
+	}
+
+	public void addDiscordRole(DiscordRole role)
+	{
+		discordRoles.add(role);
+	}
+
+	public Member getMember()
+	{
+		if (!getGame().wasServerCreated()) throw new IllegalStateException("Server not created yet");
+		return getGame().getGuild().getMemberById(getID());
 	}
 
 	/**
@@ -62,12 +103,6 @@ public class DiscordGamePerson
 	public void mute(boolean val)
 	{
 		muted = val;
-		if (game != null)
-		{
-			Member member = game.getMemberFromGame(this);
-			if (member.getVoiceState().inVoiceChannel())
-				game.getGuild().mute(member, muted).queue(e -> {}, e -> {});
-		}
 	}
 
 	/**
@@ -167,11 +202,19 @@ public class DiscordGamePerson
 			System.out.println("Could not send to private channel");
 	}
 
+	/**
+	 * Sends a direct message to a discord user
+	 * @param msg The message sent
+	 */
 	public void sendDM(String msg)
 	{
 		getGame().getUser(this).openPrivateChannel().queue(pc -> pc.sendMessage(msg).queue());
 	}
 
+	/**
+	 * Sends a direct message to a discord user
+	 * @param msg The message sent
+	 */
 	public void sendDM(MessageEmbed msg)
 	{
 		getGame().getUser(this).openPrivateChannel().queue(pc -> pc.sendMessage(msg).queue());
@@ -229,7 +272,10 @@ public class DiscordGamePerson
 		if (!alive) return;
 		if (!reason.isEmpty()) causeOfDeath = reason;
 		if (!isDisconnected())
-			getGame().modifyMemberRoles(this, "dead", getRole().getName()).queue();
+		{
+			addDiscordRole(getGame().getRole("dead"));
+			syncRoles();
+		}
 		if (saveForMorning)
 			getGame().saveForMorning(this);
 		alive = false;

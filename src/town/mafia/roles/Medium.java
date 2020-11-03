@@ -42,7 +42,7 @@ public class Medium implements Role
 		if (phase instanceof Night && user.isAlive())
 			user.getGame().setChannelVisibility(user, "the_afterlife", true, true).queue();
 		else if (phase instanceof Morning && user.isAlive())
-			user.getGame().getTextChannel("the_afterlife").getPermissionOverride(user.getGame().getMemberFromGame(user)).delete().queue();
+			user.getGame().getTextChannel("the_afterlife").getPermissionOverride(user.getMember()).delete().queue();
 	}
 
 	@Override

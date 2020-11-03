@@ -3,8 +3,8 @@ package town.persons.assigner;
 import java.util.ArrayList;
 import java.util.Random;
 
-import town.DiscordGame;
 import town.GameParty;
+import town.discordgame.DiscordGame;
 import town.persons.DiscordGamePerson;
 import town.persons.LobbyPerson;
 import town.roles.Role;

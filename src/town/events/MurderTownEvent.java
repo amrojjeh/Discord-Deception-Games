@@ -1,6 +1,6 @@
 package town.events;
 
-import town.DiscordGame;
+import town.discordgame.DiscordGame;
 import town.persons.DiscordGamePerson;
 import town.roles.Role;
 

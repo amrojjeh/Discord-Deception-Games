@@ -2,7 +2,6 @@ package town.games.parser;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Set;
 
 import town.persons.assigner.Assigner;
 import town.persons.assigner.RoleAssigner;
@@ -31,7 +30,7 @@ public class Rule
 		roles.add(role);
 	}
 
-	public Set<Role> getRoles()
+	public HashSet<Role> getRoles()
 	{
 		HashSet<Role> allRoles = new HashSet<>();
 		for (RoleInfo sr : roles)

@@ -6,7 +6,7 @@ import java.util.List;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import town.DiscordGame;
+import town.discordgame.DiscordGame;
 import town.persons.DiscordGamePerson;
 import town.phases.Phase;
 import town.phases.PhaseManager;
@@ -51,7 +51,7 @@ public class Judgment extends Phase
 		else if(numTrials > 0)
 		{
 			if (!defendant.isDisconnected())
-				getGame().getGuild().modifyMemberRoles(getGame().getMemberFromGame(defendant), getGame().getRole("player")).queue();
+				getGame().getGuild().modifyMemberRoles(defendant.getMember(), getGame().getRole("player").getRole()).queue();
 			return new Accusation(getGame(), getPhaseManager(), numTrials);
 		}
 		else

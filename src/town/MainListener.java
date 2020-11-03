@@ -24,6 +24,7 @@ import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import town.commands.StartupCommands;
+import town.discordgame.DiscordGame;
 
 // This listens to discord messages and events. It also manages discord games.
 public class MainListener extends ListenerAdapter

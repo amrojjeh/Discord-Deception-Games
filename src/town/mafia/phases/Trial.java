@@ -1,6 +1,6 @@
 package town.mafia.phases;
 
-import town.DiscordGame;
+import town.discordgame.DiscordGame;
 import town.persons.DiscordGamePerson;
 import town.phases.Phase;
 import town.phases.PhaseManager;
@@ -33,7 +33,7 @@ public class Trial extends Phase
 			getGame().sendMessageToTextChannel("daytime_discussion", "<@" + defendant.getID() + ">, your trial has begun. All "
 					+ "other players are muted. What is your defense? You have 30 seconds."),
 			getGame().setChannelVisibility("player", "daytime_discussion", true, false),
-			getGame().muteAllInRoleExcept("player", true, defendant)
+			getGame().getRole("player").muteAllInRoleExcept(defendant)
 		);
 
 		getPhaseManager().setWarningInSeconds(5);
@@ -44,7 +44,7 @@ public class Trial extends Phase
 	{
 		RestHelper.queueAll
 		(
-			getGame().muteAllInRole("player", false),
+			getGame().getRole("player").muteAllInRole(false),
 			getGame().setChannelVisibility("player", "daytime_discussion", true, true)
 		);
 	}

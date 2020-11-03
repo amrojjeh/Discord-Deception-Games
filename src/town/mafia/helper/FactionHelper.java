@@ -1,6 +1,6 @@
 package town.mafia.helper;
 
-import town.DiscordGame;
+import town.discordgame.DiscordGame;
 import town.roles.Faction;
 
 public class FactionHelper

@@ -1,6 +1,6 @@
 package town.mafia.phases;
 
-import town.DiscordGame;
+import town.discordgame.DiscordGame;
 import town.persons.DiscordGamePerson;
 import town.phases.Phase;
 import town.phases.PhaseManager;
@@ -22,8 +22,8 @@ public class LastWords extends Phase
 		RestHelper.queueAll
 		(
 			getGame().sendMessageToTextChannel("daytime_discussion", String.format("What are your last words? <@%d>", defendant.getID())),
-			getGame().muteAllInRole("player", true),
-			getGame().muteAllInRole("defendant", false),
+			getGame().getRole("player").muteAllInRole(true),
+			getGame().getRole("defendant").muteAllInRole(false),
 			getGame().setChannelVisibility("player", "daytime_discussion", true, false)
 		);
 	}
@@ -35,7 +35,7 @@ public class LastWords extends Phase
 		getGame().sendMessageToTextChannel("daytime_discussion", "Their role was: " + defendant.getRole().getName())
 		.queue();
 
-		RestHelper.queueAll(getGame().muteAllInRole("player", false));
+		RestHelper.queueAll(getGame().getRole("player").muteAllInRole(false));
 	}
 
 	@Override

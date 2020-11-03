@@ -1,12 +1,10 @@
 package town.games;
 
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
 
-import town.DiscordGame;
 import town.GameParty;
 import town.commands.CommandSet;
+import town.discordgame.DiscordGame;
 import town.games.parser.Rule;
 import town.mafia.commands.TVMCommands;
 import town.persons.DiscordGamePerson;
@@ -21,7 +19,6 @@ public class GameMode
 	private final String description;
 	private final boolean isSpecial;
 	private final CommandSet<DiscordGame> gameCommands;
-	protected Set<Role> roles = new HashSet<>();
 
 	public GameMode(String name, String description, boolean special)
 	{
@@ -68,13 +65,7 @@ public class GameMode
 	public void addRule(Rule rule)
 	{
 		rules.add(rule);
-		roles.addAll(rule.getRoles());
 		rules.sort((s, o) -> s.totalPlayers - o.totalPlayers);
-	}
-
-	public Set<Role> getTownRoles()
-	{
-		return roles;
 	}
 
 	public int getMinimumTotalPlayers()
@@ -99,7 +90,7 @@ public class GameMode
 	public ArrayList<DiscordGamePerson> buildRand(GameParty gp, DiscordGame game)
 	{
 		Assigner assigner = new Assigner(0);
-		for (Role role : roles)
+		for (Role role : getClosestRule(gp.getPlayerSize()).getRoles())
 			assigner.addRole(new RoleAssigner(role));
 		return assigner.assignRoles(gp, game);
 	}

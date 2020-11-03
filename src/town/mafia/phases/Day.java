@@ -1,6 +1,6 @@
 package town.mafia.phases;
 
-import town.DiscordGame;
+import town.discordgame.DiscordGame;
 import town.persons.DiscordGamePerson;
 import town.phases.Phase;
 import town.phases.PhaseManager;
@@ -26,7 +26,7 @@ public class Day extends Phase
 		getGame().toggleVC("Daytime", true).queue();
 
 		getGame().getPlayersCache().forEach((person) -> checkVictory(person));
-		RestHelper.queueAll(getGame().muteAllInRole("dead", true));
+		RestHelper.queueAll(getGame().getRole("dead").muteAllInRole(true));
 		getPhaseManager().setWarningInSeconds(5);
 	}
 

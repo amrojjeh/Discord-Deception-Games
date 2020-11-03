@@ -5,7 +5,7 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 
-import town.DiscordGame;
+import town.discordgame.DiscordGame;
 import town.events.MurderTownEvent;
 import town.events.TownEvent;
 import town.mafia.phases.Night;
@@ -20,7 +20,7 @@ import town.roles.RoleData;
 public class Doctor implements Role
 {
 	public final Attributes attr = new Attributes(AttributeValue.NONE, AttributeValue.NONE);
-	public final String name = "Civillian";
+	public final String name = "Doctor";
 
 	public DoctorData getRoleDataFromPerson(DiscordGamePerson user)
 	{

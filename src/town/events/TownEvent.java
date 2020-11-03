@@ -2,7 +2,7 @@ package town.events;
 
 import javax.annotation.Nullable;
 
-import town.DiscordGame;
+import town.discordgame.DiscordGame;
 import town.persons.DiscordGamePerson;
 
 public interface TownEvent extends Comparable<TownEvent>

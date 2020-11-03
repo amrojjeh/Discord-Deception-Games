@@ -1,6 +1,6 @@
 package town.mafia.phases;
 
-import town.DiscordGame;
+import town.discordgame.DiscordGame;
 import town.phases.Phase;
 import town.phases.PhaseManager;
 

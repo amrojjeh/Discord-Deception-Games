@@ -2,7 +2,7 @@ package town.phases;
 
 import java.util.TimerTask;
 
-import town.DiscordGame;
+import town.discordgame.DiscordGame;
 
 public abstract class Phase extends TimerTask
 {
