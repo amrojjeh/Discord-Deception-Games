@@ -11,6 +11,7 @@ import javax.security.auth.login.LoginException;
 
 import io.github.dinglydo.town.commands.StartupCommands;
 import io.github.dinglydo.town.discordgame.DiscordGame;
+import io.github.dinglydo.town.party.Party;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
@@ -30,7 +31,7 @@ import net.dv8tion.jda.api.utils.cache.CacheFlag;
 public class MainListener extends ListenerAdapter
 {
 	private String prefix = "pg.";
-	private ArrayList<GameParty> parties = new ArrayList<>();
+	private ArrayList<Party> parties = new ArrayList<>();
 	private ArrayList<DiscordGame> games = new ArrayList<>();
 	private JDA jda;
 	private final StartupCommands commands = new StartupCommands();
@@ -71,11 +72,11 @@ public class MainListener extends ListenerAdapter
 	}
 
 	@Nullable
-	public GameParty getGamePartyFromMessage(@Nonnull Message message)
+	public Party getGamePartyFromMessage(@Nonnull Message message)
 	{
 		if (message == null) throw new NullPointerException("Message cannot be null");
 		long id = message.getChannel().getIdLong();
-		for (GameParty gp : parties)
+		for (Party gp : parties)
 		{
 			if (gp.getChannelId() == id)
 				return gp;
@@ -100,18 +101,18 @@ public class MainListener extends ListenerAdapter
 		return jda;
 	}
 
-	public void addGameParty(GameParty p)
+	public void addGameParty(Party p)
 	{
 		parties.add(p);
 	}
 
-	public void addDiscordGame(DiscordGame dg, GameParty p)
+	public void addDiscordGame(DiscordGame dg, Party p)
 	{
 		games.add(dg);
 		endParty(p);
 	}
 
-	public void endParty(GameParty party)
+	public void endParty(Party party)
 	{
 		party.registerAsListener(false);
 		parties.remove(party);

@@ -1,9 +1,11 @@
-package io.github.dinglydo.town;
+package io.github.dinglydo.town.party;
 
 import java.util.ArrayList;
 
 import javax.annotation.Nullable;
 
+import io.github.dinglydo.town.DiscordGameConfig;
+import io.github.dinglydo.town.MainListener;
 import io.github.dinglydo.town.commands.PartyCommands;
 import io.github.dinglydo.town.games.parser.Rule;
 import io.github.dinglydo.town.persons.LobbyPerson;
@@ -15,7 +17,7 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
-public class GameParty extends ListenerAdapter
+public class Party extends ListenerAdapter
 {
 	private final MainListener ml;
 	private final PartyCommands commands;
@@ -27,7 +29,7 @@ public class GameParty extends ListenerAdapter
 	private ArrayList<LobbyPerson> persons = new ArrayList<>();
 	private boolean registeredListener;
 
-	private GameParty(MainListener ml, long channelId, long partyLeaderId)
+	private Party(MainListener ml, long channelId, long partyLeaderId)
 	{
 		this.ml = ml;
 		this.channelId = channelId;
@@ -49,9 +51,9 @@ public class GameParty extends ListenerAdapter
 		return ml;
 	}
 
-	public static GameParty createParty(MainListener ml, TextChannel tc, Member member)
+	public static Party createParty(MainListener ml, TextChannel tc, Member member)
 	{
-		GameParty gp = new GameParty(ml, tc.getIdLong(), member.getIdLong());
+		Party gp = new Party(ml, tc.getIdLong(), member.getIdLong());
 		gp.registerAsListener(true);
 		return gp;
 	}

@@ -3,11 +3,11 @@ package io.github.dinglydo.town.commands;
 import java.awt.Color;
 import java.util.ArrayList;
 
-import io.github.dinglydo.town.GameParty;
 import io.github.dinglydo.town.MainListener;
-import io.github.dinglydo.town.PartyIsFullException;
 import io.github.dinglydo.town.games.GameMode;
 import io.github.dinglydo.town.games.GameModeLoader;
+import io.github.dinglydo.town.party.Party;
+import io.github.dinglydo.town.party.PartyIsFullException;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
@@ -32,7 +32,7 @@ public class StartupCommands extends CommandSet<MainListener>
 			channelUsed.sendMessage("Can't start a party in a discord game!").queue();
 		else
 		{
-			GameParty party = GameParty.createParty(ml, message.getTextChannel(), message.getMember());
+			Party party = Party.createParty(ml, message.getTextChannel(), message.getMember());
 			String[] words = message.getContentRaw().split(" ", 2);
 			String messageToSend = "Party started\n";
 			// TODO: Change custom parsers

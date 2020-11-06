@@ -11,9 +11,9 @@ import java.util.PriorityQueue;
 import javax.annotation.Nullable;
 
 import io.github.dinglydo.town.DiscordGameConfig;
-import io.github.dinglydo.town.GameParty;
 import io.github.dinglydo.town.MainListener;
 import io.github.dinglydo.town.events.TownEvent;
+import io.github.dinglydo.town.party.Party;
 import io.github.dinglydo.town.persons.DiscordGamePerson;
 import io.github.dinglydo.town.phases.Phase;
 import io.github.dinglydo.town.phases.PhaseManager;
@@ -108,7 +108,7 @@ public class DiscordGame
 		return registeredListener;
 	}
 
-	public static DiscordGame createServer(GameParty party, long identifier)
+	public static DiscordGame createServer(Party party, long identifier)
 	{
 		DiscordGame game = new DiscordGame(party.getMainListener(), party.getConfig());
 		game.identifier = identifier;

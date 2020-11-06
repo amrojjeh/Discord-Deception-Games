@@ -2,12 +2,12 @@ package io.github.dinglydo.town.games;
 
 import java.util.ArrayList;
 
-import io.github.dinglydo.town.GameParty;
 import io.github.dinglydo.town.commands.CommandSet;
 import io.github.dinglydo.town.discordgame.DiscordGame;
 import io.github.dinglydo.town.games.parser.Rule;
 import io.github.dinglydo.town.mafia.commands.TVMCommands;
 import io.github.dinglydo.town.mafia.phases.FirstDay;
+import io.github.dinglydo.town.party.Party;
 import io.github.dinglydo.town.persons.DiscordGamePerson;
 import io.github.dinglydo.town.persons.assigner.Assigner;
 import io.github.dinglydo.town.persons.assigner.RoleAssigner;
@@ -75,13 +75,13 @@ public class GameMode
 		return rules.get(0).totalPlayers;
 	}
 
-	public ArrayList<DiscordGamePerson> build(GameParty gp, DiscordGame game, boolean rand)
+	public ArrayList<DiscordGamePerson> build(Party gp, DiscordGame game, boolean rand)
 	{
 		if (rand) return buildRand(gp, game);
 		return buildDefault(gp, game);
 	}
 
-	public ArrayList<DiscordGamePerson> buildDefault(GameParty gp, DiscordGame game)
+	public ArrayList<DiscordGamePerson> buildDefault(Party gp, DiscordGame game)
 	{
 		int totalPlayers = gp.getPlayerSize();
 		Rule ruleFloor = getClosestRule(totalPlayers);
@@ -89,7 +89,7 @@ public class GameMode
 		return assigner.assignRoles(gp, game);
 	}
 
-	public ArrayList<DiscordGamePerson> buildRand(GameParty gp, DiscordGame game)
+	public ArrayList<DiscordGamePerson> buildRand(Party gp, DiscordGame game)
 	{
 		Assigner assigner = new Assigner(0);
 		for (Role role : getClosestRule(gp.getPlayerSize()).getRoles())

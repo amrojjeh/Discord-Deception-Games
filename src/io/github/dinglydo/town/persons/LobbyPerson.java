@@ -1,14 +1,14 @@
 package io.github.dinglydo.town.persons;
 
-import io.github.dinglydo.town.GameParty;
+import io.github.dinglydo.town.party.Party;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 
 public class LobbyPerson
 {
-	GameParty party;
+	Party party;
 	long id;
 
-	public LobbyPerson(GameParty gp, long id)
+	public LobbyPerson(Party gp, long id)
 	{
 		this.party = gp;
 		this.id = id;

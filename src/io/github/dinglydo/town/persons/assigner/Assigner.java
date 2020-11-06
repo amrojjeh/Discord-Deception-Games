@@ -3,8 +3,8 @@ package io.github.dinglydo.town.persons.assigner;
 import java.util.ArrayList;
 import java.util.Random;
 
-import io.github.dinglydo.town.GameParty;
 import io.github.dinglydo.town.discordgame.DiscordGame;
+import io.github.dinglydo.town.party.Party;
 import io.github.dinglydo.town.persons.DiscordGamePerson;
 import io.github.dinglydo.town.persons.LobbyPerson;
 import io.github.dinglydo.town.roles.Role;
@@ -29,7 +29,7 @@ public class Assigner
 		return roles;
 	}
 
-	public ArrayList<DiscordGamePerson> assignRoles(GameParty party, DiscordGame game)
+	public ArrayList<DiscordGamePerson> assignRoles(Party party, DiscordGame game)
 	{
 		ArrayList<DiscordGamePerson> people = new ArrayList<>();
 		for (LobbyPerson person : party.getPlayersCache())

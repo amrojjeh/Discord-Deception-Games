@@ -3,12 +3,12 @@ package io.github.dinglydo.town.commands;
 import java.awt.Color;
 
 import io.github.dinglydo.town.DiscordGameConfig;
-import io.github.dinglydo.town.GameParty;
 import io.github.dinglydo.town.MainListener;
-import io.github.dinglydo.town.PartyIsEmptyException;
-import io.github.dinglydo.town.PartyIsFullException;
 import io.github.dinglydo.town.discordgame.DiscordGame;
 import io.github.dinglydo.town.games.GameMode;
+import io.github.dinglydo.town.party.Party;
+import io.github.dinglydo.town.party.PartyIsEmptyException;
+import io.github.dinglydo.town.party.PartyIsFullException;
 import io.github.dinglydo.town.persons.LobbyPerson;
 import io.github.dinglydo.town.util.JavaHelper;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -17,7 +17,7 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 
-public class PartyCommands extends CommandSet<GameParty>
+public class PartyCommands extends CommandSet<Party>
 {
 	public PartyCommands()
 	{
@@ -31,7 +31,7 @@ public class PartyCommands extends CommandSet<GameParty>
 		addCommand(true, PartyCommands::setRand, "setrand");
 	}
 
-	public static void startGame(GameParty p, Message message)
+	public static void startGame(Party p, Message message)
 	{
 		DiscordGameConfig c = p.getConfig();
 
@@ -56,7 +56,7 @@ public class PartyCommands extends CommandSet<GameParty>
 		}
 	}
 
-	public static void setGame(GameParty party, Message message)
+	public static void setGame(Party party, Message message)
 	{
 		if (message.getMember().getIdLong() != party.getGameLeader().getID())
 		{
@@ -88,7 +88,7 @@ public class PartyCommands extends CommandSet<GameParty>
 			message.getChannel().sendMessage(party.getConfig().setGameMode(words[1])).queue();
 	}
 
-	public static void joinGame(GameParty party, Message message)
+	public static void joinGame(Party party, Message message)
 	{
 		MessageChannel channelUsed = message.getChannel();
 		long id = message.getMember().getIdLong();
@@ -116,7 +116,7 @@ public class PartyCommands extends CommandSet<GameParty>
 		channelUsed.sendMessage(messageToSend).queue();
 	}
 
-	public static void leave(GameParty party, Message userMessage)
+	public static void leave(Party party, Message userMessage)
 	{
 		long id = userMessage.getMember().getIdLong();
 		MessageChannel channelUsed = userMessage.getChannel();
@@ -143,7 +143,7 @@ public class PartyCommands extends CommandSet<GameParty>
 		channelUsed.sendMessage(message).queue();
 	}
 
-	public static void displayParty(GameParty game, Message message)
+	public static void displayParty(Party game, Message message)
 	{
 		MessageChannel channelUsed = message.getChannel();
 		String description = "";
@@ -157,14 +157,14 @@ public class PartyCommands extends CommandSet<GameParty>
 		channelUsed.sendMessage(embed).queue();
 	}
 
-	public static void endParty(GameParty game, Message message)
+	public static void endParty(Party game, Message message)
 	{
 		game.registerAsListener(false);
 		game.getMainListener().endParty(game);
 		message.getChannel().sendMessage("Party ended").queue();
 	}
 
-	public static void displayConfig(GameParty party, Message message)
+	public static void displayConfig(Party party, Message message)
 	{
 		String[] words = message.getContentRaw().split(" ", 2);
 
@@ -191,7 +191,7 @@ public class PartyCommands extends CommandSet<GameParty>
 		message.getChannel().sendMessage(embed.build()).queue();
 	}
 
-	public static void noMin(GameParty party, Message message)
+	public static void noMin(Party party, Message message)
 	{
 		if (message.getMember().getIdLong() != party.getGameLeader().getID())
 		{
@@ -220,7 +220,7 @@ public class PartyCommands extends CommandSet<GameParty>
 		}
 	}
 
-	public static void setRand(GameParty game, Message message)
+	public static void setRand(Party game, Message message)
 	{
 		if (message.getMember().getIdLong() != game.getGameLeader().getID())
 		{
