@@ -27,7 +27,6 @@ public class PartyCommands extends CommandSet<Party>
 		addCommand(true, PartyCommands::setGame, "setgame");
 		addCommand(false, PartyCommands::displayParty, "party");
 		addCommand(true, PartyCommands::displayConfig, "config");
-		addCommand(true, PartyCommands::noMin, "nomin");
 		addCommand(true, PartyCommands::setRand, "setrand");
 	}
 
@@ -189,35 +188,6 @@ public class PartyCommands extends CommandSet<Party>
 		.addField("Game Config", selectedGameMode.getConfig(), true);
 
 		message.getChannel().sendMessage(embed.build()).queue();
-	}
-
-	public static void noMin(Party party, Message message)
-	{
-		if (message.getMember().getIdLong() != party.getGameLeader().getID())
-		{
-			message.getChannel().sendMessage(String.format("Only party leader (<@%d>) can configure the game!", party.getGameLeader().getID())).queue();
-			return;
-		}
-
-		String syntax = "Syntax is: " + party.getPrefix() + "nomin [0|1]";
-		String words[] = message.getContentRaw().split(" ");
-		int activator = 0;
-		if (words.length != 2) message.getChannel().sendMessage(syntax).queue();
-		else
-		{
-			try
-			{
-				activator = Integer.parseInt(words[1]);
-			}
-			catch (NumberFormatException e)
-			{
-				message.getChannel().sendMessage(syntax).queue();
-				return;
-			}
-			party.getConfig().byPassMin(activator == 1);
-			if (party.getConfig().getMin() == 0) message.getChannel().sendMessage("No minimum players requried anymore.").queue();
-			else message.getChannel().sendMessage("Default minimum players required.").queue();
-		}
 	}
 
 	public static void setRand(Party game, Message message)

@@ -6,7 +6,6 @@ import io.github.dinglydo.town.games.parser.GameParser;
 
 public class DiscordGameConfig
 {
-	private boolean noMinPlayers = false;
 	private boolean isRand = false;
 
 	private GameMode gameMode;
@@ -54,12 +53,7 @@ public class DiscordGameConfig
 
 	public int getMin()
 	{
-		if (noMinPlayers) return 0;
+		if (isRand) return 0;
 		return gameMode.getMinimumTotalPlayers();
-	}
-
-	public void byPassMin(boolean value)
-	{
-		noMinPlayers = value;
 	}
 }
