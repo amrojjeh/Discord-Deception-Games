@@ -1,10 +1,12 @@
 package io.github.dinglydo.town.mafia.roles;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import io.github.dinglydo.town.discordgame.DiscordGame;
 import io.github.dinglydo.town.mafia.phases.Morning;
 import io.github.dinglydo.town.mafia.phases.Night;
 import io.github.dinglydo.town.persons.AttributeValue;
@@ -25,8 +27,26 @@ import io.github.dinglydo.town.roles.RoleData;
  */
 public class Medium implements Role
 {
-	public final String name = "Medium";
-	public final Attributes attr = new Attributes(AttributeValue.NONE, AttributeValue.NONE);
+	private final Attributes attr = new Attributes(AttributeValue.NONE, AttributeValue.NONE);
+	private final DiscordGame game;
+	private final ArrayList<DiscordGamePerson> players = new ArrayList<>();
+
+	public Medium(DiscordGame game)
+	{
+		this.game = game;
+	}
+
+	@Override
+	public DiscordGame getGame()
+	{
+		return game;
+	}
+
+	@Override
+	public TVMRole getRole()
+	{
+		return TVMRole.MEDIUM;
+	}
 
 	@Override
 	public String getHelp()
@@ -68,13 +88,6 @@ public class Medium implements Role
 
 	@Override
 	@Nonnull
-	public String getName()
-	{
-		return name;
-	}
-
-	@Override
-	@Nonnull
 	public Faction getFaction()
 	{
 		return Faction.TOWN;
@@ -91,5 +104,11 @@ public class Medium implements Role
 	public int getPriority()
 	{
 		return 0;
+	}
+
+	@Override
+	public ArrayList<DiscordGamePerson> getPlayers()
+	{
+		return players;
 	}
 }

@@ -18,8 +18,26 @@ import io.github.dinglydo.town.roles.RoleData;
 
 public class Lookout implements Role
 {
-	public final Attributes attr = new Attributes(AttributeValue.NONE, AttributeValue.NONE);
-	public final String name = "Lookout";
+	private final Attributes attr = new Attributes(AttributeValue.NONE, AttributeValue.NONE);
+	private final DiscordGame game;
+	private final ArrayList<DiscordGamePerson> players = new ArrayList<>();
+
+	public Lookout(DiscordGame game)
+	{
+		this.game = game;
+	}
+
+	@Override
+	public DiscordGame getGame()
+	{
+		return game;
+	}
+
+	@Override
+	public TVMRole getRole()
+	{
+		return TVMRole.LOOKOUT;
+	}
 
 	@Override
 	@Nonnull
@@ -77,13 +95,6 @@ public class Lookout implements Role
 
 	@Override
 	@Nonnull
-	public String getName()
-	{
-		return name;
-	}
-
-	@Override
-	@Nonnull
 	public Faction getFaction()
 	{
 		return Faction.TOWN;
@@ -100,6 +111,12 @@ public class Lookout implements Role
 	public int getPriority()
 	{
 		return 0;
+	}
+
+	@Override
+	public ArrayList<DiscordGamePerson> getPlayers()
+	{
+		return players;
 	}
 }
 

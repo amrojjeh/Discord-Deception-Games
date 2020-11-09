@@ -1,16 +1,35 @@
 package io.github.dinglydo.town.roles;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Nonnull;
 
+import io.github.dinglydo.town.discordgame.DiscordGame;
 import io.github.dinglydo.town.mafia.phases.Morning;
+import io.github.dinglydo.town.mafia.roles.TVMRole;
 import io.github.dinglydo.town.persons.Attributes;
 import io.github.dinglydo.town.persons.DiscordGamePerson;
 import io.github.dinglydo.town.phases.Phase;
 
 public interface Role
 {
+	DiscordGame getGame();
+
+	TVMRole getRole();
+
+	ArrayList<DiscordGamePerson> getPlayers();
+
+	default void addPlayer(DiscordGamePerson person)
+	{
+		getPlayers().add(person);
+	}
+
+	default int getPlayerAmount()
+	{
+		return getPlayers().size();
+	}
+
 	Attributes getAttributes();
 
 	List<DiscordGamePerson> getPossibleTargets(DiscordGamePerson user);
@@ -37,7 +56,10 @@ public interface Role
 
 	String getHelp();
 
-	String getName();
+	default String getName()
+	{
+		return getRole().getName();
+	}
 
 	Faction getFaction();
 

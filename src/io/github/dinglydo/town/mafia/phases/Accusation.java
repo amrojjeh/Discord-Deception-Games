@@ -52,7 +52,7 @@ public class Accusation extends Phase
 	public void putPlayerOnTrial(DiscordGamePerson p)
 	{
 		getPhaseManager().end();
-		getGame().getGuild().modifyMemberRoles(p.getMember(), getGame().getRole("defendant").getRole())
+		getGame().getGuild().modifyMemberRoles(p.getMember(), getGame().getDiscordRole("defendant").getRole())
 		.queue();
 		getPhaseManager().start(getGame(), new Trial(getGame(), getPhaseManager(), p, numTrials - 1));
 	}

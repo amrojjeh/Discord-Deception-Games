@@ -3,12 +3,9 @@ package io.github.dinglydo.town.games.parser;
 import java.util.ArrayList;
 
 import io.github.dinglydo.town.games.GameMode;
-import io.github.dinglydo.town.mafia.roles.Civilian;
-import io.github.dinglydo.town.mafia.roles.Doctor;
-import io.github.dinglydo.town.mafia.roles.Lookout;
-import io.github.dinglydo.town.mafia.roles.Medium;
-import io.github.dinglydo.town.mafia.roles.SerialKiller;
-import io.github.dinglydo.town.roles.Role;
+import io.github.dinglydo.town.mafia.roles.TVMRole;
+import io.github.dinglydo.town.persons.assigner.Assigner;
+import io.github.dinglydo.town.roles.RoleBuilder;
 import io.github.dinglydo.town.util.JavaHelper;
 
 public class GameParser
@@ -36,10 +33,10 @@ public class GameParser
 			throw new IllegalArgumentException("No valid rules parsed in **" + str + "**");
 		while (currentLine != lines.length)
 		{
-			Rule rule = parseRule(lines[currentLine++]);
-			if (rule.totalPlayers != calculateImplicitTotalPlayers(rule.roles))
+			Assigner rule = parseRule(lines[currentLine++]);
+			if (rule.getMinimumPlayers() != calculateImplicitTotalPlayers(rule.getRoles()))
 				throw new IllegalArgumentException("The total number of players does not equal the max number of players pass in the rule: **" + str + "**");
-			game.addRule(rule);
+			game.addAssigner(rule);
 		}
 		return game;
 	}
@@ -54,57 +51,45 @@ public class GameParser
 		return true;
 	}
 
-	public static Rule parseRule(String str)
+	public static Assigner parseRule(String str)
 	{
-		Rule rule = new Rule(getExplicitTotalPlayers(str));
-		String[] tuples = str.replaceFirst(rule.totalPlayers + "", "").split(",");
+		// TODO: What if there is only one role?
+		Assigner assigner = new Assigner(getExplicitTotalPlayers(str));
+		String[] tuples = str.replaceFirst(assigner.getMinimumPlayers() + "", "").split(",");
 		if (tuples.length == 0)
 			throw new IllegalArgumentException("No roles passed");
 		for (String tuple : tuples)
-			rule.addRole(getRoleFromTuple(tuple.strip()));
-
-		return rule;
+			assigner.addRole(parseRole(tuple.strip()));
+		return assigner;
 	}
 
-	public static RoleInfo getRoleFromTuple(String tuple)
+	public static RoleBuilder parseRole(String str)
 	{
-		String[] splitTuple = tuple.split(" ");
+		String[] splitTuple = str.split(" ");
 		Integer roleMax = JavaHelper.parseInt(splitTuple[splitTuple.length - 1].replace("+", ""));
 		if (roleMax == null)
-			throw new IllegalArgumentException("No role max was passed in the tuple: " + tuple);
+			throw new IllegalArgumentException("No role max was passed in the tuple: " + str);
 		splitTuple[splitTuple.length - 1] = "";
 		String roleName = String.join(" ", splitTuple);
 
-		Role role = getRoleFromName(roleName.strip().toLowerCase());
+		TVMRole role = getRoleFromName(roleName);
 		if (role == null)
-			throw new IllegalArgumentException("Role name (" + roleName.strip() + ") not found in: **" + tuple + "**");
-		return new RoleInfo(role, roleMax, tuple.charAt(tuple.length() - 1) == '+');
+			throw new IllegalArgumentException("Role name (" + roleName.strip() + ") not found in: **" + str + "**");
+		return new RoleBuilder(role)
+				.setDefault(str.length() - 1 == '+')
+				.setMinimum(roleMax);
 	}
 
-	public static Role getRoleFromName(String roleName)
+	public static TVMRole getRoleFromName(String roleName)
 	{
-		switch (roleName)
-		{
-		case "serial killer":
-			return new SerialKiller();
-		case "doctor":
-			return new Doctor();
-		case "medium":
-			return new Medium();
-		case "civilian":
-			return new Civilian();
-		case "lookout":
-			return new Lookout();
-		default:
-			return null;
-		}
+		return TVMRole.valueOf(roleName.strip().toUpperCase().replace(" ", "_"));
 	}
 
-	public static int calculateImplicitTotalPlayers(ArrayList<RoleInfo> singleRoles)
+	public static int calculateImplicitTotalPlayers(ArrayList<RoleBuilder> singleRoles)
 	{
 		int sum = 0;
-		for (RoleInfo sr : singleRoles)
-			sum += sr.max;
+		for (RoleBuilder sr : singleRoles)
+			sum += sr.getMinimum();
 		return sum;
 	}
 

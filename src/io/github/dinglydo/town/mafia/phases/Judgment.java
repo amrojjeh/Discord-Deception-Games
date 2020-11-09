@@ -51,7 +51,7 @@ public class Judgment extends Phase
 		else if(numTrials > 0)
 		{
 			if (!defendant.isDisconnected())
-				getGame().getGuild().modifyMemberRoles(defendant.getMember(), getGame().getRole("player").getRole()).queue();
+				getGame().getGuild().modifyMemberRoles(defendant.getMember(), getGame().getDiscordRole("player").getRole()).queue();
 			return new Accusation(getGame(), getPhaseManager(), numTrials);
 		}
 		else

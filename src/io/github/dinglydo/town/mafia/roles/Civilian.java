@@ -6,6 +6,7 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import io.github.dinglydo.town.discordgame.DiscordGame;
 import io.github.dinglydo.town.persons.AttributeValue;
 import io.github.dinglydo.town.persons.Attributes;
 import io.github.dinglydo.town.persons.DiscordGamePerson;
@@ -16,8 +17,26 @@ import io.github.dinglydo.town.roles.RoleData;
 
 public class Civilian implements Role
 {
-	public final Attributes attr = new Attributes(AttributeValue.NONE, AttributeValue.NONE);
-	public final String name = "Civillian";
+	private final Attributes attr = new Attributes(AttributeValue.NONE, AttributeValue.NONE);
+	private final DiscordGame game;
+	private ArrayList<DiscordGamePerson> players = new ArrayList<>();
+
+	public Civilian(DiscordGame game)
+	{
+		this.game = game;
+	}
+
+	@Override
+	public DiscordGame getGame()
+	{
+		return game;
+	}
+
+	@Override
+	public TVMRole getRole()
+	{
+		return TVMRole.CIVILIAN;
+	}
 
 	@Override
 	public String getHelp()
@@ -59,14 +78,14 @@ public class Civilian implements Role
 	}
 
 	@Override
-	public String getName()
-	{
-		return name;
-	}
-
-	@Override
 	public int getPriority()
 	{
 		return 0;
+	}
+
+	@Override
+	public ArrayList<DiscordGamePerson> getPlayers()
+	{
+		return players;
 	}
 }

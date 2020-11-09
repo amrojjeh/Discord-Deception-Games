@@ -172,6 +172,7 @@ public class DiscordGamePerson
 		if (role == null) throw new IllegalArgumentException("Role was null");
 		this.roleData = role.getInitialRoleData();
 		if (roleData == null) throw new IllegalArgumentException("No roledata found from " + role.getName());
+		role.addPlayer(this);
 	}
 
 	/**
@@ -288,7 +289,7 @@ public class DiscordGamePerson
 		if (!alive) return;
 		if (!reason.isEmpty()) causeOfDeath = reason;
 		if (!isDisconnected())
-			addDiscordRole(getGame().getRole("dead"));
+			addDiscordRole(getGame().getDiscordRole("dead"));
 		if (saveForMorning)
 			getGame().saveForMorning(this);
 		alive = false;

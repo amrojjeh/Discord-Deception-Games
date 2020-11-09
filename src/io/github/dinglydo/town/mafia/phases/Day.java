@@ -26,7 +26,7 @@ public class Day extends Phase
 		getGame().toggleVC("Daytime", true).queue();
 
 		getGame().getPlayersCache().forEach((person) -> checkVictory(person));
-		RestHelper.queueAll(getGame().getRole("dead").muteAllInRole(true));
+		RestHelper.queueAll(getGame().getDiscordRole("dead").muteAllInRole(true));
 		getPhaseManager().setWarningInSeconds(5);
 	}
 

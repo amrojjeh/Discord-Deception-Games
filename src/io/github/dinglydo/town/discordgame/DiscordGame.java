@@ -13,8 +13,10 @@ import javax.annotation.Nullable;
 import io.github.dinglydo.town.DiscordGameConfig;
 import io.github.dinglydo.town.MainListener;
 import io.github.dinglydo.town.events.TownEvent;
+import io.github.dinglydo.town.mafia.roles.TVMRole;
 import io.github.dinglydo.town.party.Party;
 import io.github.dinglydo.town.persons.DiscordGamePerson;
+import io.github.dinglydo.town.persons.assigner.Assigner;
 import io.github.dinglydo.town.phases.Phase;
 import io.github.dinglydo.town.phases.PhaseManager;
 import io.github.dinglydo.town.roles.Faction;
@@ -52,6 +54,8 @@ public class DiscordGame
 
 	private LinkedList<DiscordGamePerson> savedForMorning = new LinkedList<>();
 	private ArrayList<DiscordGamePerson> players = new ArrayList<>();
+	private ArrayList<Role> roles = new ArrayList<>();
+	private Assigner assignerUsed;
 
 	private int dayNum = 1;
 	private boolean ended = false;
@@ -89,6 +93,32 @@ public class DiscordGame
 		return players;
 	}
 
+	public ArrayList<Role> getRoles()
+	{
+		return roles;
+	}
+
+	public void addRole(Role role)
+	{
+		roles.add(role);
+	}
+
+	@Nullable
+	public Role getRole(TVMRole role)
+	{
+		for (Role r : getRoles())
+		{
+			if (r.getRole() == role)
+				return r;
+		}
+		return null;
+	}
+
+	public Assigner getAssignerUsed()
+	{
+		return assignerUsed;
+	}
+
 	public void registerAsListener(boolean register)
 	{
 		if (register && !registeredListener)
@@ -113,7 +143,7 @@ public class DiscordGame
 		DiscordGame game = new DiscordGame(party.getMainListener(), party.getConfig());
 		game.identifier = identifier;
 		game.registerAsListener(true);
-		game.players = game.getConfig().getGameMode().build(party, game, game.getConfig().isRandom());
+		game.assignerUsed = game.getConfig().getGameMode().build(party, game, game.getConfig().isRandom());
 		game.createServer();
 		return game;
 	}
@@ -129,7 +159,7 @@ public class DiscordGame
 	private void createNewChannels(GuildAction g)
 	{
 		// this channel used for general game updates
-		for (Role role : getConfig().getGameMode().getClosestRule(getPlayersCache().size()).getRoles())
+		for (Role role : getRoles())
 			g.newRole().setName(role.getName()).setPermissionsRaw(0l);
 
 		g.newRole().setName("Bot").addPermissions(Permission.ADMINISTRATOR).setColor(Color.YELLOW);
@@ -337,7 +367,7 @@ public class DiscordGame
 	 * @return the DiscordRole corresponding to the name
 	 */
 	@Nullable
-	public DiscordRole getRole(String roleName)
+	public DiscordRole getDiscordRole(String roleName)
 	{
 		for (DiscordRole role : discordRoles)
 		{
@@ -390,7 +420,7 @@ public class DiscordGame
 
 	public PermissionOverrideAction setChannelVisibility(String roleName, String channelName, boolean read, boolean write)
 	{
-		return setChannelVisibility(getRole(roleName).getRole(), channelName, read, write);
+		return setChannelVisibility(getDiscordRole(roleName).getRole(), channelName, read, write);
 	}
 
 	/**
@@ -494,7 +524,7 @@ public class DiscordGame
 		guild.addRoleToMember(getJDA().getSelfUser().getIdLong(), guild.getRolesByName("Bot", false).get(0)).queue();
 
 		List<net.dv8tion.jda.api.entities.Role> guildRoles = guild.getRoles();
-		for (int x = 0; x < config.getGameMode().getClosestRule(getPlayersCache().size()).getRoles().size(); ++x)
+		for (int x = 0; x < getRoles().size(); ++x)
 		{
 			net.dv8tion.jda.api.entities.Role townRole = guildRoles.get(guildRoles.size() - x - 2);
 			discordRoles.add(townRole.getName().toLowerCase(), townRole.getIdLong());

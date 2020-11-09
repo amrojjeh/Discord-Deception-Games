@@ -22,8 +22,8 @@ public class LastWords extends Phase
 		RestHelper.queueAll
 		(
 			getGame().sendMessageToTextChannel("daytime_discussion", String.format("What are your last words? <@%d>", defendant.getID())),
-			getGame().getRole("player").muteAllInRole(true),
-			getGame().getRole("defendant").muteAllInRole(false),
+			getGame().getDiscordRole("player").muteAllInRole(true),
+			getGame().getDiscordRole("defendant").muteAllInRole(false),
 			getGame().setChannelVisibility("player", "daytime_discussion", true, false)
 		);
 	}
@@ -35,7 +35,7 @@ public class LastWords extends Phase
 		getGame().sendMessageToTextChannel("daytime_discussion", "Their role was: " + defendant.getRole().getName())
 		.queue();
 
-		RestHelper.queueAll(getGame().getRole("player").muteAllInRole(false));
+		RestHelper.queueAll(getGame().getDiscordRole("player").muteAllInRole(false));
 	}
 
 	@Override

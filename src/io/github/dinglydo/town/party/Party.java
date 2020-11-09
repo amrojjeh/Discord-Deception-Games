@@ -7,8 +7,8 @@ import javax.annotation.Nullable;
 import io.github.dinglydo.town.DiscordGameConfig;
 import io.github.dinglydo.town.MainListener;
 import io.github.dinglydo.town.commands.PartyCommands;
-import io.github.dinglydo.town.games.parser.Rule;
 import io.github.dinglydo.town.persons.LobbyPerson;
+import io.github.dinglydo.town.persons.assigner.Assigner;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
@@ -172,8 +172,8 @@ public class Party extends ListenerAdapter
 	public boolean isPartyFull()
 	{
 		int size = getPlayerSize();
-		Rule rule = getConfig().getGameMode().getClosestRule(size);
-		return !rule.hasDefault() && !getConfig().isRandom() && rule.totalPlayers < size + 1;
+		Assigner assigner = getConfig().getGameMode().getClosestAssigner(size);
+		return !assigner.hasDefault() && !getConfig().isRandom() && assigner.getMinimumPlayers() < size + 1;
 	}
 
 	public boolean isPartyEmpty()

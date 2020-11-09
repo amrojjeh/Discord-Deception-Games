@@ -19,8 +19,26 @@ import io.github.dinglydo.town.roles.RoleData;
 
 public class Doctor implements Role
 {
-	public final Attributes attr = new Attributes(AttributeValue.NONE, AttributeValue.NONE);
-	public final String name = "Doctor";
+	private final Attributes attr = new Attributes(AttributeValue.NONE, AttributeValue.NONE);
+	private final DiscordGame game;
+	private final ArrayList<DiscordGamePerson> players = new ArrayList<>();
+
+	public Doctor(DiscordGame game)
+	{
+		this.game = game;
+	}
+
+	@Override
+	public DiscordGame getGame()
+	{
+		return game;
+	}
+
+	@Override
+	public TVMRole getRole()
+	{
+		return TVMRole.DOCTOR;
+	}
 
 	public DoctorData getRoleDataFromPerson(DiscordGamePerson user)
 	{
@@ -93,13 +111,6 @@ public class Doctor implements Role
 
 	@Override
 	@Nonnull
-	public String getName()
-	{
-		return name;
-	}
-
-	@Override
-	@Nonnull
 	public Faction getFaction()
 	{
 		return Faction.TOWN;
@@ -115,6 +126,12 @@ public class Doctor implements Role
 	public int getPriority()
 	{
 		return 3;
+	}
+
+	@Override
+	public ArrayList<DiscordGamePerson> getPlayers()
+	{
+		return players;
 	}
 }
 
