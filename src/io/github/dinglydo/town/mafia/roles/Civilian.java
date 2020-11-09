@@ -7,6 +7,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import io.github.dinglydo.town.discordgame.DiscordGame;
+import io.github.dinglydo.town.mafia.factions.Town;
 import io.github.dinglydo.town.persons.AttributeValue;
 import io.github.dinglydo.town.persons.Attributes;
 import io.github.dinglydo.town.persons.DiscordGamePerson;
@@ -19,11 +20,13 @@ public class Civilian implements Role
 {
 	private final Attributes attr = new Attributes(AttributeValue.NONE, AttributeValue.NONE);
 	private final DiscordGame game;
-	private ArrayList<DiscordGamePerson> players = new ArrayList<>();
+	private final ArrayList<DiscordGamePerson> players = new ArrayList<>();
+	private final Faction faction;
 
 	public Civilian(DiscordGame game)
 	{
 		this.game = game;
+		this.faction = getGame().getFactionManager().getOrAddGlobalFaction("TOWN", Town::new);
 	}
 
 	@Override
@@ -74,7 +77,7 @@ public class Civilian implements Role
 	@Nonnull
 	public Faction getFaction()
 	{
-		return Faction.TOWN;
+		return faction;
 	}
 
 	@Override

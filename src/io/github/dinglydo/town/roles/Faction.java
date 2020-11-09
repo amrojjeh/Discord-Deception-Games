@@ -1,39 +1,42 @@
 package io.github.dinglydo.town.roles;
 
-import java.util.function.Consumer;
-import java.util.function.Predicate;
+import java.util.ArrayList;
 
 import io.github.dinglydo.town.discordgame.DiscordGame;
-import io.github.dinglydo.town.mafia.helper.FactionHelper;
+import io.github.dinglydo.town.persons.DiscordGamePerson;
 
-public enum Faction
+public interface Faction
 {
-	TOWN("Town", FactionHelper::isTownLeft, FactionHelper::townWin),
-	SERIAL_KILLER("Serial Killer", FactionHelper::isSKLeft, FactionHelper::skWin);
+	String getName();
 
-	private final String name;
-	private final Predicate<DiscordGame> canWin;
-	private final Consumer<DiscordGame> win;
+	String getCodeName();
 
-	Faction(String name, Predicate<DiscordGame> canWin, Consumer<DiscordGame> win)
+	boolean canWin();
+
+	void win();
+
+	DiscordGame getGame();
+
+	/**
+	 * Whether the faction is the last one standing.
+	 * @return Returns true if every alive player is part of the faction
+	 */
+	default boolean isFactionAlone()
 	{
-		this.name = name;
-		this.canWin = canWin;
-		this.win = win;
+		return getPlayersAlive().length == getGame().getAlivePlayers().size();
 	}
 
-	public String getName()
+	default void factionWin()
 	{
-		return name;
+		getGame().winTownFaction(this);
+		getGame().sendMessageToTextChannel("daytime_discussion", "**" + getName() + " has won!**").queue();
+		getGame().endGame();
 	}
 
-	public boolean canWin(DiscordGame game)
-	{
-		return canWin.test(game);
-	}
+	ArrayList<DiscordGamePerson> getPlayers();
 
-	public void win(DiscordGame game)
+	default DiscordGamePerson[] getPlayersAlive()
 	{
-		win.accept(game);
+		return getPlayers().stream().filter(p -> p.isAlive()).toArray(DiscordGamePerson[]::new);
 	}
 }

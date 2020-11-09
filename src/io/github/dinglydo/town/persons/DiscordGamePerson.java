@@ -168,6 +168,8 @@ public class DiscordGamePerson
 	 */
 	public void setRole(@Nonnull Role role)
 	{
+		if (getRole() != null)
+			getRole().removePlayer(this);
 		this.role = role;
 		if (role == null) throw new IllegalArgumentException("Role was null");
 		this.roleData = role.getInitialRoleData();

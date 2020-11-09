@@ -13,6 +13,7 @@ import javax.annotation.Nullable;
 import io.github.dinglydo.town.DiscordGameConfig;
 import io.github.dinglydo.town.MainListener;
 import io.github.dinglydo.town.events.TownEvent;
+import io.github.dinglydo.town.mafia.phases.End;
 import io.github.dinglydo.town.mafia.roles.TVMRole;
 import io.github.dinglydo.town.party.Party;
 import io.github.dinglydo.town.persons.DiscordGamePerson;
@@ -55,6 +56,7 @@ public class DiscordGame
 	private LinkedList<DiscordGamePerson> savedForMorning = new LinkedList<>();
 	private ArrayList<DiscordGamePerson> players = new ArrayList<>();
 	private ArrayList<Role> roles = new ArrayList<>();
+	private FactionManager factionManager = new FactionManager(this);
 	private Assigner assignerUsed;
 
 	private int dayNum = 1;
@@ -98,9 +100,12 @@ public class DiscordGame
 		return roles;
 	}
 
+	// TODO: Check for duplicates
 	public void addRole(Role role)
 	{
-		roles.add(role);
+		if (getRole(role.getRole()) == null)
+			getRoles().add(role);
+		else throw new IllegalArgumentException("");
 	}
 
 	@Nullable
@@ -112,6 +117,11 @@ public class DiscordGame
 				return r;
 		}
 		return null;
+	}
+
+	public FactionManager getFactionManager()
+	{
+		return factionManager;
 	}
 
 	public Assigner getAssignerUsed()
@@ -209,19 +219,17 @@ public class DiscordGame
 //				executeCommand(this, config.getGameMode().getCommands(), prefix, message);
 //	}
 
+	public void endGame()
+	{
+		ended = true;
+		phaseManager.end();
+		phaseManager.start(this, new End(this, phaseManager));
+	}
 
-//
-//	public void endGame()
-//	{
-//		ended = true;
-//		phaseManager.end();
-//		phaseManager.start(this, new End(this, phaseManager));
-//	}
-//
-//	public boolean hasEnded()
-//	{
-//		return ended;
-//	}
+	public boolean hasEnded()
+	{
+		return ended;
+	}
 
 	public boolean wasServerCreated()
 	{
@@ -474,12 +482,12 @@ public class DiscordGame
 //		Person person = getPerson(m);
 //		m.mute(person.isMuted()).queue();
 //	}
-//
-//	public void winTownFaction(Faction faction)
-//	{
-//		wonTownRoles.add(faction);
-//	}
-//
+
+	public void winTownFaction(Faction faction)
+	{
+		wonTownRoles.add(faction);
+	}
+
 	public boolean hasTownFactionWon(Faction faction)
 	{
 		return wonTownRoles.contains(faction);

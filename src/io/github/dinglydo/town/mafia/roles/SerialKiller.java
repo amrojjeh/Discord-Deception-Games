@@ -20,10 +20,12 @@ public class SerialKiller implements Role
 	private final Attributes attr = new Attributes(AttributeValue.BASIC, AttributeValue.BASIC);
 	private final DiscordGame game;
 	private final ArrayList<DiscordGamePerson> players = new ArrayList<>();
+	private final Faction faction;
 
 	public SerialKiller(DiscordGame game)
 	{
 		this.game = game;
+		this.faction = game.getFactionManager().getOrAddGlobalFaction("SERIAL_KILLER", SerialKillerFaction::new);
 	}
 
 	@Override
@@ -96,7 +98,7 @@ public class SerialKiller implements Role
 	@Override
 	public Faction getFaction()
 	{
-		return Faction.SERIAL_KILLER;
+		return faction;
 	}
 
 	@Override
@@ -109,6 +111,53 @@ public class SerialKiller implements Role
 	public int getPriority()
 	{
 		return 5;
+	}
+
+	@Override
+	public ArrayList<DiscordGamePerson> getPlayers()
+	{
+		return players;
+	}
+}
+
+class SerialKillerFaction implements Faction
+{
+	private final DiscordGame game;
+	private final ArrayList<DiscordGamePerson> players = new ArrayList<>();
+
+	public SerialKillerFaction(DiscordGame game)
+	{
+		this.game = game;
+	}
+
+	@Override
+	public String getName()
+	{
+		return "Serial Killer";
+	}
+
+	@Override
+	public String getCodeName()
+	{
+		return "SERIAL_KILLER";
+	}
+
+	@Override
+	public boolean canWin()
+	{
+		return isFactionAlone();
+	}
+
+	@Override
+	public void win()
+	{
+		factionWin();
+	}
+
+	@Override
+	public DiscordGame getGame()
+	{
+		return game;
 	}
 
 	@Override

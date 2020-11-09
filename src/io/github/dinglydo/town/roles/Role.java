@@ -23,6 +23,13 @@ public interface Role
 	default void addPlayer(DiscordGamePerson person)
 	{
 		getPlayers().add(person);
+		getFaction().getPlayers().add(person);
+	}
+
+	default void removePlayer(DiscordGamePerson person)
+	{
+		getPlayers().remove(person);
+		getFaction().getPlayers().remove(person);
 	}
 
 	default int getPlayerAmount()
@@ -45,13 +52,13 @@ public interface Role
 	default boolean canWin(@Nonnull DiscordGamePerson user)
 	{
 		if (user == null) throw new NullPointerException("User cannot be an exception");
-		return getFaction().canWin(user.getGame());
+		return getFaction().canWin();
 	}
 
 	default void win(@Nonnull DiscordGamePerson user)
 	{
 		if (user == null) throw new NullPointerException("User cannot be an exception");
-		getFaction().win(user.getGame());
+		getFaction().win();
 	}
 
 	String getHelp();

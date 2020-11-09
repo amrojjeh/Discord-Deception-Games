@@ -7,6 +7,7 @@ import javax.annotation.Nonnull;
 
 import io.github.dinglydo.town.discordgame.DiscordGame;
 import io.github.dinglydo.town.events.TownEvent;
+import io.github.dinglydo.town.mafia.factions.Town;
 import io.github.dinglydo.town.mafia.phases.Night;
 import io.github.dinglydo.town.persons.AttributeValue;
 import io.github.dinglydo.town.persons.Attributes;
@@ -21,10 +22,12 @@ public class Lookout implements Role
 	private final Attributes attr = new Attributes(AttributeValue.NONE, AttributeValue.NONE);
 	private final DiscordGame game;
 	private final ArrayList<DiscordGamePerson> players = new ArrayList<>();
+	private final Faction faction;
 
 	public Lookout(DiscordGame game)
 	{
 		this.game = game;
+		this.faction = game.getFactionManager().getOrAddGlobalFaction("TOWN", Town::new);
 	}
 
 	@Override
@@ -97,7 +100,7 @@ public class Lookout implements Role
 	@Nonnull
 	public Faction getFaction()
 	{
-		return Faction.TOWN;
+		return faction;
 	}
 
 	@Override

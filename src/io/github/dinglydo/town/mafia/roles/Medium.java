@@ -7,6 +7,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import io.github.dinglydo.town.discordgame.DiscordGame;
+import io.github.dinglydo.town.mafia.factions.Town;
 import io.github.dinglydo.town.mafia.phases.Morning;
 import io.github.dinglydo.town.mafia.phases.Night;
 import io.github.dinglydo.town.persons.AttributeValue;
@@ -30,10 +31,12 @@ public class Medium implements Role
 	private final Attributes attr = new Attributes(AttributeValue.NONE, AttributeValue.NONE);
 	private final DiscordGame game;
 	private final ArrayList<DiscordGamePerson> players = new ArrayList<>();
+	private final Faction faction;
 
 	public Medium(DiscordGame game)
 	{
 		this.game = game;
+		this.faction = game.getFactionManager().getOrAddGlobalFaction("TOWN", Town::new);
 	}
 
 	@Override
@@ -90,7 +93,7 @@ public class Medium implements Role
 	@Nonnull
 	public Faction getFaction()
 	{
-		return Faction.TOWN;
+		return faction;
 	}
 
 	@Override
