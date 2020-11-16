@@ -19,8 +19,8 @@ public class Night extends Phase
 	{
 		getGame().getPlayersCache().forEach(person -> checkVictory(person));
 
-//		if (getGame().hasEnded())
-//			return;
+		if (getGame().hasEnded())
+			return;
 
 		RestHelper.queueAll
 		(

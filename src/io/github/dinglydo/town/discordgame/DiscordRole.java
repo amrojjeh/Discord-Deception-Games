@@ -72,4 +72,19 @@ public class DiscordRole
 		}
 		return role.getManager().revokePermissions(Permission.VOICE_SPEAK);
 	}
+
+	public RoleManager muteAllInRoleUnless(DiscordRole r)
+	{
+		Role role = getRole();
+		List<Member> members = getGame().getGuild().getMembersWithRoles(role);
+		for (Member member : members)
+		{
+			DiscordGamePerson p = getGame().getPerson(member);
+			if (p.getDiscordRoles().contains(r)) continue;
+			p.mute(true);
+			p.syncMute();
+		}
+
+		return role.getManager().setPermissions(Permission.VOICE_SPEAK);
+	}
 }

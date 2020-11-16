@@ -23,6 +23,7 @@ import io.github.dinglydo.town.phases.Phase;
 import io.github.dinglydo.town.phases.PhaseManager;
 import io.github.dinglydo.town.roles.Faction;
 import io.github.dinglydo.town.roles.Role;
+import io.github.dinglydo.town.util.RestHelper;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.ChannelType;
@@ -173,19 +174,20 @@ public class DiscordGame
 		for (Role role : getRoles())
 			g.newRole().setName(role.getName()).setPermissionsRaw(0l);
 
-		g.newRole().setName("Bot").addPermissions(Permission.ADMINISTRATOR).setColor(Color.YELLOW);
-
-		g.newRole().setName("Player").setColor(Color.CYAN)
-				.setPermissionsRaw(QP.readPermissions() | QP.writePermissions() | QP.speakPermissions());
+		g.newRole().setName("Bot").addPermissions(Permission.ADMINISTRATOR).setColor(Color.YELLOW)
+		.setPosition(1);
 
 		RoleData deadPlayerRoleData = g.newRole().setName("Dead").setColor(Color.GRAY)
-				.setPermissionsRaw(QP.readPermissions());
+				.setPermissionsRaw(QP.readPermissions())
+				.setPosition(2);
 
 		RoleData defendantRoleData = g.newRole().setName("Defendant").setColor(Color.GREEN)
-				.setPermissionsRaw(QP.speakPermissions() | QP.writePermissions() | QP.readPermissions());
+				.setPermissionsRaw(QP.speakPermissions() | QP.writePermissions() | QP.readPermissions())
+				.setPosition(3);
 
-		// FIXME: WARNING: Unable to load JDK7 types (java.nio.file.Path): no Java7 type support added
-		// Is being caued by the addPermissionOverride method.
+		g.newRole().setName("Player").setColor(Color.CYAN)
+		.setPermissionsRaw(QP.readPermissions() | QP.writePermissions() | QP.speakPermissions())
+		.setPosition(4);
 
 		// players discussing during the day
 		g.newChannel(ChannelType.TEXT, "daytime_discussion")
@@ -212,6 +214,18 @@ public class DiscordGame
 	{
 		ended = true;
 		phaseManager.end();
+		RestHelper.queueAll
+		(
+				getDiscordRole("player").muteAllInRole(false),
+				setChannelVisibility("dead", "daytime_discussion", true, true),
+				setChannelVisibility("player", "daytime_discussion", true, true),
+				setChannelVisibility("player", "the_afterlife", true, true),
+				sendMessageToTextChannel("daytime_discussion",
+				"The game has ended! You can either `!delete` the server or `!transfer`" +
+				" the server. In 60 seconds if no choice is made, the server will delete itself." +
+				" (To transfer, the party leader must be in the server)")
+		);
+		openPrivateChannels();
 		phaseManager.start(this, new End(this, phaseManager));
 	}
 

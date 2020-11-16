@@ -65,7 +65,7 @@ public class Accusation extends Phase
 			Integer vote = numOfVotes.get(p);
 			if (vote == null) vote = 0;
 			description += "(votes " + vote + ") ";
-			description += ". <@" + p.getID() + ">\n";
+			description += getGame().getReferenceFromPerson(p) + ". <@" + p.getID() + ">\n";
 		}
 		return new EmbedBuilder().setTitle("Players Alive").setColor(Color.GREEN).setDescription(description).build();
 	}

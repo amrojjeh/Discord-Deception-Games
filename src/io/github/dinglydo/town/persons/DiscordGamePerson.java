@@ -1,5 +1,7 @@
 package io.github.dinglydo.town.persons;
 
+import java.util.ArrayList;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -95,6 +97,11 @@ public class DiscordGamePerson
 	public void addDiscordRole(DiscordRole role)
 	{
 		discordRoles.add(role);
+	}
+
+	public ArrayList<DiscordRole> getDiscordRoles()
+	{
+		return discordRoles;
 	}
 
 	public Member getMember()
