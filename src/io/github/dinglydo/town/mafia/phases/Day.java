@@ -19,13 +19,15 @@ public class Day extends Phase
 	@Override
 	public void start()
 	{
+		getGame().getPlayersCache().forEach((person) -> checkVictory(person));
+		if (getGame().hasEnded())
+			return;
 		getGame().sendMessageToTextChannel("daytime_discussion", "Day " + getGame().getDayNum() + " started")
 		.flatMap(msg -> getGame().setChannelVisibility("player", "daytime_discussion", true, true))
 		.queue();
 
 		getGame().toggleVC("Daytime", true).queue();
 
-		getGame().getPlayersCache().forEach((person) -> checkVictory(person));
 		RestHelper.queueAll(getGame().getDiscordRole("dead").muteAllInRole(true));
 		getPhaseManager().setWarningInSeconds(5);
 	}
