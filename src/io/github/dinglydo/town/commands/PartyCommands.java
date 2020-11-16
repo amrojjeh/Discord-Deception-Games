@@ -37,7 +37,7 @@ public class PartyCommands extends CommandSet<Party>
 		if (p.getPlayersCache().isEmpty())
 			message.getChannel().sendMessage("Not enough players to start a server!").queue();
 		else if (message.getMember().getIdLong() != p.getGameLeader().getID())
-			message.getChannel().sendMessage(String.format("Only party leader (<@%d>) can start the game!", p.getGameLeader())).queue();
+			message.getChannel().sendMessage(String.format("Only party leader (<@%d>) can start the game!", p.getGameLeader().getID())).queue();
 		else if (p.getPlayersCache().size() < c.getMin())
 			message.getChannel().sendMessage("Not enough players to play " + c.getGameMode().getName() + "! (" +
 		(c.getMin() - p.getPlayersCache().size()) + " left to play)").queue();

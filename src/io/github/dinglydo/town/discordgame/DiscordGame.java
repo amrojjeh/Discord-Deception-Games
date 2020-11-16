@@ -265,14 +265,6 @@ public class DiscordGame
 		return getPerson(member.getIdLong());
 	}
 
-//	public Person getPerson(int refNum)
-//	{
-//		for (Person person : persons)
-//			if (person.getNum() == refNum)
-//				return person;
-//		return null;
-//	}
-
 	public DiscordGamePerson getPerson(long id)
 	{
 		for (DiscordGamePerson person : getPlayersCache())
@@ -288,26 +280,6 @@ public class DiscordGame
 		return alive;
 	}
 
-//	public List<Person> getDeadPlayers()
-//	{
-//		ArrayList<Person> dead = new ArrayList<>();
-//		persons.stream().filter(p -> !p.isAlive()).forEach(p -> dead.add(p));
-//		return dead;
-//	}
-//
-//	public GuildChannel getGuildChannel(String channelName)
-//	{
-//		Long channelID = channels.get(channelName);
-//		return getGuildChannel(channelID);
-//	}
-//
-//	public GuildChannel getGuildChannel(Long channelID)
-//	{
-//		if (channelID != null)
-//			return getGameGuild().getGuildChannelById(channelID);
-//		return null;
-//	}
-//
 	public TextChannel getTextChannel(String channelName)
 	{
 		if (!serverCreated) throw new IllegalStateException("Server not created yet");
