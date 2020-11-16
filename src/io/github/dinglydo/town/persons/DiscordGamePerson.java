@@ -297,13 +297,16 @@ public class DiscordGamePerson
 		mute(true);
 		if (!alive) return;
 		if (!reason.isEmpty()) causeOfDeath = reason;
-		if (!isDisconnected())
-			addDiscordRole(getGame().getDiscordRole("dead"));
+		addDiscordRole(getGame().getDiscordRole("dead"));
+		addDiscordRole(getGame().getDiscordRole(getRole().getName()));
 		if (saveForMorning)
 			getGame().saveForMorning(this);
 		alive = false;
-		syncRoles();
-		syncMute();
+		if (canSync())
+		{
+			syncRoles();
+			syncMute();
+		}
 	}
 
 	/**

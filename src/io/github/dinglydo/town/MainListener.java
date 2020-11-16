@@ -118,14 +118,6 @@ public class MainListener extends ListenerAdapter
 		parties.remove(party);
 	}
 
-//	@Override
-//	public void onGuildMemberJoin(GuildMemberJoinEvent event)
-//	{
-//		DiscordGame game = games.get(event.getGuild().getIdLong());
-//		if (game != null)
-//			games.get(event.getGuild().getIdLong()).gameGuildJoin(event.getMember());
-//	}
-
 	@Override
 	public void onReady(ReadyEvent e)
 	{
@@ -143,31 +135,6 @@ public class MainListener extends ListenerAdapter
 		});
 		else if (member.getIdLong() == jda.getSelfUser().getIdLong()) guild.delete().queue();
 	}
-
-//	@Override
-//	public void onGuildVoiceJoin(GuildVoiceJoinEvent event)
-//	{
-//		DiscordGame game = games.get(event.getGuild().getIdLong());
-//		if (game == null) return;
-//		game.gameGuildVoiceJoin(event.getMember(), event.getChannelJoined());
-//	}
-
-//	@Override
-//	public void onGuildVoiceMove(GuildVoiceMoveEvent event)
-//	{
-//		DiscordGame game = games.get(event.getGuild().getIdLong());
-//		if (game == null) return;
-//		game.gameGuildVoiceJoin(event.getMember(), event.getChannelJoined());
-//	}
-
-
-//	@Override
-//	public void onGuildMemberLeave(GuildMemberLeaveEvent event)
-//	{
-//		DiscordGame game = games.get(event.getGuild().getIdLong());
-//		if (game == null) return;
-//		game.memberLeftGameGuild(event.getMember());
-//	}
 
 	@Override
 	public void onMessageReceived(MessageReceivedEvent e)

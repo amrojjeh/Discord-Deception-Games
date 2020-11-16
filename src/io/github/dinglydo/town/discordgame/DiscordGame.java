@@ -175,19 +175,19 @@ public class DiscordGame
 			g.newRole().setName(role.getName()).setPermissionsRaw(0l);
 
 		g.newRole().setName("Bot").addPermissions(Permission.ADMINISTRATOR).setColor(Color.YELLOW)
-		.setPosition(1);
-
-		RoleData deadPlayerRoleData = g.newRole().setName("Dead").setColor(Color.GRAY)
-				.setPermissionsRaw(QP.readPermissions())
-				.setPosition(2);
-
-		RoleData defendantRoleData = g.newRole().setName("Defendant").setColor(Color.GREEN)
-				.setPermissionsRaw(QP.speakPermissions() | QP.writePermissions() | QP.readPermissions())
-				.setPosition(3);
+		.setHoisted(true);
 
 		g.newRole().setName("Player").setColor(Color.CYAN)
 		.setPermissionsRaw(QP.readPermissions() | QP.writePermissions() | QP.speakPermissions())
-		.setPosition(4);
+		.setHoisted(true);
+
+		RoleData deadPlayerRoleData = g.newRole().setName("Dead").setColor(Color.GRAY)
+				.setPermissionsRaw(QP.readPermissions())
+				.setHoisted(true);
+
+		RoleData defendantRoleData = g.newRole().setName("Defendant").setColor(Color.GREEN)
+				.setPermissionsRaw(QP.speakPermissions() | QP.writePermissions() | QP.readPermissions())
+				.setHoisted(true);
 
 		// players discussing during the day
 		g.newChannel(ChannelType.TEXT, "daytime_discussion")
@@ -253,12 +253,14 @@ public class DiscordGame
 		getGuild().transferOwnership(member).reason("The game has ended").queue();
 	}
 
+	@Nullable
 	public DiscordGamePerson getPerson(Member member)
 	{
 		return getPerson(member.getIdLong());
 	}
 
-	public DiscordGamePerson getPerson(long id)
+	@Nullable
+	private DiscordGamePerson getPerson(long id)
 	{
 		for (DiscordGamePerson person : getPlayersCache())
 			if (person.getID() == id)
@@ -268,7 +270,10 @@ public class DiscordGame
 
 	public int getReferenceFromPerson(@Nonnull DiscordGamePerson person)
 	{
-		return getPlayersCache().indexOf(person) + 1;
+		int ref = getPlayersCache().indexOf(person) + 1;
+		if (ref <= 0)
+			throw new IllegalArgumentException("Person does not exist");
+		return ref;
 	}
 
 	public DiscordGamePerson getPersonFromReference(int ref)
@@ -449,15 +454,6 @@ public class DiscordGame
 		return action;
 	}
 
-//	public void gameGuildVoiceJoin(Member m, VoiceChannel channel)
-//	{
-//		if (!initiated) return;
-//		if (channel.getGuild().getIdLong() != getGameID()) return;
-//
-//		Person person = getPerson(m);
-//		m.mute(person.isMuted()).queue();
-//	}
-
 	public void winTownFaction(Faction faction)
 	{
 		wonTownRoles.add(faction);
@@ -485,13 +481,6 @@ public class DiscordGame
 		return savedForMorning.peek();
 	}
 
-//	public void memberLeftGameGuild(Member member)
-//	{
-//		Person person = getPerson(member);
-//		if (person != null)
-//			person.disconnect();
-//	}
-
 	public int getDayNum()
 	{
 		return dayNum;
@@ -510,7 +499,7 @@ public class DiscordGame
 		for (int x = 0; x < getRoles().size(); ++x)
 		{
 			net.dv8tion.jda.api.entities.Role townRole = guildRoles.get(guildRoles.size() - x - 2);
-			discordRoles.add(townRole.getName().toLowerCase(), townRole.getIdLong());
+			discordRoles.add(townRole.getName(), townRole.getIdLong());
 		}
 
 		DiscordRole playerRole = new DiscordRole(this, "player", guild.getRolesByName("Player", false).get(0).getIdLong());

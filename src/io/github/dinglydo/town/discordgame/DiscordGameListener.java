@@ -1,12 +1,17 @@
 package io.github.dinglydo.town.discordgame;
 
+import javax.annotation.Nonnull;
+
 import io.github.dinglydo.town.persons.DiscordGamePerson;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
+import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
 import net.dv8tion.jda.api.events.guild.update.GuildUpdateOwnerEvent;
+import net.dv8tion.jda.api.events.guild.voice.GuildVoiceJoinEvent;
+import net.dv8tion.jda.api.events.guild.voice.GuildVoiceMoveEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
@@ -14,8 +19,9 @@ public class DiscordGameListener extends ListenerAdapter
 {
 	private final DiscordGame game;
 
-	public DiscordGameListener(DiscordGame game)
+	public DiscordGameListener(@Nonnull DiscordGame game)
 	{
+		if (game == null) throw new IllegalArgumentException("Game cannot be null");
 		this.game = game;
 	}
 
@@ -98,4 +104,26 @@ public class DiscordGameListener extends ListenerAdapter
 		return game.getConfig().getGameMode().getCommands().executeCommand(game, prefix, message);
 	}
 
+	@Override
+	public void onGuildVoiceJoin(GuildVoiceJoinEvent event)
+	{
+		DiscordGamePerson person = game.getPerson(event.getMember());
+		person.syncMute();
+	}
+
+	@Override
+	public void onGuildVoiceMove(GuildVoiceMoveEvent event)
+	{
+		DiscordGamePerson person = game.getPerson(event.getMember());
+		person.syncMute();
+	}
+
+	@Override
+	public void onGuildMemberRemove(GuildMemberRemoveEvent event)
+	{
+		if (event.getGuild().getIdLong() != game.getGuildId()) return;
+		DiscordGamePerson person = game.getPerson(event.getMember());
+		if (person != null)
+			person.disconnect();
+	}
 }
