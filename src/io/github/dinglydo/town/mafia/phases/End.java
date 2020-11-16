@@ -47,15 +47,8 @@ public class End extends Phase
 		delete();
 	}
 
-	public void transfer()
-	{
-		getPhaseManager().end();
-		getGame().transferOrDelete();
-	}
-
 	public void delete()
 	{
-		getPhaseManager().end();
 		getGame().sendMessageToTextChannel("daytime_discussion", "!delete").queue();
 	}
 }

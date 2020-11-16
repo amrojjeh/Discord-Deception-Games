@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import io.github.dinglydo.town.DiscordGameConfig;
@@ -224,28 +225,18 @@ public class DiscordGame
 		return serverCreated;
 	}
 
-	public void transferOrDelete()
-	{
-		if (!transfer()) deleteServer();
-	}
-
 	public void deleteServer()
 	{
 		phaseManager.end();
+		registerAsListener(false);
 		getGuild().delete().queue();
 	}
 
-	public boolean transfer()
+	public void transfer(@Nonnull Member member)
 	{
 		phaseManager.end();
-		for (DiscordGamePerson p : getPlayersCache())
-		{
-			Member member = p.getMember();
-			if (member == null) continue;
-			getGuild().transferOwnership(member).reason("The game has ended").queue();
-			return true;
-		}
-		return false;
+		registerAsListener(false);
+		getGuild().transferOwnership(member).reason("The game has ended").queue();
 	}
 
 	public DiscordGamePerson getPerson(Member member)
@@ -259,6 +250,16 @@ public class DiscordGame
 			if (person.getID() == id)
 				return person;
 		return null;
+	}
+
+	public int getReferenceFromPerson(@Nonnull DiscordGamePerson person)
+	{
+		return getPlayersCache().indexOf(person) + 1;
+	}
+
+	public DiscordGamePerson getPersonFromReference(int ref)
+	{
+		return getPlayersCache().get(ref - 1);
 	}
 
 	public ArrayList<DiscordGamePerson> getAlivePlayers()

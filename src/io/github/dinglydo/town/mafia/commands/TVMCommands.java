@@ -7,9 +7,11 @@ import java.util.List;
 import io.github.dinglydo.town.commands.CommandSet;
 import io.github.dinglydo.town.discordgame.DiscordGame;
 import io.github.dinglydo.town.mafia.phases.Accusation;
+import io.github.dinglydo.town.mafia.phases.End;
 import io.github.dinglydo.town.mafia.phases.Judgment;
 import io.github.dinglydo.town.persons.DiscordGamePerson;
 import io.github.dinglydo.town.phases.Phase;
+import io.github.dinglydo.town.util.JavaHelper;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
@@ -28,6 +30,8 @@ public class TVMCommands extends CommandSet<DiscordGame>
 		addCommand(false, TVMCommands::innocent, "i", "inno", "innocent");
 		addCommand(false, TVMCommands::getTargets, "t", "targets");
 		addCommand(false, TVMCommands::displayParty, "p", "party");
+		addCommand(false, TVMCommands::delete, "delete");
+		addCommand(false, TVMCommands::transfer, "transfer");
 	}
 
 	public static void displayParty(DiscordGame game, Message message)
@@ -175,10 +179,24 @@ public class TVMCommands extends CommandSet<DiscordGame>
 		for (int x = 0; x < targets.size(); ++x)
 		{
 			DiscordGamePerson p = targets.get(x);
-			description += String.format(format, x + 1, p.getID()) + (p.isDisconnected() ? "(d)\n" : "\n");
+			description += String.format(format, game.getReferenceFromPerson(p), p.getID()) + (p.isDisconnected() ? "(d)\n" : "\n");
 		}
 		MessageEmbed embed = new EmbedBuilder().setColor(Color.GREEN).setTitle("Possible targets").setDescription(description).build();
 		user.sendMessage(embed);
+	}
+
+	public static void delete(DiscordGame game, Message message)
+	{
+		Phase phase = game.getCurrentPhase();
+		if (phase instanceof End)
+			game.deleteServer();
+	}
+
+	public static void transfer(DiscordGame game, Message message)
+	{
+		Phase phase = game.getCurrentPhase();
+		if (phase instanceof End)
+			game.transfer(message.getMember());
 	}
 
 	private static List<DiscordGamePerson> getPersonsFromMessage(DiscordGame game, Message message)
@@ -218,18 +236,10 @@ public class TVMCommands extends CommandSet<DiscordGame>
 		if (words.length == 1) return references;
 		for (int x = 1; x < words.length; ++x)
 		{
-			// Check if parsable
-			int personNum = 0; // 0 can't exist as a ref
-			try
-			{
-				personNum = Integer.parseInt(words[x]);
-			}
-			catch (NumberFormatException e)
-			{
-				return null;
-			}
+			Integer personNum = JavaHelper.parseInt(words[x]);
+			if (personNum == null) return null;
 
-			DiscordGamePerson reference = game.getPerson(personNum);
+			DiscordGamePerson reference = game.getPersonFromReference(personNum);
 			if (reference == null)
 			{
 				message.getChannel().sendMessage(String.format("Person with number %d doesn't exist", personNum)).queue();

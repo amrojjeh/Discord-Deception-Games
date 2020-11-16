@@ -144,17 +144,6 @@ public class MainListener extends ListenerAdapter
 		else if (member.getIdLong() == jda.getSelfUser().getIdLong()) guild.delete().queue();
 	}
 
-	// Bot should leave the game once the owner has changed
-//	@Override
-//	public void onGuildUpdateOwner(GuildUpdateOwnerEvent event)
-//	{
-//		DiscordGame game = games.get(event.getGuild().getIdLong());
-//		if (game == null) return;
-//		game.getGameGuild().leave().queue();
-//		games.remove(game.getGameID());
-//		parties.remove(game.getPartyID());
-//	}
-
 //	@Override
 //	public void onGuildVoiceJoin(GuildVoiceJoinEvent event)
 //	{
@@ -193,29 +182,6 @@ public class MainListener extends ListenerAdapter
 
 //		else if (lowerCaseMessage.startsWith(prefix + "help"))
 //			e.getChannel().sendMessage(helpTable()).queue();
-//		else if (lowerCaseMessage.contentEquals(prefix + "delete") || lowerCaseMessage.contentEquals("!delete"))
-//		{
-//			DiscordGame game = games.get(message.getGuild().getIdLong());
-//			if (game == null) return;
-//			if (!game.ended)
-//			{
-//				message.getChannel().sendMessage("Game hasn't ended yet. If you no longer want to play, leave the server.").queue();
-//				return;
-//			}
-//			games.remove(message.getGuild().getIdLong());
-//			game.deleteServer();
-//		}
-//		else if (lowerCaseMessage.contentEquals(prefix + "transfer") || lowerCaseMessage.contentEquals("!transfer"))
-//		{
-//			DiscordGame game = games.get(message.getGuild().getIdLong());
-//			if (game == null) return;
-//			if (!game.ended)
-//			{
-//				message.getChannel().sendMessage("Game hasn't ended yet. If you no longer want to play, leave the server.").queue();
-//				return;
-//			}
-//			game.transferOrDelete(); // Game gets removed from games when ownership updates
-//		}
 	}
 
 	// TODO: Add multiple help tables

@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
+import net.dv8tion.jda.api.events.guild.update.GuildUpdateOwnerEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
@@ -49,6 +50,7 @@ public class DiscordGameListener extends ListenerAdapter
 	public void onGuildMemberJoin(GuildMemberJoinEvent event)
 	{
 		// TODO: Don't kick if spectators are allowed -- coming soon
+		if (event.getGuild().getIdLong() != game.getGuildId()) return;
 		boolean shouldKick = true;
 		Member member = event.getMember();
 		for (DiscordGamePerson p : game.getPlayersCache())
@@ -67,6 +69,15 @@ public class DiscordGameListener extends ListenerAdapter
 		if (shouldKick)
 			member.kick("Member was not part of the party").queue();
 	}
+
+	// Bot should leave the game once the owner has changed
+	@Override
+	public void onGuildUpdateOwner(GuildUpdateOwnerEvent event)
+	{
+		if (event.getGuild().getIdLong() != game.getGuildId()) return;
+		game.getGuild().leave().queue();
+	}
+
 
 	@Override
 	public void onMessageReceived(MessageReceivedEvent message)
