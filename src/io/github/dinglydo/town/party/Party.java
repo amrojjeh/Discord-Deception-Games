@@ -159,14 +159,14 @@ public class Party extends ListenerAdapter
 			processMessage(message.getMessage());
 	}
 
-	public void processMessage(Message message)
+	public boolean processMessage(Message message)
 	{
-		processMessage(getPrefix(), message);
+		return processMessage(getPrefix(), message);
 	}
 
-	public void processMessage(String prefix, Message message)
+	public boolean processMessage(String prefix, Message message)
 	{
-		commands.executeCommand(this, prefix, message);
+		return commands.executeCommand(this, prefix, message);
 	}
 
 	public boolean isPartyFull()

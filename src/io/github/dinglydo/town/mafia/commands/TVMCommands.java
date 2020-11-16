@@ -172,10 +172,10 @@ public class TVMCommands extends CommandSet<DiscordGame>
 
 		String description = "";
 		String format = "%d. <@%d> ";
-		for (int x = 1; x < game.getPlayersCache().size(); ++x)
+		for (int x = 0; x < targets.size(); ++x)
 		{
-			DiscordGamePerson p = game.getPlayersCache().get(x - 1);
-			description += String.format(format, x, p.getID()) + (p.isDisconnected() ? "(d)\n" : "\n");
+			DiscordGamePerson p = targets.get(x);
+			description += String.format(format, x + 1, p.getID()) + (p.isDisconnected() ? "(d)\n" : "\n");
 		}
 		MessageEmbed embed = new EmbedBuilder().setColor(Color.GREEN).setTitle("Possible targets").setDescription(description).build();
 		user.sendMessage(embed);

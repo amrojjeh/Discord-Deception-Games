@@ -207,18 +207,6 @@ public class DiscordGame
 		.addPermissionOverride(deadPlayerRoleData, QP.readPermissions() | QP.writePermissions(), 0);
 	}
 
-
-//	public void processMessage(String prefix, Message message)
-//	{
-//		boolean fromGuild = isMessageFromGameGuild(message);
-//
-//		if (!executeCommand(this, new GlobalCommands(), prefix, message))
-//			if (!fromGuild)
-//				executeCommand(this, new PartyCommands(), prefix, message);
-//			else if (initiated)
-//				executeCommand(this, config.getGameMode().getCommands(), prefix, message);
-//	}
-
 	public void endGame()
 	{
 		ended = true;

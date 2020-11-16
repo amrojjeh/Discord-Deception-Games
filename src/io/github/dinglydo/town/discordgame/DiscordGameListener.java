@@ -3,8 +3,10 @@ package io.github.dinglydo.town.discordgame;
 import io.github.dinglydo.town.persons.DiscordGamePerson;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 public class DiscordGameListener extends ListenerAdapter
@@ -65,4 +67,24 @@ public class DiscordGameListener extends ListenerAdapter
 		if (shouldKick)
 			member.kick("Member was not part of the party").queue();
 	}
+
+	@Override
+	public void onMessageReceived(MessageReceivedEvent message)
+	{
+		if (message.getGuild().getIdLong() == game.getGuildId())
+			processMessage(message.getMessage());
+	}
+
+	public boolean processMessage(Message message)
+	{
+		if (processMessage("!", message))
+			return true;
+		else return processMessage("pg.", message);
+	}
+
+	public boolean processMessage(String prefix, Message message)
+	{
+		return game.getConfig().getGameMode().getCommands().executeCommand(game, prefix, message);
+	}
+
 }

@@ -32,7 +32,6 @@ public class Town implements Faction
 	@Override
 	public boolean canWin()
 	{
-		System.out.println(game.getCurrentPhase().getClass().getName() + " " + isFactionAlone());
 		return isFactionAlone();
 	}
 
