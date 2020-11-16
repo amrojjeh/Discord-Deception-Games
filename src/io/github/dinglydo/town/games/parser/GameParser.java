@@ -76,7 +76,7 @@ public class GameParser
 		if (role == null)
 			throw new IllegalArgumentException("Role name (" + roleName.strip() + ") not found in: **" + str + "**");
 		return new RoleBuilder(role)
-				.setDefault(str.length() - 1 == '+')
+				.setDefault(str.charAt(str.length() - 1) == '+')
 				.setMinimum(roleMax);
 	}
 
