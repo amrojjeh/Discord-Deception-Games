@@ -12,6 +12,11 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 
+/**
+ * StartupCommands represents the command required to start the party and commands usable outside of party.
+ * @author Amr Ojjeh
+ *
+ */
 public class StartupCommands extends CommandSet<MainListener>
 {
 	public StartupCommands()

@@ -2,6 +2,8 @@ package io.github.dinglydo.town.commands;
 
 import java.awt.Color;
 
+import javax.annotation.Nonnull;
+
 import io.github.dinglydo.town.DiscordGameConfig;
 import io.github.dinglydo.town.MainListener;
 import io.github.dinglydo.town.discordgame.DiscordGame;
@@ -17,8 +19,15 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 
+/**
+ * The party commands are what store data relatied to viewing and configuring game settings before launching it.
+ * @author Amr Ojjeh
+ */
 public class PartyCommands extends CommandSet<Party>
 {
+	/**
+	 * The default PartyCommands constructor.
+	 */
 	public PartyCommands()
 	{
 		addCommand(false, PartyCommands::startGame, "startgame");
@@ -30,8 +39,15 @@ public class PartyCommands extends CommandSet<Party>
 		addCommand(true, PartyCommands::setRand, "setrand");
 	}
 
-	public static void startGame(Party p, Message message)
+	/**
+	 * The command which starts the game.
+	 * @param p party
+	 * @param message message
+	 */
+	public static void startGame(@Nonnull Party p, @Nonnull Message message)
 	{
+		if (p == null || message == null)
+			throw new IllegalArgumentException("Party or message cannot be null.");
 		DiscordGameConfig c = p.getConfig();
 
 		if (p.getPlayersCache().isEmpty())
@@ -55,8 +71,16 @@ public class PartyCommands extends CommandSet<Party>
 		}
 	}
 
-	public static void setGame(Party party, Message message)
+	/**
+	 * The command that sets the game mode.
+	 * @param party party
+	 * @param message message
+	 */
+	public static void setGame(@Nonnull Party party, @Nonnull Message message)
 	{
+		if (party == null || message == null)
+			throw new IllegalArgumentException("Party or message cannot be null.");
+
 		if (message.getMember().getIdLong() != party.getGameLeader().getID())
 		{
 			message.getChannel().sendMessage(String.format("Only party leader (<@%d>) can configure the game!", party.getGameLeader().getID())).queue();
@@ -87,8 +111,16 @@ public class PartyCommands extends CommandSet<Party>
 			message.getChannel().sendMessage(party.getConfig().setGameMode(words[1])).queue();
 	}
 
-	public static void joinGame(Party party, Message message)
+	/**
+	 * The command which joins a user into the party.
+	 * @param party party
+	 * @param message message
+	 */
+	public static void joinGame(@Nonnull Party party, @Nonnull Message message)
 	{
+		if (party == null || message == null)
+			throw new IllegalArgumentException("Party or message cannot be null.");
+
 		MessageChannel channelUsed = message.getChannel();
 		long id = message.getMember().getIdLong();
 		if (party.hasPersonJoined(message.getMember()))
@@ -115,8 +147,16 @@ public class PartyCommands extends CommandSet<Party>
 		channelUsed.sendMessage(messageToSend).queue();
 	}
 
-	public static void leave(Party party, Message userMessage)
+	/**
+	 * Command for leaving the party.
+	 * @param party party
+	 * @param userMessage message
+	 */
+	public static void leave(@Nonnull Party party, @Nonnull Message userMessage)
 	{
+		if (party == null || userMessage == null)
+			throw new IllegalArgumentException("Party or message cannot be null.");
+
 		long id = userMessage.getMember().getIdLong();
 		MessageChannel channelUsed = userMessage.getChannel();
 
@@ -142,29 +182,53 @@ public class PartyCommands extends CommandSet<Party>
 		channelUsed.sendMessage(message).queue();
 	}
 
-	public static void displayParty(Party game, Message message)
+	/**
+	 * Command to display the party.
+	 * @param party party
+	 * @param message message
+	 */
+	public static void displayParty(@Nonnull Party party, @Nonnull Message message)
 	{
+		if (party == null || message == null)
+			throw new IllegalArgumentException("Party or message cannot be null.");
+
 		MessageChannel channelUsed = message.getChannel();
 		String description = "";
 		String format = "%d. <@%d> ";
-		for (int x = 1; x <= game.getPlayersCache().size(); ++x)
+		for (int x = 1; x <= party.getPlayersCache().size(); ++x)
 		{
-			LobbyPerson p = game.getPlayersCache().get(x - 1);
+			LobbyPerson p = party.getPlayersCache().get(x - 1);
 			description += String.format(format, x, p.getID());
 		}
 		MessageEmbed embed = new EmbedBuilder().setColor(Color.GREEN).setTitle("Party members").setDescription(description).build();
 		channelUsed.sendMessage(embed).queue();
 	}
 
-	public static void endParty(Party game, Message message)
+	/**
+	 * Command to end the game party.
+	 * @param party party
+	 * @param message message
+	 */
+	public static void endParty(@Nonnull Party party, @Nonnull Message message)
 	{
-		game.registerAsListener(false);
-		game.getMainListener().endParty(game);
+		if (party == null || message == null)
+			throw new IllegalArgumentException("Party or message cannot be null.");
+
+		party.registerAsListener(false);
+		party.getMainListener().endParty(party);
 		message.getChannel().sendMessage("Party ended").queue();
 	}
 
-	public static void displayConfig(Party party, Message message)
+	/**
+	 * Command to display the game configuration.
+	 * @param party party
+	 * @param message message
+	 */
+	public static void displayConfig(@Nonnull Party party, @Nonnull Message message)
 	{
+		if (party == null || message == null)
+			throw new IllegalArgumentException("Party or message cannot be null.");
+
 		String[] words = message.getContentRaw().split(" ", 2);
 
 		// Let StartupCommands::displayConfig handle it
@@ -190,28 +254,36 @@ public class PartyCommands extends CommandSet<Party>
 		message.getChannel().sendMessage(embed.build()).queue();
 	}
 
-	public static void setRand(Party game, Message message)
+	/**
+	 * Command to set the game mode to be random.
+	 * @param party party
+	 * @param message message
+	 */
+	public static void setRand(@Nonnull Party party, @Nonnull Message message)
 	{
-		if (message.getMember().getIdLong() != game.getGameLeader().getID())
+		if (party == null || message == null)
+			throw new IllegalArgumentException("Party or message cannot be null.");
+
+		if (message.getMember().getIdLong() != party.getGameLeader().getID())
 		{
-			message.getChannel().sendMessage(String.format("Only party leader (<@%d>) can configure the game!", game.getGameLeader().getID())).queue();
+			message.getChannel().sendMessage(String.format("Only party leader (<@%d>) can configure the game!", party.getGameLeader().getID())).queue();
 			return;
 		}
 
 		String words[] = message.getContentRaw().split(" ");
 		if (words.length != 2)
 		{
-			message.getChannel().sendMessage("Syntax is: `" + game.getPrefix() + "setRand [0|1]`");
+			message.getChannel().sendMessage("Syntax is: `" + party.getPrefix() + "setRand [0|1]`");
 			return;
 		}
 
 		Integer activator = JavaHelper.parseInt(words[1]);
 		if (activator == null)
 		{
-			message.getChannel().sendMessage("Syntax is: `" + game.getPrefix() + "setRand [0|1]`");
+			message.getChannel().sendMessage("Syntax is: `" + party.getPrefix() + "setRand [0|1]`");
 			return;
 		}
 
-		message.getChannel().sendMessage(game.getConfig().setRandomMode(activator == 1)).queue();
+		message.getChannel().sendMessage(party.getConfig().setRandomMode(activator == 1)).queue();
 	}
 }
