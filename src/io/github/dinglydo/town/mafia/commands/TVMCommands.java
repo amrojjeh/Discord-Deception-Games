@@ -139,7 +139,11 @@ public class TVMCommands extends CommandSet<DiscordGame>
 			return;
 		}
 
-		if (!user.isAlive()) message.getChannel().sendMessage(String.format("Can't vote if you're dead <@%d>.", user.getID())).queue();
+		if (!user.isAlive())
+		{
+			message.getChannel().sendMessage(String.format("Can't vote if you're dead <@%d>.", user.getID())).queue();
+			return;
+		}
 
 		Judgment j = (Judgment)currentPhase;
 		message.getChannel().sendMessage(j.guilty(user)).queue();
@@ -157,7 +161,11 @@ public class TVMCommands extends CommandSet<DiscordGame>
 			return;
 		}
 
-		if (!user.isAlive()) message.getChannel().sendMessage(String.format("Can't vote if you're dead <@%d>.", user.getID())).queue();
+		if (!user.isAlive())
+		{
+			message.getChannel().sendMessage(String.format("Can't vote if you're dead <@%d>.", user.getID())).queue();
+			return;
+		}
 
 		Judgment j = (Judgment)currentPhase;
 		message.getChannel().sendMessage(j.innocent(user)).queue();
