@@ -26,7 +26,7 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 public class PartyCommands extends CommandSet<Party>
 {
 	/**
-	 * The default PartyCommands constructor.
+	 * The default PartyCommands constructor
 	 */
 	public PartyCommands()
 	{

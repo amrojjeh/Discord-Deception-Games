@@ -18,6 +18,9 @@ import net.dv8tion.jda.api.entities.MessageChannel;
  */
 public class StartupCommands extends CommandSet<MainListener>
 {
+	/**
+	 * The default StartupCommands constructor
+	 */
 	public StartupCommands()
 	{
 		addCommand(true, StartupCommands::startLobby, "startparty");
@@ -25,6 +28,11 @@ public class StartupCommands extends CommandSet<MainListener>
 		addCommand(true, StartupCommands::displayConfig, "config");
 	}
 
+	/**
+	 * The command used to start a new game party
+	 * @param ml the mainlistener
+	 * @param message message
+	 */
 	public static void startLobby(MainListener ml, Message message)
 	{
 		System.out.println("Starting party");
@@ -57,7 +65,6 @@ public class StartupCommands extends CommandSet<MainListener>
 
 			ml.addGameParty(party);
 			try {
-				// TODO: Make him game leader automatically when he first joins
 				party.joinGame(message.getMember());
 			} catch (PartyIsFullException e) {
 				e.panicInDiscord(channelUsed);
@@ -65,6 +72,11 @@ public class StartupCommands extends CommandSet<MainListener>
 		}
 	}
 
+	/**
+	 * The command used to display all special games and the games in the Games folder
+	 * @param ml the MainListener
+	 * @param message message
+	 */
 	public static void displayGames(MainListener ml, Message message)
 	{
 		EmbedBuilder builder = new EmbedBuilder().setTitle("Party Games").setColor(Color.GREEN);
@@ -80,6 +92,11 @@ public class StartupCommands extends CommandSet<MainListener>
 		message.getChannel().sendMessage(builder.build()).queue();
 	}
 
+	/**
+	 * The command used to display the configuration for a game mode
+	 * @param ml MainListener
+	 * @param message message
+	 */
 	public static void displayConfig(MainListener ml, Message message)
 	{
 		String[] words = message.getContentRaw().split(" ", 2);
