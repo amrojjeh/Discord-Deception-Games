@@ -10,8 +10,6 @@ import io.github.dinglydo.town.discordgame.DiscordGame;
 import io.github.dinglydo.town.mafia.factions.Town;
 import io.github.dinglydo.town.mafia.phases.Morning;
 import io.github.dinglydo.town.mafia.phases.Night;
-import io.github.dinglydo.town.persons.AttributeValue;
-import io.github.dinglydo.town.persons.Attributes;
 import io.github.dinglydo.town.persons.DiscordGamePerson;
 import io.github.dinglydo.town.phases.Phase;
 import io.github.dinglydo.town.roles.EmptyRoleData;
@@ -28,7 +26,6 @@ import io.github.dinglydo.town.roles.RoleData;
  */
 public class Medium implements Role
 {
-	private final Attributes attr = new Attributes(AttributeValue.NONE, AttributeValue.NONE);
 	private final DiscordGame game;
 	private final ArrayList<DiscordGamePerson> players = new ArrayList<>();
 	private final Faction faction;
@@ -69,13 +66,6 @@ public class Medium implements Role
 	}
 
 	@Override
-	@Nonnull
-	public Attributes getAttributes()
-	{
-		return attr;
-	}
-
-	@Override
 	@Nullable
 	public List<DiscordGamePerson> getPossibleTargets(DiscordGamePerson user)
 	{
@@ -101,12 +91,6 @@ public class Medium implements Role
 	public RoleData getInitialRoleData()
 	{
 		return new EmptyRoleData();
-	}
-
-	@Override
-	public int getPriority()
-	{
-		return 0;
 	}
 
 	@Override

@@ -15,7 +15,6 @@ import net.dv8tion.jda.api.entities.MessageChannel;
 /**
  * StartupCommands represents the command required to start the party and commands usable outside of party.
  * @author Amr Ojjeh
- *
  */
 public class StartupCommands extends CommandSet<MainListener>
 {
@@ -60,7 +59,6 @@ public class StartupCommands extends CommandSet<MainListener>
 			try {
 				// TODO: Make him game leader automatically when he first joins
 				party.joinGame(message.getMember());
-				party.setGameLeader(party.getPerson(message.getMember()));
 			} catch (PartyIsFullException e) {
 				e.panicInDiscord(channelUsed);
 			}

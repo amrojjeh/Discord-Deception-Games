@@ -8,8 +8,6 @@ import javax.annotation.Nullable;
 
 import io.github.dinglydo.town.discordgame.DiscordGame;
 import io.github.dinglydo.town.mafia.factions.Town;
-import io.github.dinglydo.town.persons.AttributeValue;
-import io.github.dinglydo.town.persons.Attributes;
 import io.github.dinglydo.town.persons.DiscordGamePerson;
 import io.github.dinglydo.town.roles.EmptyRoleData;
 import io.github.dinglydo.town.roles.Faction;
@@ -18,7 +16,6 @@ import io.github.dinglydo.town.roles.RoleData;
 
 public class Civilian implements Role
 {
-	private final Attributes attr = new Attributes(AttributeValue.NONE, AttributeValue.NONE);
 	private final DiscordGame game;
 	private final ArrayList<DiscordGamePerson> players = new ArrayList<>();
 	private final Faction faction;
@@ -48,12 +45,6 @@ public class Civilian implements Role
 	}
 
 	@Override
-	public Attributes getAttributes()
-	{
-		return attr;
-	}
-
-	@Override
 	public RoleData getInitialRoleData()
 	{
 		return new EmptyRoleData();
@@ -78,12 +69,6 @@ public class Civilian implements Role
 	public Faction getFaction()
 	{
 		return faction;
-	}
-
-	@Override
-	public int getPriority()
-	{
-		return 0;
 	}
 
 	@Override

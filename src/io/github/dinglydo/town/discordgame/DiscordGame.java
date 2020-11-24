@@ -183,7 +183,7 @@ public class DiscordGame
 
 		RoleData deadPlayerRoleData = g.newRole().setName("Dead").setColor(Color.GRAY)
 				.setPermissionsRaw(QP.readPermissions())
-				.setHoisted(true);
+				.setHoisted(false);
 
 		RoleData defendantRoleData = g.newRole().setName("Defendant").setColor(Color.GREEN)
 				.setPermissionsRaw(QP.speakPermissions() | QP.writePermissions() | QP.readPermissions())
@@ -193,7 +193,8 @@ public class DiscordGame
 		g.newChannel(ChannelType.TEXT, "daytime_discussion")
 		.setPosition(0)
 		.addPermissionOverride(g.getPublicRole(), QP.readPermissions(), QP.writePermissions())
-		.addPermissionOverride(defendantRoleData, QP.readPermissions() | QP.writePermissions(), 0);
+		.addPermissionOverride(defendantRoleData, QP.readPermissions() | QP.writePermissions(), 0)
+		.addPermissionOverride(deadPlayerRoleData, QP.readPermissions(), QP.writePermissions());
 
 		for (DiscordGamePerson p : getPlayersCache())
 		{
@@ -321,6 +322,7 @@ public class DiscordGame
 	{
 		if (events.size() == 0) return;
 		TownEvent event = events.remove();
+		System.out.println("DiscordGame.java:325 -> " + event.getUser());
 		for (DiscordGamePerson person : getPlayersCache())
 			person.onEvent(event);
 

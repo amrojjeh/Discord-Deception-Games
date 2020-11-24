@@ -10,6 +10,7 @@ public interface TownEvent extends Comparable<TownEvent>
 	DiscordGame getGame();
 	void standard(DiscordGamePerson person);
 	@Nullable DiscordGamePerson getTarget();
+	@Nullable DiscordGamePerson getUser();
 	int getPriority();
 
 	default void postDispatch() { }

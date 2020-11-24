@@ -6,8 +6,6 @@ import java.util.List;
 import io.github.dinglydo.town.discordgame.DiscordGame;
 import io.github.dinglydo.town.events.MurderTownEvent;
 import io.github.dinglydo.town.mafia.phases.Night;
-import io.github.dinglydo.town.persons.AttributeValue;
-import io.github.dinglydo.town.persons.Attributes;
 import io.github.dinglydo.town.persons.DiscordGamePerson;
 import io.github.dinglydo.town.roles.EmptyRoleData;
 import io.github.dinglydo.town.roles.Faction;
@@ -17,7 +15,6 @@ import io.github.dinglydo.town.roles.RoleData;
 // A Serial Killer can kill a person each night.
 public class SerialKiller implements Role
 {
-	private final Attributes attr = new Attributes(AttributeValue.BASIC, AttributeValue.BASIC);
 	private final DiscordGame game;
 	private final ArrayList<DiscordGamePerson> players = new ArrayList<>();
 	private final Faction faction;
@@ -90,12 +87,6 @@ public class SerialKiller implements Role
 	}
 
 	@Override
-	public Attributes getAttributes()
-	{
-		return attr;
-	}
-
-	@Override
 	public Faction getFaction()
 	{
 		return faction;
@@ -105,12 +96,6 @@ public class SerialKiller implements Role
 	public RoleData getInitialRoleData()
 	{
 		return new EmptyRoleData();
-	}
-
-	@Override
-	public int getPriority()
-	{
-		return 5;
 	}
 
 	@Override

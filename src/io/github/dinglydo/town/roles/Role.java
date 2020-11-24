@@ -37,7 +37,10 @@ public interface Role
 		return getPlayers().size();
 	}
 
-	Attributes getAttributes();
+	default Attributes getAttributes()
+	{
+		return getRole().getAttributes();
+	}
 
 	List<DiscordGamePerson> getPossibleTargets(DiscordGamePerson user);
 
@@ -72,7 +75,10 @@ public interface Role
 
 	RoleData getInitialRoleData();
 
-	int getPriority();
+	default int getPriority()
+	{
+		return getRole().getPriority();
+	}
 
 	/**
 	 * Cancel the planned action.

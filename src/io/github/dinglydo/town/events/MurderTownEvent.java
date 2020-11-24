@@ -6,21 +6,28 @@ import io.github.dinglydo.town.roles.Role;
 
 public class MurderTownEvent implements TownEvent
 {
-	private DiscordGamePerson user;
-	private Role role;
-	private DiscordGamePerson victim;
-	private DiscordGame game;
+	private final DiscordGamePerson user;
+	private final Role role;
+	private final DiscordGamePerson victim;
+	private final DiscordGame game;
 
 	public MurderTownEvent(DiscordGame game, DiscordGamePerson m, DiscordGamePerson v)
 	{
 		this.game = game;
 		this.user = m;
 		this.victim = v;
+		this.role = user.getRole();
 	}
 
 	public Role getRole()
 	{
 		return role;
+	}
+
+	@Override
+	public DiscordGamePerson getUser()
+	{
+		return getMurderer();
 	}
 
 	public DiscordGamePerson getMurderer()
@@ -63,6 +70,9 @@ public class MurderTownEvent implements TownEvent
 		getMurderer().sendMessage("You attacked <@" + victim.getID() + ">");
 		victim.sendMessage("You were attacked");
 		if(getMurderer().getAttributes().attack.getVal() > victim.getAttributes().defense.getVal())
+		{
+			System.out.println(getMurderer().getAttributes().attack.name() + " > " + victim.getAttributes().defense.name());
 			victim.die(String.format("<@%d> was murdered by a serial killer.", getVictim().getID()));
+		}
 	}
 }

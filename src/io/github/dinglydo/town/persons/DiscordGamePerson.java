@@ -99,6 +99,11 @@ public class DiscordGamePerson
 		discordRoles.add(role);
 	}
 
+	public void removeDiscordRole(DiscordRole role)
+	{
+		discordRoles.remove(role);
+	}
+
 	public ArrayList<DiscordRole> getDiscordRoles()
 	{
 		return discordRoles;
@@ -297,6 +302,7 @@ public class DiscordGamePerson
 		mute(true);
 		if (!alive) return;
 		if (!reason.isEmpty()) causeOfDeath = reason;
+		removeDiscordRole(getGame().getDiscordRole("player"));
 		addDiscordRole(getGame().getDiscordRole("dead"));
 		addDiscordRole(getGame().getDiscordRole(getRole().getName()));
 		if (saveForMorning)
@@ -395,7 +401,7 @@ public class DiscordGamePerson
 	}
 
 	/**
-	 * Set the person's event.
+	 * Set the person's event. This does not add the event to the game's dispatch queue.
 	 * @param e The town event to be used
 	 */
 	public void setTownEvent(@Nullable TownEvent e)

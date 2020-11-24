@@ -31,12 +31,13 @@ public class PartyCommands extends CommandSet<Party>
 	public PartyCommands()
 	{
 		addCommand(false, PartyCommands::startGame, "startgame");
-		addCommand(false, PartyCommands::joinGame, "join");
+		addCommand(false, PartyCommands::joinGame, "join", "in");
 		addCommand(false, PartyCommands::leave, "leave");
 		addCommand(true, PartyCommands::setGame, "setgame");
 		addCommand(false, PartyCommands::displayParty, "party");
 		addCommand(true, PartyCommands::displayConfig, "config");
 		addCommand(true, PartyCommands::setRand, "setrand");
+		addCommand(false, PartyCommands::endParty, "endparty");
 	}
 
 	/**
@@ -51,9 +52,23 @@ public class PartyCommands extends CommandSet<Party>
 		DiscordGameConfig c = p.getConfig();
 
 		if (p.getPlayersCache().isEmpty())
+		{
 			message.getChannel().sendMessage("Not enough players to start a server!").queue();
-		else if (message.getMember().getIdLong() != p.getGameLeader().getID())
-			message.getChannel().sendMessage(String.format("Only party leader (<@%d>) can start the game!", p.getGameLeader().getID())).queue();
+			return;
+		}
+
+		LobbyPerson leader;
+
+		try {
+			leader = p.getGameLeader();
+		} catch (PartyIsEmptyException e) {
+			// This shouldn't ever be called since we check if there are players before getting leader
+			e.panicInDiscord(message.getChannel());
+			return;
+		}
+
+		if (message.getMember().getIdLong() != leader.getID())
+			message.getChannel().sendMessage(String.format("Only party leader (<@%d>) can start the game!", leader.getID())).queue();
 		else if (p.getPlayersCache().size() < c.getMin())
 			message.getChannel().sendMessage("Not enough players to play " + c.getGameMode().getName() + "! (" +
 		(c.getMin() - p.getPlayersCache().size()) + " left to play)").queue();
@@ -81,10 +96,14 @@ public class PartyCommands extends CommandSet<Party>
 		if (party == null || message == null)
 			throw new IllegalArgumentException("Party or message cannot be null.");
 
-		if (message.getMember().getIdLong() != party.getGameLeader().getID())
-		{
-			message.getChannel().sendMessage(String.format("Only party leader (<@%d>) can configure the game!", party.getGameLeader().getID())).queue();
-			return;
+		try {
+			if (message.getMember().getIdLong() != party.getGameLeader().getID())
+			{
+				message.getChannel().sendMessage(String.format("Only party leader (<@%d>) can configure the game!", party.getGameLeader().getID())).queue();
+				return;
+			}
+		} catch (PartyIsEmptyException e) {
+			e.panicInDiscord(message.getChannel());
 		}
 
 		String words[] = message.getContentRaw().split(" ", 2);
@@ -160,14 +179,6 @@ public class PartyCommands extends CommandSet<Party>
 		long id = userMessage.getMember().getIdLong();
 		MessageChannel channelUsed = userMessage.getChannel();
 
-		// TODO: Game leader should transfer
-		if (id == party.getGameLeader().getID())
-		{
-			String message = String.format("Party leader can't leave the party. `" + party.getPrefix() + "endParty` instead <@%d>", id);
-			channelUsed.sendMessage(message).queue();
-			return;
-		}
-
 		// TODO: End party if everyone leaves
 
 		try {
@@ -178,7 +189,16 @@ public class PartyCommands extends CommandSet<Party>
 			return;
 		}
 
-		String message = String.format("You've been removed from the party <@%d>", id);
+		String message;
+
+		if (party.isPartyEmpty())
+		{
+			party.endParty();
+			message = String.format("Everyone left. Ending party...");
+		}
+		else
+			message = String.format("You've been removed from the party <@%d>", id);
+
 		channelUsed.sendMessage(message).queue();
 	}
 
@@ -194,7 +214,7 @@ public class PartyCommands extends CommandSet<Party>
 
 		MessageChannel channelUsed = message.getChannel();
 		String description = "";
-		String format = "%d. <@%d> ";
+		String format = "%d. <@%d>\n";
 		for (int x = 1; x <= party.getPlayersCache().size(); ++x)
 		{
 			LobbyPerson p = party.getPlayersCache().get(x - 1);
@@ -214,8 +234,7 @@ public class PartyCommands extends CommandSet<Party>
 		if (party == null || message == null)
 			throw new IllegalArgumentException("Party or message cannot be null.");
 
-		party.registerAsListener(false);
-		party.getMainListener().endParty(party);
+		party.endParty();
 		message.getChannel().sendMessage("Party ended").queue();
 	}
 
@@ -239,7 +258,12 @@ public class PartyCommands extends CommandSet<Party>
 
 		boolean randomMode = party.getConfig().isRandom();
 		boolean noMin = party.getConfig().getMin() == 0;
-		long partyLeaderID = party.getGameLeader().getID();
+		long partyLeaderID = 0;
+		try {
+			partyLeaderID = party.getGameLeader().getID();
+		} catch (PartyIsEmptyException e) {
+			e.panicInDiscord(message.getChannel());
+		}
 
 		EmbedBuilder embed = new EmbedBuilder();
 		embed
@@ -264,10 +288,14 @@ public class PartyCommands extends CommandSet<Party>
 		if (party == null || message == null)
 			throw new IllegalArgumentException("Party or message cannot be null.");
 
-		if (message.getMember().getIdLong() != party.getGameLeader().getID())
-		{
-			message.getChannel().sendMessage(String.format("Only party leader (<@%d>) can configure the game!", party.getGameLeader().getID())).queue();
-			return;
+		try {
+			if (message.getMember().getIdLong() != party.getGameLeader().getID())
+			{
+				message.getChannel().sendMessage(String.format("Only party leader (<@%d>) can configure the game!", party.getGameLeader().getID())).queue();
+				return;
+			}
+		} catch (PartyIsEmptyException e) {
+			e.panicInDiscord(message.getChannel());
 		}
 
 		String words[] = message.getContentRaw().split(" ");

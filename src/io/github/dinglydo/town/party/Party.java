@@ -25,7 +25,6 @@ public class Party extends ListenerAdapter
 
 	DiscordGameConfig config;
 	private String prefix;
-	private LobbyPerson gameLeader;
 	private ArrayList<LobbyPerson> persons = new ArrayList<>();
 	private boolean registeredListener;
 
@@ -73,14 +72,10 @@ public class Party extends ListenerAdapter
 		return new ArrayList<>(persons);
 	}
 
-	public LobbyPerson getGameLeader()
+	public LobbyPerson getGameLeader() throws PartyIsEmptyException
 	{
-		return gameLeader;
-	}
-
-	public void setGameLeader(LobbyPerson p)
-	{
-		gameLeader = p;
+		if (getPlayersCache().isEmpty()) throw new PartyIsEmptyException(this);
+		return getPlayersCache().get(0);
 	}
 
 	@Nullable
@@ -200,13 +195,18 @@ public class Party extends ListenerAdapter
 
 	public void leaveGame(Member member) throws PartyIsEmptyException
 	{
-		if (isPartyEmpty()) throw new PartyIsEmptyException(this);
-		getPlayersCache().remove(getPerson(member));
+		leaveGame(getPerson(member));
 	}
 
 	public void leaveGame(LobbyPerson person) throws PartyIsEmptyException
 	{
 		if (isPartyEmpty()) throw new PartyIsEmptyException(this);
 		getPlayersCache().remove(person);
+	}
+
+	public void endParty()
+	{
+		registerAsListener(false);
+		getMainListener().endParty(this);
 	}
 }
