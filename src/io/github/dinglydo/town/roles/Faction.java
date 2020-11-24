@@ -28,7 +28,7 @@ public interface Faction
 
 	default void factionWin()
 	{
-		getGame().winTownFaction(this);
+		getGame().getFactionManager().winTownFaction(this);
 		getGame().sendMessageToTextChannel("daytime_discussion", "**" + getName() + " has won!**").queue();
 		getGame().endGame();
 	}

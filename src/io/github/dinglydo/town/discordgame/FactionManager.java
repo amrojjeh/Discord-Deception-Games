@@ -1,6 +1,7 @@
 package io.github.dinglydo.town.discordgame;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.function.Function;
 
 import javax.annotation.Nullable;
@@ -10,6 +11,7 @@ import io.github.dinglydo.town.roles.Faction;
 public class FactionManager
 {
 	private final ArrayList<Faction> globalFactions = new ArrayList<>();
+	private final HashSet<Faction> wonTownRoles = new HashSet<>();
 	private final DiscordGame game;
 
 	public FactionManager(DiscordGame game)
@@ -20,6 +22,20 @@ public class FactionManager
 	public DiscordGame getGame()
 	{
 		return game;
+	}
+
+	/**
+	 * Win a town faction
+	 * @param faction
+	 */
+	public void winTownFaction(Faction faction)
+	{
+		wonTownRoles.add(faction);
+	}
+
+	public boolean hasTownFactionWon(Faction faction)
+	{
+		return wonTownRoles.contains(faction);
 	}
 
 	public void addGlobalFaction(Faction faction)

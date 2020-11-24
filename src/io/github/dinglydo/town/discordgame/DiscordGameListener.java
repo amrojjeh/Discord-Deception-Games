@@ -46,7 +46,7 @@ public class DiscordGameListener extends ListenerAdapter
 			game.sendInviteToPlayers(guild);
 			game.gameGuildId = guild.getIdLong();
 			guild.getChannels(true).forEach((channel) -> game.assignChannel(channel));
-			game.assignRoles(guild);
+			game.assignRoles();
 			guild.getPublicRole().getManager().reset().queue();
 			game.sendMessageToTextChannel("daytime_discussion", "Waiting for players...").queue();
 		}

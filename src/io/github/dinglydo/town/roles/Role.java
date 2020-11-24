@@ -49,7 +49,7 @@ public interface Role
 	default boolean hasWon(@Nonnull DiscordGamePerson user)
 	{
 		if (user == null) throw new NullPointerException("User cannot be an exception");
-		return user.getGame().hasTownFactionWon(getFaction());
+		return user.getGame().getFactionManager().hasTownFactionWon(getFaction());
 	}
 
 	default boolean canWin(@Nonnull DiscordGamePerson user)
