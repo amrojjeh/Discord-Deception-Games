@@ -250,8 +250,9 @@ public class DiscordGame
 	public void transfer(@Nonnull Member member)
 	{
 		phaseManager.end();
-		registerAsListener(false);
 		getGuild().transferOwnership(member).reason("The game has ended").queue();
+		ml.endDiscordGame(this);
+		// Listener is unregistered in DiscordGameListener::onGuildUpdateOwner
 	}
 
 	@Nullable
@@ -277,6 +278,7 @@ public class DiscordGame
 		return ref;
 	}
 
+	// TODO: Index out of range when calling "!a 12"
 	public DiscordGamePerson getPersonFromReference(int ref)
 	{
 		return getPlayersCache().get(ref - 1);

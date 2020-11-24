@@ -112,6 +112,11 @@ public class MainListener extends ListenerAdapter
 		endParty(p);
 	}
 
+	public void endDiscordGame(DiscordGame dg)
+	{
+		games.remove(dg);
+	}
+
 	public void endParty(Party party)
 	{
 		party.registerAsListener(false);

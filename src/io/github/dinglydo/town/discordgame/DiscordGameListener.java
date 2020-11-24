@@ -81,9 +81,9 @@ public class DiscordGameListener extends ListenerAdapter
 	public void onGuildUpdateOwner(GuildUpdateOwnerEvent event)
 	{
 		if (event.getGuild().getIdLong() != game.getGuildId()) return;
+		game.registerAsListener(false);
 		game.getGuild().leave().queue();
 	}
-
 
 	@Override
 	public void onMessageReceived(MessageReceivedEvent message)
