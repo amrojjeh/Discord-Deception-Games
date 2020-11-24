@@ -721,7 +721,7 @@ public class DiscordGame
 
 	}
 
-	public void assignChannel(GuildChannel channel)
+	protected void assignChannel(GuildChannel channel)
 	{
 		if (!channel.getName().contentEquals("private")) channels.put(channel.getName(), channel.getIdLong());
 		else
@@ -737,8 +737,13 @@ public class DiscordGame
 			}
 	}
 
-	public void sendInviteToPlayers(Guild guild)
+	/**
+	 * Send invite to all players
+	 * @param guild
+	 */
+	protected void sendInviteToPlayers()
 	{
+		Guild guild = getGuild();
 		guild.getChannels().get(0).createInvite().queue((invite) -> getPlayersCache().forEach((person) -> person.sendDM(invite.getUrl())));
 	}
 }

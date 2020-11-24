@@ -43,8 +43,8 @@ public class DiscordGameListener extends ListenerAdapter
 		if (roleNumber == game.identifier)
 		{
 			game.serverCreated = true;
-			game.sendInviteToPlayers(guild);
 			game.gameGuildId = guild.getIdLong();
+			game.sendInviteToPlayers();
 			guild.getChannels(true).forEach((channel) -> game.assignChannel(channel));
 			game.assignRoles();
 			guild.getPublicRole().getManager().reset().queue();
