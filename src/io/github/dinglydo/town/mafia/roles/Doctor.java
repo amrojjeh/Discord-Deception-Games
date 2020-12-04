@@ -81,7 +81,6 @@ public class Doctor implements Role
 		}
 
 		user.setTownEvent(new DoctorTownEvent(user.getGame(), user, this, references.get(0)));
-		user.getGame().addEvent(user.getTownEvent());
 
 		return msg + String.format("You will heal <@%d> tonight.", references.get(0).getID());
 	}
@@ -178,7 +177,7 @@ class DoctorTownEvent implements TownEvent
 	@Override
 	public void standard(DiscordGamePerson person)
 	{
-		if (isVisitingTarget(person) && person.getTownEvent() instanceof MurderTownEvent)
+		if (person.isVisiting(getTarget()) && person.getTownEvent() instanceof MurderTownEvent)
 			visitors.add(person);
 		else if (getTarget() == person)
 		{

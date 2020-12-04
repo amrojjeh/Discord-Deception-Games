@@ -88,7 +88,7 @@ public interface Role
 	{
 		if (user == null) throw new NullPointerException("User cannot be an exception");
 		if (user.getTownEvent() == null) return "There's no action to cancel";
-		user.getGame().removeEvent(user.getTownEvent());
+		user.clearTownEvent();
 		return "Action canceled";
 	}
 

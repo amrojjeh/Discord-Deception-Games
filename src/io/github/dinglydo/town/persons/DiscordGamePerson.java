@@ -344,7 +344,7 @@ public class DiscordGamePerson
 		if (tempAttributes == null) return getRole().getAttributes();
 		AttributeValue attack = tempAttributes.attack == AttributeValue.DEFAULT ? getRole().getAttributes().attack : tempAttributes.attack;
 		AttributeValue defense = tempAttributes.defense == AttributeValue.DEFAULT ? getRole().getAttributes().defense : tempAttributes.defense;
-		return new Attributes(attack, defense);
+		return new Attributes(defense, attack);
 	}
 
 	/**
@@ -424,5 +424,15 @@ public class DiscordGamePerson
 	public void clearTownEvent()
 	{
 		setTownEvent(null);
+	}
+
+	/**
+	 * Is this user visiting the person specified?
+	 * @param person The person being visited
+	 * @return True if the person is being visited
+	 */
+	public boolean isVisiting(DiscordGamePerson person)
+	{
+		return getTownEvent() != null && getTownEvent().getTarget() == person;
 	}
 }

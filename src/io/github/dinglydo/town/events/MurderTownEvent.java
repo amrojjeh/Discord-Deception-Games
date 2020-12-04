@@ -71,7 +71,7 @@ public class MurderTownEvent implements TownEvent
 		victim.sendMessage("You were attacked");
 		if(getMurderer().getAttributes().attack.getVal() > victim.getAttributes().defense.getVal())
 		{
-			System.out.println(getMurderer().getAttributes().attack.name() + " > " + victim.getAttributes().defense.name());
+			System.out.println("MurderTownEvent.java:74 -> " + getMurderer().getAttributes().attack.name() + " > " + victim.getAttributes().defense.name());
 			victim.die(String.format("<@%d> was murdered by a serial killer.", getVictim().getID()));
 		}
 	}

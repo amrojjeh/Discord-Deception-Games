@@ -65,7 +65,6 @@ public class SerialKiller implements Role
 		}
 
 		user.setTownEvent(new MurderTownEvent(user.getGame(), user, references.get(0)));
-		user.getGame().addEvent(user.getTownEvent());
 
 		return msg + String.format("You will kill <@%d> tonight.", references.get(0).getID());
 	}

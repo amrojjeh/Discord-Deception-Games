@@ -66,7 +66,6 @@ public class Lookout implements Role
 		}
 
 		user.setTownEvent(new LookoutTownEvent(user.getGame(), user, this, references.get(0)));
-		user.getGame().addEvent(user.getTownEvent());
 
 		return msg + String.format("You will watch <@%d> tonight.", references.get(0).getID());
 	}
@@ -154,7 +153,7 @@ class LookoutTownEvent implements TownEvent
 	@Override
 	public void standard(DiscordGamePerson person)
 	{
-		if (isVisitingTarget(person))
+		if (person.isVisiting(getTarget()))
 			visitors.add(person);
 	}
 

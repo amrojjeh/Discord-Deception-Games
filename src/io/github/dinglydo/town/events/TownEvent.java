@@ -20,9 +20,4 @@ public interface TownEvent extends Comparable<TownEvent>
 	{
 		return getPriority() - e.getPriority();
 	}
-
-	default boolean isVisitingTarget(DiscordGamePerson person)
-	{
-		return person.getTownEvent() != null && person.getTownEvent().getTarget() == getTarget();
-	}
 }

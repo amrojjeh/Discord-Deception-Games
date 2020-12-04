@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
+import java.util.Queue;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -53,7 +54,6 @@ public class DiscordGame
 	// Important channels (Name : id)
 	private HashMap<String, Long> channels = new HashMap<>();
 	private DiscordRoles discordRoles = new DiscordRoles(this);
-	private PriorityQueue<TownEvent> events = new PriorityQueue<>();
 	private PhaseManager phaseManager = new PhaseManager();
 
 	private LinkedList<DiscordGamePerson> savedForMorning = new LinkedList<>();
@@ -420,36 +420,29 @@ public class DiscordGame
 	}
 
 	/**
-	 * Add an event that'll be processed on dispatch
-	 * @param event The event which will be processed on dispatch
-	 */
-	public void addEvent(TownEvent event)
-	{
-		events.add(event);
-	}
-
-	/**
-	 * Remove the event from the queue
-	 * @param event The event to be removed
-	 */
-	public void removeEvent(TownEvent event)
-	{
-		events.remove(event);
-	}
-
-	/**
-	 * Dispatch all events added
+	 * Dispatch all player events
 	 */
 	public void dispatchEvents()
 	{
+		PriorityQueue<TownEvent> events = new PriorityQueue<>();
+		for (DiscordGamePerson person : getPlayersCache())
+		{
+			if (person.getTownEvent() != null)
+				events.add(person.getTownEvent());
+		}
+
+		dispatchEvents(events);
+	}
+
+	private void dispatchEvents(Queue<TownEvent> events)
+	{
 		if (events.size() == 0) return;
 		TownEvent event = events.remove();
-		System.out.println("DiscordGame.java:325 -> " + event.getUser());
 		for (DiscordGamePerson person : getPlayersCache())
 			person.onEvent(event);
 
 		event.postDispatch();
-		dispatchEvents();
+		dispatchEvents(events);
 	}
 
 	/**
